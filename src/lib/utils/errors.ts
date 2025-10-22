@@ -35,8 +35,8 @@ export function getErrorMessage(code: AuthErrorCode | string): string {
   return errorMessages[AuthErrorCode.UNKNOWN_ERROR]
 }
 
-export function translateSupabaseError(error: any): AuthErrorCode {
-  const message = error?.message?.toLowerCase() || ''
+export function translateSupabaseError(error: unknown): AuthErrorCode {
+  const message = (error as { message?: string })?.message?.toLowerCase() || ''
   
   if (message.includes('invalid login credentials') || message.includes('invalid credentials')) {
     return AuthErrorCode.INVALID_CREDENTIALS

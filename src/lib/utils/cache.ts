@@ -8,7 +8,7 @@ interface CacheEntry<T> {
 }
 
 class ResponseCache {
-  private cache = new Map<string, CacheEntry<any>>()
+  private cache = new Map<string, CacheEntry<unknown>>()
 
   /**
    * Get cached data if it exists and hasn't expired

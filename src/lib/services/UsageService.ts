@@ -8,7 +8,6 @@ import type {
   PlanLimits,
   UsageStats,
   UserProfile,
-  DEFAULT_PLAN_LIMITS,
 } from '../types/usage'
 import { DEFAULT_PLAN_LIMITS as FALLBACK_LIMITS } from '../types/usage'
 
@@ -69,7 +68,7 @@ export class UsageService {
    */
   static calculatePeriodStart(
     billingAnchor: number,
-    timezone: string = 'UTC'
+    _timezone: string = 'UTC'
   ): Date {
     const now = new Date()
     
@@ -359,7 +358,7 @@ export class UsageService {
   static async logUsageEvent(
     userId: string,
     event: 'pack_created' | 'quota_exceeded' | 'grace_window_used',
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     try {
       // Use service role client for background jobs (no user session)
@@ -371,7 +370,7 @@ export class UsageService {
         metadata,
       })
 
-      const { data, error } = await supabase.from('events').insert({
+      const { error } = await supabase.from('events').insert({
         user_id: userId,
         event,
         props_json: metadata || {},
