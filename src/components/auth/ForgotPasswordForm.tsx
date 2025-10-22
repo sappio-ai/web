@@ -60,11 +60,11 @@ export default function ForgotPasswordForm() {
       {/* Background gradient orbs */}
       <div className="absolute left-0 top-1/4 w-[500px] h-[500px] bg-gradient-to-br from-[#a8d5d5]/[0.08] to-transparent rounded-full blur-3xl pointer-events-none" />
       <div className="absolute left-1/4 bottom-1/4 w-96 h-96 bg-gradient-to-br from-[#f5e6d3]/[0.06] to-transparent rounded-full blur-3xl pointer-events-none" />
-      
+
       {/* Content Container */}
       <div className="relative h-screen flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
-          
+
           {/* Left side - Branding & Mascot */}
           <div className="hidden lg:flex flex-col items-center justify-center space-y-2">
             <div className="relative mb-0.5">
@@ -73,8 +73,8 @@ export default function ForgotPasswordForm() {
             </div>
             <div className="text-center space-y-2 max-w-md">
               <h2 className="text-2xl font-bold text-[#EAF2FF]">Reset your password</h2>
-              <p className="text-base text-[#A9B4CA]">We'll send you a secure link</p>
-              
+              <p className="text-base text-[#A9B4CA]">We&apos;ll send you a secure link</p>
+
               {/* How it works strip */}
               <div className="pt-3 space-y-1.5 text-sm text-[#A9B4CA]">
                 <p className="font-medium text-[#EAF2FF] mb-1.5">How it works:</p>
@@ -105,7 +105,7 @@ export default function ForgotPasswordForm() {
             </div>
 
             <div className="bg-[rgba(255,255,255,0.07)] backdrop-blur-[10px] rounded-3xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)] border border-[#233047]">
-            
+
               {/* Error banner */}
               {errors.general && (
                 <div className="mb-5 p-4 bg-red-500/10 border border-red-400/20 rounded-2xl text-red-300 text-sm flex items-start gap-3">
@@ -126,13 +126,13 @@ export default function ForgotPasswordForm() {
                   </div>
                   <h1 className="text-2xl font-bold text-[#EAF2FF] mb-3">Check your email</h1>
                   <p className="text-[#A9B4CA] mb-6">
-                    If an account exists with <span className="text-[#EAF2FF] font-medium">{email}</span>, you'll receive a password reset link shortly.
+                    If an account exists with <span className="text-[#EAF2FF] font-medium">{email}</span>, you&apos;ll receive a password reset link shortly.
                   </p>
                   <p className="text-sm text-[#A9B4CA] mb-6">
                     The link will expire in 1 hour for security reasons.
                   </p>
-                  <a 
-                    href="/login" 
+                  <a
+                    href="/login"
                     className="inline-flex items-center gap-2 text-[#a8d5d5] hover:text-[#f5e6d3] font-medium transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,7 +146,7 @@ export default function ForgotPasswordForm() {
                   {/* Header */}
                   <div className="mb-3.5">
                     <h1 className="text-2xl font-bold text-[#EAF2FF] mb-1">Forgot password?</h1>
-                    <p className="text-sm text-[#A9B4CA]">No worries, we'll send you reset instructions</p>
+                    <p className="text-sm text-[#A9B4CA]">No worries, we&apos;ll send you reset instructions</p>
                   </div>
 
                   {/* Form */}
@@ -162,10 +162,10 @@ export default function ForgotPasswordForm() {
                       required
                     />
 
-                    <Button 
-                      type="submit" 
-                      size="lg" 
-                      className="w-full" 
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full"
                       loading={loading}
                       disabled={!isFormValid || loading}
                     >
@@ -183,8 +183,8 @@ export default function ForgotPasswordForm() {
 
                   {/* Back to login link */}
                   <div className="mt-5 pt-5 border-t border-[#233047] text-center">
-                    <a 
-                      href="/login" 
+                    <a
+                      href="/login"
                       className="inline-flex items-center gap-2 text-sm text-[#A9B4CA] hover:text-[#a8d5d5] transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
