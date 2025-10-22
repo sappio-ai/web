@@ -51,12 +51,12 @@ export default function PasswordResetEmail({ resetLink, appUrl }: PasswordResetE
           
           <Section style={warningBox}>
             <Text style={warningText}>
-              <strong>Security Notice:</strong> If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.
+              <strong>Security Notice:</strong> If you didn&apos;t request this password reset, you can safely ignore this email. Your password will remain unchanged.
             </Text>
           </Section>
           
           <Text style={footer}>
-            If the button doesn't work, copy and paste this link into your browser:
+            If the button doesn&apos;t work, copy and paste this link into your browser:
           </Text>
           <Text style={linkText}>
             {resetLink}

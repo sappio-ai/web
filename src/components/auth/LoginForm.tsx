@@ -180,7 +180,7 @@ export default function LoginForm() {
                                     </svg>
                                     Continue with Google
                                 </Button>
-                                <p className="text-center text-xs text-[#A9B4CA]/80 mb-5">We'll never post without your permission</p>
+                                <p className="text-center text-xs text-[#A9B4CA]/80 mb-5">We&apos;ll never post without your permission</p>
 
                                 {/* Divider - consistent weight */}
                                 <div className="relative my-5">
@@ -245,7 +245,7 @@ export default function LoginForm() {
                                 {/* Switch link */}
                                 <div className="mt-5 pt-5 border-t border-[#233047] text-center">
                                     <p className="text-sm text-[#A9B4CA]">
-                                        Don't have an account?{' '}
+                                        Don&apos;t have an account?{' '}
                                         <a href="/signup" className="text-[#a8d5d5] hover:text-[#f5e6d3] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#a8d5d5]/40 rounded">
                                             Sign up
                                         </a>

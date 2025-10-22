@@ -192,7 +192,7 @@ export default function SignupForm() {
                 </svg>
                 Continue with Google
               </Button>
-              <p className="text-center text-xs text-[#A9B4CA]/80 mb-5">We'll never post without your permission</p>
+              <p className="text-center text-xs text-[#A9B4CA]/80 mb-5">We&apos;ll never post without your permission</p>
 
               {/* Divider - consistent weight */}
               <div className="relative my-5">

@@ -42,7 +42,7 @@ export default function WelcomeEmail({ name, dashboardUrl }: WelcomeEmailProps) 
           </Text>
           
           <Text style={text}>
-            We're excited to have you on board! Sappio is your AI-powered study companion that transforms your materials into smart notes, flashcards, quizzes, and mind maps.
+            We&apos;re excited to have you on board! Sappio is your AI-powered study companion that transforms your materials into smart notes, flashcards, quizzes, and mind maps.
           </Text>
           
           <Text style={text}>
@@ -56,7 +56,7 @@ export default function WelcomeEmail({ name, dashboardUrl }: WelcomeEmailProps) 
           </Section>
           
           <Text style={footer}>
-            If you have any questions, just reply to this email. We're here to help!
+            If you have any questions, just reply to this email. We&apos;re here to help!
           </Text>
           
           <Text style={footer}>
