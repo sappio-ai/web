@@ -8,11 +8,11 @@ import { responseCache, CACHE_TTL } from '@/lib/utils/cache'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const studyPackId = params.id
+    const { id: studyPackId } = await params
 
     // Authenticate user
     const {
@@ -152,11 +152,11 @@ export async function GET(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const studyPackId = params.id
+    const { id: studyPackId } = await params
 
     // Authenticate user
     const {
