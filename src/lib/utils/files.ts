@@ -13,7 +13,9 @@ export const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB in bytes
 export const ALLOWED_MIME_TYPES = {
   pdf: ['application/pdf'],
   docx: [
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ],
+  doc: [
     'application/msword'
   ],
   image: [
@@ -27,7 +29,8 @@ export const ALLOWED_MIME_TYPES = {
 
 export const ALLOWED_EXTENSIONS = {
   pdf: ['.pdf'],
-  docx: ['.docx', '.doc'],
+  docx: ['.docx'],
+  doc: ['.doc'],
   image: ['.jpg', '.jpeg', '.png', '.webp', '.gif']
 } as const
 
@@ -42,6 +45,7 @@ export function isValidFileType(file: File): boolean {
   const allAllowedTypes: string[] = [
     ...ALLOWED_MIME_TYPES.pdf,
     ...ALLOWED_MIME_TYPES.docx,
+    ...ALLOWED_MIME_TYPES.doc,
     ...ALLOWED_MIME_TYPES.image
   ]
   
@@ -61,6 +65,7 @@ export function isValidFileSize(file: File): boolean {
 export function getMaterialKindFromFile(file: File): MaterialKind | null {
   const pdfTypes: string[] = [...ALLOWED_MIME_TYPES.pdf]
   const docxTypes: string[] = [...ALLOWED_MIME_TYPES.docx]
+  const docTypes: string[] = [...ALLOWED_MIME_TYPES.doc]
   const imageTypes: string[] = [...ALLOWED_MIME_TYPES.image]
   
   if (pdfTypes.includes(file.type)) {
@@ -69,6 +74,10 @@ export function getMaterialKindFromFile(file: File): MaterialKind | null {
   
   if (docxTypes.includes(file.type)) {
     return 'docx'
+  }
+  
+  if (docTypes.includes(file.type)) {
+    return 'doc'
   }
   
   if (imageTypes.includes(file.type)) {
@@ -88,10 +97,12 @@ export function getMaterialKindFromExtension(filename: string): MaterialKind | n
   
   const pdfExts: string[] = [...ALLOWED_EXTENSIONS.pdf]
   const docxExts: string[] = [...ALLOWED_EXTENSIONS.docx]
+  const docExts: string[] = [...ALLOWED_EXTENSIONS.doc]
   const imageExts: string[] = [...ALLOWED_EXTENSIONS.image]
   
   if (pdfExts.includes(ext)) return 'pdf'
   if (docxExts.includes(ext)) return 'docx'
+  if (docExts.includes(ext)) return 'doc'
   if (imageExts.includes(ext)) return 'image'
   
   return null
@@ -178,7 +189,7 @@ export function generateStoragePath(
  */
 export function validateFile(file: File): string | null {
   if (!isValidFileType(file)) {
-    return 'Unsupported file type. Please upload PDF, DOCX, or images (JPG, PNG, WEBP, GIF).'
+    return 'Unsupported file type. Please upload PDF, DOCX, DOC, or images (JPG, PNG, WEBP, GIF).'
   }
   
   if (!isValidFileSize(file)) {

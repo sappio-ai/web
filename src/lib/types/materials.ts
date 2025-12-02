@@ -9,7 +9,7 @@ import { Tables } from './database'
 // Material Types
 // ============================================================================
 
-export type MaterialKind = 'pdf' | 'docx' | 'image' | 'url' | 'youtube'
+export type MaterialKind = 'pdf' | 'docx' | 'doc' | 'image' | 'url' | 'youtube' | 'text'
 export type MaterialStatus = 'uploading' | 'processing' | 'chunking' | 'ready' | 'failed'
 
 export interface MaterialMetadata {

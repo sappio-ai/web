@@ -20,9 +20,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
-        className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen bg-[#0A0F1A] text-white`}
+        className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen bg-[#F8FAFB] text-[#1A1D2E]`}
       >
         <NavbarClient />
         <main className="flex-1 pt-16">

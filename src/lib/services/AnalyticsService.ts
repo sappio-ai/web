@@ -1,0 +1,149 @@
+/**
+ * AnalyticsService - Client-side service for tracking user events
+ */
+
+export interface EventProperties {
+  [key: string]: string | number | boolean | null | undefined
+}
+
+export class AnalyticsService {
+  /**
+   * Track a user event
+   */
+  static async trackEvent(
+    eventName: string,
+    properties?: EventProperties
+  ): Promise<void> {
+    try {
+      await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event: eventName,
+          props: properties || {},
+        }),
+      })
+    } catch (error) {
+      // Silently fail - don't disrupt user experience
+      console.error('Analytics tracking failed:', error)
+    }
+  }
+
+  // Mind Map Events
+  static trackMapViewed(studyPackId: string, nodeCount: number): void {
+    this.trackEvent('map_viewed', {
+      studyPackId,
+      nodeCount,
+    })
+  }
+
+  static trackMapEdited(
+    nodeId: string,
+    action: 'edit' | 're-parent' | 'delete',
+    studyPackId: string
+  ): void {
+    this.trackEvent('map_edited', {
+      nodeId,
+      action,
+      studyPackId,
+    })
+  }
+
+  // Export Events
+  static trackExportTriggered(
+    exportType: string,
+    studyPackId: string
+  ): void {
+    this.trackEvent('export_triggered', {
+      exportType,
+      studyPackId,
+    })
+  }
+
+  static trackExportCompleted(
+    exportType: string,
+    studyPackId: string,
+    duration: number
+  ): void {
+    this.trackEvent('export_completed', {
+      exportType,
+      studyPackId,
+      duration,
+    })
+  }
+
+  static trackUpgradeClicked(
+    feature: string,
+    currentPlan: string,
+    studyPackId?: string
+  ): void {
+    this.trackEvent('upgrade_clicked', {
+      feature,
+      currentPlan,
+      studyPackId: studyPackId || null,
+    })
+  }
+
+  // Dashboard Events
+  static trackPackSearched(searchQuery: string): void {
+    this.trackEvent('pack_searched', {
+      searchQuery,
+    })
+  }
+
+  static trackPackFiltered(filterType: string): void {
+    this.trackEvent('pack_filtered', {
+      filterType,
+    })
+  }
+
+  static trackPackSorted(sortType: string): void {
+    this.trackEvent('pack_sorted', {
+      sortType,
+    })
+  }
+
+  static trackQuickActionUsed(
+    actionType: string,
+    packId: string
+  ): void {
+    this.trackEvent('quick_action_used', {
+      actionType,
+      packId,
+    })
+  }
+
+  // Insights Events
+  static trackInsightsViewed(packId: string): void {
+    this.trackEvent('insights_viewed', {
+      packId,
+    })
+  }
+
+  static trackForecastViewed(packId: string): void {
+    this.trackEvent('forecast_viewed', {
+      packId,
+    })
+  }
+
+  static trackLapseCardClicked(cardId: string, packId: string): void {
+    this.trackEvent('lapse_card_clicked', {
+      cardId,
+      packId,
+    })
+  }
+
+  static trackPerformanceChartViewed(packId: string): void {
+    this.trackEvent('performance_chart_viewed', {
+      packId,
+    })
+  }
+
+  static trackSessionAnalyticsViewed(packId: string): void {
+    this.trackEvent('session_analytics_viewed', {
+      packId,
+    })
+  }
+}

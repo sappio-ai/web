@@ -21,10 +21,44 @@
 
 ## 2. Value/Plan Tiers
 
-- **Free:** 3 packs/mo, 25 cards/pack, 10-Q quizzes, mini mind-map, exports limited.
-- **Student Pro** (€7.99/mo or €24/semester): 300 packs/mo, 300 cards/pack, 30-Q quizzes, full map, Anki export, priority queue.
-- **Pro+** (€11.99/mo): Bulk upload, custom quiz blueprints, higher caps.
-- **Ambassador/edu coupons** for campuses.
+### **Free**
+- **5 packs/month**
+- **80 cards/pack**
+- **10-15 quiz questions**
+- **Mini mind map** (50 nodes)
+- **Daily due cap:** 100 cards
+- **New cards/day:** 10
+- **Exports:** PDF + CSV
+- **Processing:** Standard queue (Class C)
+
+### **Student Pro** (€7.99/mo or €24/semester) - "Unlimited Study Packs"
+- **Unlimited packs** (fair use: ~10/day soft limit)
+- **150 cards/pack**
+- **20-30 quiz questions**
+- **Full mind map** (150 nodes)
+- **Daily due cap:** 300 cards
+- **New cards/day:** 25
+- **Exports:** PDF + CSV + Anki
+- **Processing:** Standard queue (Class B), 1 pack at a time
+
+### **Pro+** (€11.99/mo) - "Priority Power User"
+- **Unlimited packs** (fair use: ~20/day soft limit)
+- **250 cards/pack**
+- **Multi-source packs** (up to 3 sources per pack)
+- **30-40 quiz questions**
+- **Large mind map** (250 nodes)
+- **Daily due cap:** 500 cards
+- **New cards/day:** 40
+- **Bulk upload** (10 files at once)
+- **Advanced quiz blueprints**
+- **Processing:** Priority queue (Class A), 3 packs concurrent
+- **"Rush" button:** 1 pack/day jumps queue
+
+### **Ambassador/Edu Coupons**
+- Campus partnerships and student discounts available
+
+### **Fair Use Policy**
+"Unlimited" means no monthly pack limit. We pace generation to maintain quality and apply reasonable per-file limits (100 pages, 50MB for Pro; 200 pages, 100MB for Pro+). Most students never hit these limits.
 
 ---
 

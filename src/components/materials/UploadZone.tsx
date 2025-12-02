@@ -80,16 +80,16 @@ export default function UploadZone({
         onDrop={handleDrop}
         onClick={handleClick}
         className={`
-          relative rounded-xl border-2 border-dashed p-12 text-center transition-all
+          relative rounded-xl border-2 border-dashed p-8 text-center transition-all
           ${isDragging 
-            ? 'border-[#a8d5d5] bg-[#a8d5d5]/10 scale-[1.02]' 
-            : 'border-white/20 bg-white/5'
+            ? 'border-[#5A5FF0] bg-[#5A5FF0]/10 scale-[1.01] shadow-lg shadow-[#5A5FF0]/20' 
+            : 'border-[#CBD5E1] bg-[#F8FAFB]'
           }
           ${disabled 
             ? 'cursor-not-allowed opacity-50' 
-            : 'cursor-pointer hover:border-[#a8d5d5]/50 hover:bg-white/10'
+            : 'cursor-pointer hover:border-[#5A5FF0]/60 hover:bg-[#5A5FF0]/5'
           }
-          ${error ? 'border-red-500/50 bg-red-500/10' : ''}
+          ${error ? 'border-[#DC2626] bg-[#FEF2F2]' : ''}
         `}
         role="button"
         tabIndex={disabled ? -1 : 0}
@@ -111,38 +111,41 @@ export default function UploadZone({
           aria-label="File input"
         />
 
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-3">
           <Orb
             pose={error ? 'error-confused' : isDragging ? 'upload-ready' : 'neutral'}
-            size="lg"
+            size="md"
           />
 
           {error ? (
-            <div className="text-red-400">
-              <p className="font-semibold">Upload Error</p>
-              <p className="text-sm">{error}</p>
+            <div className="text-[#DC2626] text-center">
+              <p className="font-semibold text-[15px]">Upload Error</p>
+              <p className="text-[14px] mt-1">{error}</p>
             </div>
           ) : (
             <>
-              <div className="space-y-2">
+              <div className="space-y-1.5 text-center">
                 <div className="flex items-center justify-center gap-2">
-                  <Upload className={`w-5 h-5 ${isDragging ? 'text-[#a8d5d5]' : 'text-gray-400'}`} />
-                  <p className="text-lg font-semibold text-white">
+                  <Upload className={`w-5 h-5 ${isDragging ? 'text-[#5A5FF0]' : 'text-[#64748B]'}`} />
+                  <p className="text-[16px] font-bold text-[#1A1D2E]">
                     {isDragging ? 'Drop your file here' : 'Drag & drop your file here'}
                   </p>
                 </div>
-                <p className="text-sm text-gray-400">
+                <p className="text-[14px] text-[#64748B] font-medium">
                   or click to browse
                 </p>
-              </div>
-
-              <div className="mt-2 px-4 py-2 rounded-lg bg-black/30 backdrop-blur-sm border border-white/10">
-                <p className="text-xs text-gray-300">Supported formats: PDF, DOCX, Images (JPG, PNG, WEBP, GIF)</p>
-                <p className="text-xs text-gray-300">Maximum size: 50MB</p>
               </div>
             </>
           )}
         </div>
+        
+        {!error && (
+          <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
+            <p className="text-[12px] text-[#94A3B8] text-center">
+              PDF, DOCX, Images (JPG, PNG, WEBP, GIF) • Max 50MB
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

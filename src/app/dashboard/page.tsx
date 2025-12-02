@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { BookOpen, Package, CheckCircle } from 'lucide-react'
 import DashboardClient from '@/app/dashboard/DashboardClient'
 
 export default async function DashboardPage() {
@@ -19,122 +18,102 @@ export default async function DashboardPage() {
     .eq('auth_user_id', user.id)
     .single()
 
+  // Get user's study packs with progress
+  const { data: studyPacks } = await supabase
+    .from('study_packs')
+    .select(`
+      id,
+      title,
+      summary,
+      created_at,
+      updated_at,
+      stats_json
+    `)
+    .eq('user_id', userData?.id)
+    .order('updated_at', { ascending: false })
+
+  // Get materials count
+  const { count: materialsCount } = await supabase
+    .from('materials')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userData?.id)
+
+  // Get quiz results count (using database user_id)
+  const { count: quizResultsCount } = await supabase
+    .from('quiz_results')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userData?.id)
+
+  // Get all flashcards for the user's study packs
+  const packIds = studyPacks?.map(p => p.id) || []
+  
+  let dueCount = 0
+  let masteredCount = 0
+  let packsWithDueCards = new Set<string>()
+  const dueCountByPack: Record<string, number> = {}
+
+  if (packIds.length > 0) {
+    // Get due cards count
+    const now = new Date().toISOString()
+    const { data: dueCards } = await supabase
+      .from('flashcards')
+      .select('id, study_pack_id')
+      .in('study_pack_id', packIds)
+      .or(`due_at.is.null,due_at.lte.${now}`)
+
+    dueCount = dueCards?.length || 0
+    packsWithDueCards = new Set(dueCards?.map(c => c.study_pack_id) || [])
+    
+    // Count due cards per pack
+    dueCards?.forEach(card => {
+      dueCountByPack[card.study_pack_id] = (dueCountByPack[card.study_pack_id] || 0) + 1
+    })
+
+    // Get mastered cards (interval >= 30 days indicates mastery)
+    const { count: mastered } = await supabase
+      .from('flashcards')
+      .select('*', { count: 'exact', head: true })
+      .in('study_pack_id', packIds)
+      .gte('interval_days', 30)
+
+    masteredCount = mastered || 0
+  }
+
+  // Enhance study packs with due counts
+  const studyPacksWithDue = studyPacks?.map(pack => ({
+    ...pack,
+    dueCount: dueCountByPack[pack.id] || 0
+  }))
+
+  // Get average quiz accuracy (score is already a percentage 0-100)
+  // Note: quiz_results.user_id is the database user ID, not auth_user_id
+  const { data: quizResults } = await supabase
+    .from('quiz_results')
+    .select('score')
+    .eq('user_id', userData?.id) // userData.id is the database user ID
+    .order('taken_at', { ascending: false })
+    .limit(10)
+
+  const avgAccuracy = quizResults && quizResults.length > 0
+    ? Math.round(quizResults.reduce((acc, r) => acc + r.score, 0) / quizResults.length)
+    : null
+
+  const dashboardData = {
+    dueCount,
+    packsWithDueCards: packsWithDueCards.size,
+    masteredCount,
+    avgAccuracy: avgAccuracy ?? 0,
+    hasQuizResults: (quizResults?.length || 0) > 0,
+    totalPacks: studyPacks?.length || 0,
+    materialsCount: materialsCount || 0,
+    quizResultsCount: quizResultsCount || 0,
+  }
+
   return (
-    <DashboardClient userData={userData}>
-      {/* Welcome Section */}
-      <div className="mb-8 animate-in fade-in duration-1000">
-        <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-[#a8d5d5] via-white to-[#f5e6d3] bg-clip-text text-transparent">
-            Welcome back{userData?.full_name ? `, ${userData.full_name}` : ''}!
-          </span>
-        </h1>
-        <p className="text-gray-400 text-lg">
-          Ready to continue your learning journey?
-        </p>
-      </div>
-
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Quick Stats Card */}
-          <div className="relative group animate-in slide-in-from-bottom duration-700 delay-100">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#a8d5d5]/20 to-[#8bc5c5]/20 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-500" />
-            <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#a8d5d5] to-[#8bc5c5] flex items-center justify-center shadow-lg">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Study Materials</p>
-                  <p className="text-2xl font-bold text-white">0</p>
-                </div>
-              </div>
-              <p className="text-gray-500 text-sm">Upload your first material to get started</p>
-            </div>
-          </div>
-
-          {/* Study Packs Card */}
-          <div className="relative group animate-in slide-in-from-bottom duration-700 delay-200">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#f5e6d3]/20 to-[#e5d6c3]/20 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-500" />
-            <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#f5e6d3] to-[#e5d6c3] flex items-center justify-center shadow-lg">
-                  <Package className="w-6 h-6 text-[#0a0e14]" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Study Packs</p>
-                  <p className="text-2xl font-bold text-white">0</p>
-                </div>
-              </div>
-              <p className="text-gray-500 text-sm">Create your first study pack</p>
-            </div>
-          </div>
-
-          {/* Quiz Results Card */}
-          <div className="relative group animate-in slide-in-from-bottom duration-700 delay-300">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#a8d5d5]/20 to-[#f5e6d3]/20 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-500" />
-            <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#a8d5d5] to-[#8bc5c5] flex items-center justify-center shadow-lg">
-                  <CheckCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Quizzes Taken</p>
-                  <p className="text-2xl font-bold text-white">0</p>
-                </div>
-              </div>
-              <p className="text-gray-500 text-sm">Take your first quiz</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Getting Started Section */}
-        <div className="mt-12 animate-in slide-in-from-bottom duration-700 delay-400">
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#a8d5d5]/20 to-[#f5e6d3]/20 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-500" />
-            <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl">
-              <h2 className="text-2xl font-bold text-white mb-6">Getting Started</h2>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#a8d5d5]/30 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#a8d5d5] to-[#8bc5c5] flex items-center justify-center flex-shrink-0 shadow-lg">
-                    <span className="text-white font-bold">1</span>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold mb-1">Upload Study Material</h3>
-                    <p className="text-gray-400 text-sm">Upload PDFs, documents, or paste URLs to create your first study material</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#f5e6d3]/30 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#f5e6d3] to-[#e5d6c3] flex items-center justify-center flex-shrink-0 shadow-lg">
-                    <span className="text-[#0a0e14] font-bold">2</span>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold mb-1">Generate Study Pack</h3>
-                    <p className="text-gray-400 text-sm">Let AI create flashcards, quizzes, and mind maps from your materials</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#a8d5d5]/30 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#a8d5d5] to-[#8bc5c5] flex items-center justify-center flex-shrink-0 shadow-lg">
-                    <span className="text-white font-bold">3</span>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold mb-1">Start Learning</h3>
-                    <p className="text-gray-400 text-sm">Practice with flashcards, take quizzes, and track your progress</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      {/* User Info (Debug) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-8 p-4 bg-white/[0.03] rounded-xl border border-white/10 backdrop-blur-xl">
-          <p className="text-gray-400 text-sm mb-2">Debug Info:</p>
-          <p className="text-gray-500 text-xs">Email: {user.email}</p>
-          <p className="text-gray-500 text-xs">User ID: {userData?.id}</p>
-          <p className="text-gray-500 text-xs">Plan: {userData?.plan}</p>
-        </div>
-      )}
-    </DashboardClient>
+    <DashboardClient 
+      userData={userData} 
+      studyPacks={studyPacksWithDue || []}
+      dashboardData={dashboardData}
+    />
   )
 }

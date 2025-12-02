@@ -199,8 +199,6 @@ This checklist breaks down the Sappio V2 project into logical phases. Each phase
 - [ ] Node drag & drop
 - [ ] Node editing (rename, re-parent)
 - [ ] Branch expansion/collapse
-- [ ] Generate flashcards from branch
-- [ ] Generate quiz from branch
 - [ ] Layout persistence
 - [ ] Zoom and pan controls
 - [ ] Source chunk references
@@ -314,7 +312,6 @@ This checklist breaks down the Sappio V2 project into logical phases. Each phase
 - [ ] Exam coach interface
 - [ ] 10-15 high-yield question selection
 - [ ] Timer countdown
-- [ ] Quick answer input
 - [ ] Instant feedback
 - [ ] Score summary
 - [ ] Weak area recommendations
@@ -340,21 +337,33 @@ This checklist breaks down the Sappio V2 project into logical phases. Each phase
 
 **Features:**
 - [ ] Usage tracking (packs/month, cards/pack, quiz questions)
+- [ ] **Daily pacing limits**
+  - [ ] Daily due cap (100/300/500 by tier)
+  - [ ] New cards/day limit (10/25/40 by tier)
+  - [ ] Per-pack card budget (80/150/250 by tier)
+  - [ ] Soft daily pack creation limits (10/20 by tier)
 - [ ] Paywall triggers
-  - [ ] Pack creation limit
-  - [ ] Flashcard limit per pack
-  - [ ] Quiz question limit
-  - [ ] Export restrictions
-  - [ ] Full mind map access
+  - [ ] Pack creation limit (Free: 5/month)
+  - [ ] Flashcard limit per pack (80/150/250)
+  - [ ] Quiz question limit (10-15/20-30/30-40)
+  - [ ] Export restrictions (Anki for Pro+)
+  - [ ] Full mind map access (Free: 50 nodes)
+  - [ ] Multi-source packs (Pro+ only)
+  - [ ] Bulk upload (Pro+ only)
+  - [ ] Priority processing (Pro+ only)
 - [ ] Stripe integration
 - [ ] Checkout flow
 - [ ] Plan selection UI
-- [ ] Semester bundle pricing
+- [ ] Semester bundle pricing (€24 for Student Pro)
 - [ ] Upgrade prompts
 - [ ] Billing page
 - [ ] Receipt generation
 - [ ] Subscription management
 - [ ] Payment webhooks
+- [ ] Fair use enforcement
+  - [ ] File size limits (50MB/100MB by tier)
+  - [ ] Page count limits (100/200 by tier)
+  - [ ] Friendly messaging when limits approached
 
 **Orb Avatar Integration:**
 - [ ] Upgrade Orb (friendly upsell, showing premium features)

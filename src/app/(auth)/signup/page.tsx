@@ -9,7 +9,7 @@ export default async function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0A0F1A] px-4 py-12 sm:py-16">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFB] px-4 py-12 sm:py-16">
       <SignupForm />
     </div>
   )

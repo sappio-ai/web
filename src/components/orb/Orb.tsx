@@ -13,10 +13,10 @@ interface OrbProps {
 }
 
 const sizeMap = {
-  sm: 80,
-  md: 120,
-  lg: 160,
-  xl: 200,
+  sm: { mobile: 60, desktop: 80 },
+  md: { mobile: 90, desktop: 120 },
+  lg: { mobile: 120, desktop: 160 },
+  xl: { mobile: 150, desktop: 200 },
 }
 
 export default function Orb({
@@ -27,7 +27,20 @@ export default function Orb({
   message,
 }: OrbProps) {
   const poseData = orbPoses[pose]
-  const dimensions = sizeMap[size]
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  const dimensions = isMobile
+    ? sizeMap[size].mobile
+    : sizeMap[size].desktop
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {

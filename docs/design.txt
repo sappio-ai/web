@@ -1,0 +1,103 @@
+Sappio should feel like opening a neat stack of study papers on a clean desk.
+
+Everything is bright, structured, and calm. The interface feels purpose-built for documents and learning, not like a generic dashboard. The “personality” comes from one repeating cue: subtle layered sheets and a small bookmark tab that quietly signals what’s important.
+
+Overall vibe
+	•	Academic and trustworthy: crisp whites, ink-like text, clear hierarchy.
+	•	Premium and tactile: cards feel like paper sheets, not floating glass panels.
+	•	Friendly but not childish: the mascot is supportive, small, and calm. The UI stays serious.
+
+No glow, no neon gradients, no futuristic ornaments.
+
+Colors
+
+Use a cool paper base, not beige:
+	•	Background: a very light cool white (paper) with a hint of blue
+	•	Surfaces: pure white for the top “sheet”
+	•	Ink text: near-black/navy for readability
+	•	Borders: soft blue-gray lines
+	•	One brand accent: your blue (#5A5FF0 or a slightly inkier variant) reserved for focus, CTAs, links, and the bookmark tab
+
+Optional micro-accent:
+	•	A muted “highlighter” yellow only for progress or tiny highlights, never large backgrounds.
+
+The signature system: Document Stack
+
+Every important container is a paper stack:
+	•	The main card is a clean white sheet.
+	•	Behind it, 1 to 2 offset sheets appear as subtle layers.
+	•	Layers are created with borders and tiny offsets, not heavy shadows.
+
+This becomes the visual identity across the whole app:
+	•	login card
+	•	study pack cards
+	•	uploaded document tiles
+	•	flashcard decks
+	•	quiz modules
+
+Bookmark Tab (your brand mark)
+
+A tiny bookmark tab is the repeatable brand element:
+	•	Appears on the top-right edge of active cards and selected items.
+	•	Also appears on the mascot’s book.
+	•	Same size and shape everywhere, always in brand blue.
+
+It’s not decorative, it’s functional: “this is the current or saved thing.”
+
+Cards
+
+Cards must feel like paper:
+	•	White surface
+	•	1px border
+	•	12px radius
+	•	Very soft shadow only to separate from background, never dramatic
+
+Inside cards:
+	•	Clear header area
+	•	Thin divider lines
+	•	Consistent spacing rhythm
+
+Buttons
+
+Buttons feel decisive, like a clean call-to-action on a form:
+	•	Primary button is solid brand blue with white text
+	•	Secondary is white with a border
+	•	Hover states are subtle: slight darken or slight lift
+	•	Focus states are consistent across everything: a calm blue ring
+
+No gradients, no glowing outlines.
+
+Inputs
+
+Inputs feel like a worksheet:
+	•	White background
+	•	Clear border
+	•	Strong focus border in brand blue
+	•	Helpful placeholder contrast (not washed out)
+	•	Labels small and confident, not faint
+
+Typography
+
+Typography does most of the heavy lifting:
+	•	Headings are tight and confident (Inter Tight or similar)
+	•	Body is neutral and highly readable (Inter)
+	•	Clear hierarchy and spacing, like an editorial layout
+
+Layout and spacing
+
+The layout is simple and intentional:
+	•	Big whitespace around the left story column
+	•	The right card is the “top sheet”
+	•	The left column supports: mascot, headline, “how it works” as short steps
+
+Everything aligns to a clean grid and uses thin dividers instead of decoration.
+
+Mascot usage
+
+The porcelain reading mascot fits perfectly here:
+	•	Small, calm, matte
+	•	No glow
+	•	Used sparingly as a friendly anchor, not as the main brand identity
+	•	The blue bookmark on the book ties it directly into the UI system
+
+This design stands out because it looks like a real study tool built around documents, with a recognizable “stack + bookmark” language that you can repeat everywhere

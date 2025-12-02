@@ -71,12 +71,12 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-[#EAF2FF] mb-2"
+            className="block text-[13px] font-medium text-[#1A1D2E] mb-2"
           >
             {label}
           </label>
         )}
-        <div className="relative">
+        <div className="relative group">
           <input
             ref={ref}
             id={inputId}
@@ -94,14 +94,14 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUp}
             className={`
-              w-full px-4 py-4 pr-12 bg-white/[0.03] border rounded-xl text-[#EAF2FF] placeholder-[#A9B4CA]/50
-              focus:outline-none focus-visible:outline-none focus:ring-2 focus:border-[#a8d5d5]
-              transition-all duration-150 ease-out backdrop-blur-sm
+              w-full h-12 px-4 pr-12 bg-white border rounded-xl text-[#1A1D2E] placeholder-[#94A3B8]
+              focus:outline-none focus:ring-2 focus:border-[#5A5FF0]
+              transition-all duration-150
               ${hasError 
-                ? 'border-red-400/30 focus:ring-red-400/40 focus:border-red-400/50' 
-                : 'border-white/10 focus:ring-[#a8d5d5]/20 focus:border-[#a8d5d5] hover:border-white/20'
+                ? 'border-[#DC2626] focus:ring-[#DC2626]/40 focus:border-[#DC2626]' 
+                : 'border-[#94A3B8]/30 focus:ring-[#5A5FF0]/40 focus:border-[#5A5FF0]'
               }
-              disabled:opacity-50 disabled:cursor-not-allowed
+              disabled:bg-[#F1F5F9] disabled:text-[#94A3B8] disabled:cursor-not-allowed
               ${className}
             `}
             aria-invalid={hasError}
@@ -110,10 +110,13 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             }
             {...props}
           />
+          {/* Bookmark tab indicator on focus */}
+          <div className="absolute top-0 right-16 w-[12px] h-[8px] bg-[#5A5FF0] rounded-b-[2px] opacity-0 group-focus-within:opacity-100 transition-opacity duration-150 pointer-events-none" />
+          
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#A9B4CA] hover:text-[#EAF2FF] transition-colors duration-150"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#1A1D2E] transition-colors duration-150 z-10"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? (
@@ -131,7 +134,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         
         {/* Caps Lock warning */}
         {capsLockOn && isFocused && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-xs text-yellow-400">
+          <div className="mt-2 flex items-center gap-1.5 text-[12px] text-[#DC2626] font-medium">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -143,12 +146,12 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {shouldShowStrength && (
           <div className="mt-2">
             <div className="flex items-center gap-2 mb-1">
-              <div className="flex-1 h-1.5 bg-[#233047] rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
                 <div 
                   className={`h-full ${strengthConfig[strength as keyof typeof strengthConfig].color} transition-all duration-300 ${strengthConfig[strength as keyof typeof strengthConfig].width}`}
                 />
               </div>
-              <span className="text-xs text-[#A9B4CA]">
+              <span className="text-[12px] text-[#64748B] font-medium">
                 {strengthConfig[strength as keyof typeof strengthConfig].label}
               </span>
             </div>
@@ -158,7 +161,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {error && (
           <p
             id={`${inputId}-error`}
-            className="mt-1.5 text-sm text-red-400"
+            className="mt-2 text-[13px] text-[#DC2626] font-medium"
             role="alert"
           >
             {error}
@@ -167,7 +170,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {helperText && !error && (
           <p
             id={`${inputId}-helper`}
-            className="mt-1.5 text-sm text-[#A9B4CA]"
+            className="mt-2 text-[13px] text-[#64748B]"
           >
             {helperText}
           </p>

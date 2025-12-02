@@ -84,37 +84,36 @@ export default function ProcessingStatus({
   const orbPose = status ? (stageToOrbPose[status.stage] || 'processing-thinking') : 'processing-thinking'
 
   return (
-    <div className="min-h-screen bg-[#0A0F1A] relative overflow-hidden">
-      {/* Animated Background Gradients */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#a8d5d5]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#f5e6d3]/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-[#a8d5d5]/5 to-[#f5e6d3]/5 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-[#F8FAFB] relative overflow-hidden">
+      {/* Subtle paper texture */}
+      <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.4"/%3E%3C/svg%3E")'
+      }} />
 
       <div className="relative flex min-h-screen items-center justify-center p-4">
         <div className="w-full max-w-2xl animate-in fade-in duration-700">
-          {/* Glow effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#a8d5d5] via-[#8bc5c5] to-[#f5e6d3] rounded-3xl blur-2xl opacity-20" />
+          {/* Paper stack layers */}
+          <div className="absolute top-[6px] left-[6px] right-[-6px] h-full bg-white/40 rounded-xl border border-[#94A3B8]/25" />
           
           {/* Main Card */}
-          <div className="relative bg-gradient-to-br from-white/[0.12] to-white/[0.05] backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden p-12">
-            {/* Decorative gradient orbs */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#a8d5d5]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#f5e6d3]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+          <div className="relative bg-white rounded-2xl shadow-[0_8px_32px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.08)] border border-[#E2E8F0] overflow-hidden p-12">
+            {/* Bookmark Tab */}
+            <div className="absolute -top-0 right-12 w-[32px] h-[26px] bg-[#5A5FF0] rounded-b-[5px] shadow-sm">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[22px] h-[3px] bg-[#4A4FD0] rounded-t-sm" />
+            </div>
             
             <div className="relative">
               {/* Error State */}
               {error && (
                 <div className="text-center">
                   <Orb pose="error-confused" size="xl" />
-                  <h2 className="mt-6 text-3xl font-bold text-white">
+                  <h2 className="mt-6 text-3xl font-bold text-[#1A1D2E]">
                     Something went wrong
                   </h2>
-                  <p className="mt-3 text-gray-400">{error}</p>
+                  <p className="mt-3 text-[#64748B]">{error}</p>
                   <button
                     onClick={() => router.push('/dashboard')}
-                    className="mt-8 rounded-xl bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] px-8 py-3 font-bold text-white transition-all hover:scale-105 hover:shadow-xl hover:shadow-[#a8d5d5]/30"
+                    className="mt-8 rounded-xl bg-[#5A5FF0] hover:bg-[#4A4FD0] px-8 py-3 font-semibold text-white transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2"
                   >
                     Back to Dashboard
                   </button>
@@ -125,8 +124,8 @@ export default function ProcessingStatus({
               {!error && !status && (
                 <div className="text-center">
                   <Orb pose="processing-thinking" size="xl" animated />
-                  <p className="mt-6 text-gray-400 flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                  <p className="mt-6 text-[#64748B] flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-[#5A5FF0]" />
                     Loading...
                   </p>
                 </div>
@@ -146,24 +145,24 @@ export default function ProcessingStatus({
 
                   {/* Stage and Description */}
                   <div className="mt-8 text-center">
-                    <h2 className="text-3xl font-bold text-white">
+                    <h2 className="text-3xl font-bold text-[#1A1D2E]">
                       {status.stage}
                     </h2>
-                    <p className="mt-3 text-lg text-gray-400">{status.description}</p>
+                    <p className="mt-3 text-lg text-[#64748B]">{status.description}</p>
                   </div>
 
                   {/* Progress Bar */}
                   {!status.isComplete && status.status !== 'failed' && (
                     <div className="mt-10">
-                      <div className="flex items-center justify-between text-sm text-gray-400 mb-3">
-                        <span className="font-medium">{status.progress}%</span>
+                      <div className="flex items-center justify-between text-sm text-[#64748B] mb-3">
+                        <span className="font-semibold text-[#1A1D2E]">{status.progress}%</span>
                         {status.estimatedTimeRemaining && (
                           <span>~{status.estimatedTimeRemaining}s remaining</span>
                         )}
                       </div>
-                      <div className="h-3 w-full overflow-hidden rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                      <div className="h-3 w-full overflow-hidden rounded-full bg-[#E2E8F0] border border-[#CBD5E1]">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] transition-all duration-500 shadow-lg shadow-[#a8d5d5]/50"
+                          className="h-full rounded-full bg-gradient-to-r from-[#5A5FF0] to-[#7B7FF5] transition-all duration-500 shadow-sm"
                           style={{ width: `${status.progress}%` }}
                           role="progressbar"
                           aria-valuenow={status.progress}
@@ -189,10 +188,10 @@ export default function ProcessingStatus({
                               <div
                                 className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 transition-all duration-300 ${
                                   isComplete
-                                    ? 'border-[#a8d5d5] bg-gradient-to-br from-[#a8d5d5] to-[#8bc5c5] text-white shadow-lg shadow-[#a8d5d5]/30'
+                                    ? 'border-[#5A5FF0] bg-gradient-to-br from-[#5A5FF0] to-[#7B7FF5] text-white shadow-lg shadow-[#5A5FF0]/20'
                                     : isActive
-                                      ? 'border-[#a8d5d5] bg-white/10 text-[#a8d5d5] backdrop-blur-sm'
-                                      : 'border-white/20 bg-white/5 text-gray-500 backdrop-blur-sm'
+                                      ? 'border-[#5A5FF0] bg-[#5A5FF0]/10 text-[#5A5FF0]'
+                                      : 'border-[#E2E8F0] bg-[#F8FAFB] text-[#94A3B8]'
                                 }`}
                               >
                                 {isComplete ? (
@@ -203,7 +202,7 @@ export default function ProcessingStatus({
                               </div>
                               <span
                                 className={`text-xs font-medium transition-colors ${
-                                  isActive ? 'text-white' : 'text-gray-500'
+                                  isActive ? 'text-[#1A1D2E]' : 'text-[#94A3B8]'
                                 }`}
                               >
                                 {stage}
@@ -217,12 +216,12 @@ export default function ProcessingStatus({
 
                   {/* Error State */}
                   {status.status === 'failed' && status.error && (
-                    <div className="mt-8 rounded-xl bg-red-500/10 border border-red-500/20 p-6 backdrop-blur-sm">
+                    <div className="mt-8 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] p-6">
                       <div className="flex gap-3">
-                        <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <XCircle className="w-5 h-5 text-[#DC2626] flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-medium text-red-300">Processing Failed</p>
-                          <p className="text-sm text-red-400 mt-1">{status.error}</p>
+                          <p className="font-semibold text-[#DC2626]">Processing Failed</p>
+                          <p className="text-sm text-[#991B1B] mt-1">{status.error}</p>
                         </div>
                       </div>
                     </div>
@@ -231,9 +230,9 @@ export default function ProcessingStatus({
                   {/* Success State */}
                   {status.isComplete && (
                     <div className="mt-8 text-center">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/20 backdrop-blur-sm">
-                        <CheckCircle className="w-5 h-5 text-green-400" />
-                        <p className="text-sm text-green-300 font-medium">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ECFDF5] border border-[#6EE7B7]">
+                        <CheckCircle className="w-5 h-5 text-[#10B981]" />
+                        <p className="text-sm text-[#047857] font-semibold">
                           Redirecting to your study pack...
                         </p>
                       </div>
@@ -245,13 +244,13 @@ export default function ProcessingStatus({
                     <div className="mt-8 flex justify-center gap-4">
                       <button
                         onClick={() => router.push('/dashboard')}
-                        className="rounded-xl bg-white/10 border border-white/20 px-6 py-3 text-gray-300 hover:bg-white/20 transition-all backdrop-blur-sm"
+                        className="rounded-xl bg-[#F8FAFB] border border-[#E2E8F0] px-6 py-3 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#1A1D2E] transition-all font-semibold"
                       >
                         Back to Dashboard
                       </button>
                       <button
                         onClick={() => window.location.reload()}
-                        className="rounded-xl bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] px-6 py-3 font-bold text-white transition-all hover:scale-105 hover:shadow-xl hover:shadow-[#a8d5d5]/30"
+                        className="rounded-xl bg-[#5A5FF0] hover:bg-[#4A4FD0] px-6 py-3 font-semibold text-white transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2"
                       >
                         Try Again
                       </button>

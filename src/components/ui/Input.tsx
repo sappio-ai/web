@@ -16,35 +16,39 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-[#EAF2FF] mb-2"
+            className="block text-[13px] font-medium text-[#1A1D2E] mb-2"
           >
             {label}
           </label>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={`
-            w-full px-4 py-4 bg-white/[0.03] border rounded-xl text-[#EAF2FF] placeholder-[#A9B4CA]/50
-            focus:outline-none focus-visible:outline-none focus:ring-2 focus:border-[#a8d5d5]
-            transition-all duration-150 ease-out backdrop-blur-sm
-            ${hasError 
-              ? 'border-red-400/30 focus:ring-red-400/40 focus:border-red-400/50' 
-              : 'border-white/10 focus:ring-[#a8d5d5]/20 focus:border-[#a8d5d5] hover:border-white/20'
+        <div className="relative group">
+          <input
+            ref={ref}
+            id={inputId}
+            className={`
+              w-full h-12 px-4 bg-white border rounded-xl text-[#1A1D2E] placeholder-[#94A3B8]
+              focus:outline-none focus:ring-2 focus:border-[#5A5FF0]
+              transition-all duration-150
+              ${hasError 
+                ? 'border-[#DC2626] focus:ring-[#DC2626]/40 focus:border-[#DC2626]' 
+                : 'border-[#94A3B8]/30 focus:ring-[#5A5FF0]/40 focus:border-[#5A5FF0]'
+              }
+              disabled:bg-[#F1F5F9] disabled:text-[#94A3B8] disabled:cursor-not-allowed
+              ${className}
+            `}
+            aria-invalid={hasError}
+            aria-describedby={
+              error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
             }
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${className}
-          `}
-          aria-invalid={hasError}
-          aria-describedby={
-            error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
-          }
-          {...props}
-        />
+            {...props}
+          />
+          {/* Bookmark tab indicator on focus */}
+          <div className="absolute top-0 right-4 w-[12px] h-[8px] bg-[#5A5FF0] rounded-b-[2px] opacity-0 group-focus-within:opacity-100 transition-opacity duration-150 pointer-events-none" />
+        </div>
         {error && (
           <p
             id={`${inputId}-error`}
-            className="mt-1.5 text-sm text-red-400"
+            className="mt-2 text-[13px] text-[#DC2626] font-medium"
             role="alert"
           >
             {error}
@@ -53,7 +57,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {helperText && !error && (
           <p
             id={`${inputId}-helper`}
-            className="mt-1.5 text-sm text-[#A9B4CA]"
+            className="mt-2 text-[13px] text-[#64748B]"
           >
             {helperText}
           </p>

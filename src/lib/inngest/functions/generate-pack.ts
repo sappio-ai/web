@@ -116,8 +116,9 @@ export const generatePack = inngest.createFunction(
     // Step 4: Generate all content in parallel
     const results = await step.run('generate-content', async () => {
       try {
-        const [notes, , , ] = await Promise.all([
+        const [notes, learningData, , , ] = await Promise.all([
           GenerationService.generateSmartNotes(materialId, chunks),
+          GenerationService.generateLearningObjectivesAndTags(chunks),
           GenerationService.generateFlashcards(
             studyPackId,
             chunks,
@@ -135,7 +136,7 @@ export const generatePack = inngest.createFunction(
           ),
         ])
 
-        return { notes }
+        return { notes, learningData }
       } catch (error: any) {
         throw new GenerationError(
           MaterialErrorCode.AI_API_ERROR,
@@ -189,6 +190,8 @@ export const generatePack = inngest.createFunction(
             mindMapNodeCount: nodeCount || 0,
             chunkUtilization: Math.min(chunks.length, 20),
             notes: results.notes,
+            learningObjectives: results.learningData.learningObjectives,
+            tags: results.learningData.tags,
           },
           updated_at: new Date().toISOString(),
         })

@@ -81,14 +81,26 @@ export async function GET(
     const statusInfo =
       statusMap[material.status] || statusMap.processing
 
-    // Check if study pack exists (means generation is complete)
+    // Check if study pack exists and has content (means generation is complete)
     const { data: studyPack } = await supabase
       .from('study_packs')
-      .select('id, created_at')
+      .select('id, created_at, stats_json')
       .eq('material_id', materialId)
       .single()
 
-    const isComplete = !!studyPack
+    // Check if flashcards have been generated (indicates completion)
+    let hasContent = false
+    if (studyPack) {
+      const { count: flashcardCount } = await supabase
+        .from('flashcards')
+        .select('*', { count: 'exact', head: true })
+        .eq('study_pack_id', studyPack.id)
+      
+      // Consider complete if has flashcards OR has notes in stats_json
+      hasContent = (flashcardCount && flashcardCount > 0) || !!studyPack.stats_json?.notes
+    }
+
+    const isComplete = !!studyPack && hasContent
     const progress = isComplete ? 100 : statusInfo.progress
     const stage = isComplete ? 'Complete' : statusInfo.stage
     const description = isComplete
