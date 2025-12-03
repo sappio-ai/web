@@ -7,7 +7,7 @@ export default async function Navbar() {
   const user = await getUser()
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E2E8F0]">
+    <nav className={`fixed top-0 left-0 right-0 z-50 ${user ? 'bg-white/95' : 'bg-white'} backdrop-blur-md border-b border-[#E2E8F0]`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo - clean and academic */}
@@ -32,19 +32,19 @@ export default async function Navbar() {
             <div className="hidden md:flex items-center gap-1 ml-8">
               <Link
                 href="/dashboard"
-                className="relative px-3 py-2 text-[14px] font-semibold text-[#4A5568] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
+                className="relative px-3 py-2 text-sm font-semibold text-[#1A1D2E] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
               >
                 Study Packs
               </Link>
               <Link
                 href="/upload"
-                className="relative px-3 py-2 text-[14px] font-semibold text-[#4A5568] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
+                className="relative px-3 py-2 text-sm font-semibold text-[#1A1D2E] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
               >
                 Upload
               </Link>
               <Link
                 href="/practice"
-                className="relative px-3 py-2 text-[14px] font-semibold text-[#4A5568] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
+                className="relative px-3 py-2 text-sm font-semibold text-[#1A1D2E] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
               >
                 Practice
               </Link>

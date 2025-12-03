@@ -41,10 +41,10 @@ export default function DueLoadForecast({ packId }: DueLoadForecastProps) {
   }
 
   const getColorClass = (count: number) => {
-    if (count === 0) return 'bg-white/5 border-white/10 text-gray-500'
-    if (count <= 10) return 'bg-green-500/20 border-green-500/30 text-green-400'
-    if (count <= 30) return 'bg-orange-500/20 border-orange-500/30 text-orange-400'
-    return 'bg-red-500/20 border-red-500/30 text-red-400'
+    if (count === 0) return 'bg-[#F8FAFB] border-[#E2E8F0] text-[#94A3B8]'
+    if (count <= 10) return 'bg-[#D1FAE5] border-[#6EE7B7] text-[#065F46]'
+    if (count <= 30) return 'bg-[#FED7AA] border-[#FB923C] text-[#C2410C]'
+    return 'bg-[#FEE2E2] border-[#FCA5A5] text-[#991B1B]'
   }
 
   const getIntensity = (count: number) => {
@@ -56,15 +56,15 @@ export default function DueLoadForecast({ packId }: DueLoadForecastProps) {
 
   if (isLoading) {
     return (
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
-          <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-6" />
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+          <div className="h-6 w-48 bg-[#F1F5F9] rounded animate-pulse mb-6" />
           <div className="grid grid-cols-7 gap-3">
             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
               <div
                 key={i}
-                className="h-24 bg-white/5 rounded-lg animate-pulse"
+                className="h-24 bg-[#F1F5F9] rounded-lg animate-pulse"
                 style={{ animationDelay: `${i * 50}ms` }}
               />
             ))}
@@ -77,14 +77,14 @@ export default function DueLoadForecast({ packId }: DueLoadForecastProps) {
   const maxCount = Math.max(...forecast.map((day) => day.dueCount), 1)
 
   return (
-    <div className="relative group">
-      <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-      <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+    <div className="relative">
+      <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+      <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
         <div className="flex items-center gap-3 mb-2">
-          <Calendar className="w-6 h-6 text-[#a8d5d5]" />
-          <h3 className="text-xl font-bold text-white">Due Load Forecast</h3>
+          <Calendar className="w-6 h-6 text-[#5A5FF0]" />
+          <h3 className="text-[20px] font-bold text-[#1A1D2E]">Due Load Forecast</h3>
         </div>
-        <p className="text-gray-400 text-sm mb-6">
+        <p className="text-[#64748B] text-[14px] mb-6">
           Plan your study schedule for the next 7 days
         </p>
 
@@ -107,29 +107,29 @@ export default function DueLoadForecast({ packId }: DueLoadForecastProps) {
                   className={`relative p-4 rounded-lg border transition-all ${colorClass} ${
                     day.dueCount > 0 ? 'hover:scale-105 cursor-pointer' : ''
                   }`}
-                  style={{ opacity: day.dueCount === 0 ? 0.5 : intensity }}
+                  style={{ opacity: day.dueCount === 0 ? 0.6 : 1 }}
                 >
                   {/* Today indicator */}
                   {isToday && (
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-[#a8d5d5] rounded-full border-2 border-[#0A0F1A]" />
+                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-[#5A5FF0] rounded-full border-2 border-white shadow-sm" />
                   )}
 
                   {/* Day name */}
-                  <p className="text-xs font-bold text-center mb-2 text-white">
+                  <p className="text-[11px] font-bold text-center mb-2 uppercase tracking-wider">
                     {day.dayName}
                   </p>
 
                   {/* Date */}
-                  <p className="text-xs text-center text-gray-400 mb-3">
+                  <p className="text-[12px] text-center text-[#64748B] mb-3">
                     {new Date(day.date).getDate()}
                   </p>
 
                   {/* Count */}
                   <div className="text-center">
-                    <p className="text-2xl font-black">
+                    <p className="text-[24px] font-black">
                       {day.dueCount}
                     </p>
-                    <p className="text-xs mt-1">
+                    <p className="text-[11px] mt-1 font-medium">
                       {day.dueCount === 1 ? 'card' : 'cards'}
                     </p>
                   </div>
@@ -137,20 +137,20 @@ export default function DueLoadForecast({ packId }: DueLoadForecastProps) {
                   {/* Tooltip on hover */}
                   {day.dueCount > 0 && (
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/day:opacity-100 transition-opacity pointer-events-none z-10">
-                      <div className="bg-[#1a1f2e] border border-white/20 rounded-lg p-3 shadow-xl whitespace-nowrap">
-                        <p className="text-xs font-bold text-white mb-1">
+                      <div className="bg-[#1A1D2E] border border-[#334155] rounded-lg p-3 shadow-xl whitespace-nowrap">
+                        <p className="text-[11px] font-bold text-white mb-1">
                           {new Date(day.date).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
                             year: 'numeric',
                           })}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-[11px] text-[#94A3B8]">
                           {day.dueCount} {day.dueCount === 1 ? 'card' : 'cards'} due
                         </p>
                         {/* Arrow */}
                         <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
-                          <div className="w-2 h-2 bg-[#1a1f2e] border-r border-b border-white/20 transform rotate-45" />
+                          <div className="w-2 h-2 bg-[#1A1D2E] border-r border-b border-[#334155] transform rotate-45" />
                         </div>
                       </div>
                     </div>
@@ -162,22 +162,22 @@ export default function DueLoadForecast({ packId }: DueLoadForecastProps) {
         </div>
 
         {/* Legend */}
-        <div className="mt-6 pt-6 border-t border-white/10">
+        <div className="mt-6 pt-6 border-t border-[#E2E8F0]">
           <div className="flex items-center justify-center gap-6 flex-wrap">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500/30" />
-              <span className="text-xs text-gray-400">Light (1-10)</span>
+              <div className="w-4 h-4 rounded bg-[#D1FAE5] border border-[#6EE7B7]" />
+              <span className="text-[12px] text-[#64748B] font-medium">Light (1-10)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-orange-500/20 border border-orange-500/30" />
-              <span className="text-xs text-gray-400">Moderate (11-30)</span>
+              <div className="w-4 h-4 rounded bg-[#FED7AA] border border-[#FB923C]" />
+              <span className="text-[12px] text-[#64748B] font-medium">Moderate (11-30)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-red-500/20 border border-red-500/30" />
-              <span className="text-xs text-gray-400">Heavy (31+)</span>
+              <div className="w-4 h-4 rounded bg-[#FEE2E2] border border-[#FCA5A5]" />
+              <span className="text-[12px] text-[#64748B] font-medium">Heavy (31+)</span>
             </div>
           </div>
-          <p className="text-xs text-gray-500 text-center mt-3">
+          <p className="text-[12px] text-[#94A3B8] text-center mt-3">
             💡 Tip: Spread out your reviews to avoid heavy days
           </p>
         </div>

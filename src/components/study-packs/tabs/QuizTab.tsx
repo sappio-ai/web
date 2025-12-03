@@ -136,23 +136,23 @@ export default function QuizTab({ packId }: QuizTabProps) {
 
   if (isLoading) {
     return (
-      <div className="relative group animate-in fade-in duration-500">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative animate-in fade-in duration-500">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex items-center gap-4 mb-6">
             <Orb pose="processing-thinking" size="md" />
             <div className="flex-1">
-              <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-2" />
-              <div className="h-4 w-64 bg-white/5 rounded animate-pulse" />
+              <div className="h-6 w-48 bg-[#F1F5F9] rounded animate-pulse mb-2" />
+              <div className="h-4 w-64 bg-[#F1F5F9] rounded animate-pulse" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="h-24 bg-white/5 rounded-lg animate-pulse" />
-            <div className="h-24 bg-white/5 rounded-lg animate-pulse" />
+            <div className="h-24 bg-[#F1F5F9] rounded-lg animate-pulse" />
+            <div className="h-24 bg-[#F1F5F9] rounded-lg animate-pulse" />
           </div>
 
-          <div className="h-12 w-full bg-white/5 rounded-xl animate-pulse" />
+          <div className="h-12 w-full bg-[#F1F5F9] rounded-xl animate-pulse" />
         </div>
       </div>
     )
@@ -160,12 +160,12 @@ export default function QuizTab({ packId }: QuizTabProps) {
 
   if (error) {
     return (
-      <div className="relative group animate-in fade-in duration-500">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative animate-in fade-in duration-500">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Orb pose="error-confused" size="lg" />
-            <p className="text-red-400 mt-4">{error}</p>
+            <p className="text-[#EF4444] mt-4">{error}</p>
           </div>
         </div>
       </div>
@@ -174,12 +174,12 @@ export default function QuizTab({ packId }: QuizTabProps) {
 
   if (!quiz) {
     return (
-      <div className="relative group animate-in fade-in duration-500">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative animate-in fade-in duration-500">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Orb pose="neutral" size="lg" />
-            <p className="text-gray-400 mt-4">No quiz available</p>
+            <p className="text-[#64748B] mt-4">No quiz available</p>
           </div>
         </div>
       </div>
@@ -203,17 +203,17 @@ export default function QuizTab({ packId }: QuizTabProps) {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Quiz Overview Card */}
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
               <Orb pose="quiz-master" size="md" />
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1">
+                <h2 className="text-[24px] font-bold text-[#1A1D2E] mb-1">
                   Practice Quiz
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-[#64748B] text-[15px]">
                   Test your knowledge with {quiz.items?.length || 0} questions
                 </p>
               </div>
@@ -222,19 +222,19 @@ export default function QuizTab({ packId }: QuizTabProps) {
 
           {/* Quiz Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="bg-white/5 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-1">Total Questions</p>
-              <p className="text-white text-2xl font-bold">
+            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+              <p className="text-[#64748B] text-[13px] mb-1">Total Questions</p>
+              <p className="text-[#1A1D2E] text-[24px] font-bold">
                 {quiz.items?.length || 0}
               </p>
-              <p className="text-gray-500 text-xs mt-1">
+              <p className="text-[#94A3B8] text-[12px] mt-1">
                 Multiple choice questions
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-1">Topics Covered</p>
+            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+              <p className="text-[#64748B] text-[13px] mb-1">Topics Covered</p>
               <div className="flex items-center gap-2">
-                <p className="text-white text-2xl font-bold">
+                <p className="text-[#1A1D2E] text-[24px] font-bold">
                   {quiz.items
                     ? new Set(
                         quiz.items.map((item) => item.topic || 'General')
@@ -243,7 +243,7 @@ export default function QuizTab({ packId }: QuizTabProps) {
                 </p>
                 <button
                   onClick={() => setShowTopics(!showTopics)}
-                  className="text-[#a8d5d5] hover:text-[#8bc5c5] transition-colors"
+                  className="text-[#5A5FF0] hover:text-[#4A4FD0] transition-colors"
                   title="View topics"
                 >
                   <svg
@@ -266,15 +266,15 @@ export default function QuizTab({ packId }: QuizTabProps) {
 
           {/* Topics List (collapsible) */}
           {showTopics && quiz.items && (
-            <div className="bg-white/5 rounded-lg p-4 mb-6">
-              <h4 className="text-white font-medium mb-3">Quiz Topics:</h4>
+            <div className="bg-[#F8FAFB] rounded-lg p-4 mb-6 border border-[#E2E8F0]">
+              <h4 className="text-[#1A1D2E] font-semibold mb-3 text-[15px]">Quiz Topics:</h4>
               <div className="flex flex-wrap gap-2">
                 {Array.from(
                   new Set(quiz.items.map((item) => item.topic || 'General'))
                 ).map((topic) => (
                   <span
                     key={topic}
-                    className="px-3 py-1 bg-[#a8d5d5]/10 border border-[#a8d5d5]/30 text-[#a8d5d5] rounded-full text-sm"
+                    className="px-3 py-1 bg-[#5A5FF0]/10 border border-[#5A5FF0]/30 text-[#5A5FF0] rounded-full text-[13px] font-medium"
                   >
                     {topic}
                   </span>
@@ -287,7 +287,7 @@ export default function QuizTab({ packId }: QuizTabProps) {
           <div className="space-y-3">
             <button
               onClick={handleStartQuiz}
-              className="w-full px-8 py-4 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] text-white text-lg font-medium rounded-xl hover:shadow-lg hover:shadow-[#a8d5d5]/30 transition-all hover:scale-105"
+              className="w-full px-8 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 shadow-sm"
             >
               Take Quiz
             </button>
@@ -297,7 +297,7 @@ export default function QuizTab({ packId }: QuizTabProps) {
               <button
                 onClick={handleStartWeakTopicQuiz}
                 disabled={isLoadingWeakQuiz}
-                className="w-full px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-lg font-medium rounded-xl hover:shadow-lg hover:shadow-orange-500/30 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                className="w-full px-8 py-4 bg-[#F59E0B] hover:bg-[#D97706] text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoadingWeakQuiz ? (
                   <>

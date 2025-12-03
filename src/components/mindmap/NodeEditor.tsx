@@ -66,23 +66,23 @@ export default function NodeEditor({
       {/* Header with orb */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#a8d5d5]/20 to-[#8bc5c5]/20 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-[#a8d5d5]" />
+          <div className="w-10 h-10 rounded-lg bg-[#5A5FF0]/10 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-[#5A5FF0]" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">Edit Node</h3>
-            <p className="text-xs text-gray-500">Customize your mind map node</p>
+            <h3 className="text-[20px] font-bold text-[#1A1D2E]">Edit Node</h3>
+            <p className="text-[13px] text-[#64748B]">Customize your mind map node</p>
           </div>
         </div>
       </div>
 
-      {/* Title input with futuristic design */}
+      {/* Title input */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-300">
+          <label className="text-[14px] font-medium text-[#1A1D2E]">
             Title
           </label>
-          <span className={`text-xs font-mono ${titleLength > 90 ? 'text-orange-400' : 'text-gray-500'}`}>
+          <span className={`text-[12px] font-mono ${titleLength > 90 ? 'text-[#F59E0B]' : 'text-[#64748B]'}`}>
             {titleLength}/100
           </span>
         </div>
@@ -93,26 +93,24 @@ export default function NodeEditor({
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={handleKeyDown}
             className={`
-              w-full px-4 py-3.5 rounded-xl
-              bg-[#0d1117] border-2 transition-all duration-200
-              text-white placeholder-gray-600
-              focus:outline-none focus:ring-2 focus:ring-[#a8d5d5]/30
+              w-full px-4 py-3 rounded-lg text-[15px]
+              bg-[#F8FAFB] border-2 transition-all duration-200
+              text-[#1A1D2E] placeholder-[#94A3B8]
+              focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/20
               ${
                 !isTitleValid
-                  ? 'border-red-500/50 focus:border-red-500'
-                  : 'border-[#30363d] focus:border-[#a8d5d5]'
+                  ? 'border-[#EF4444]/50 focus:border-[#EF4444]'
+                  : 'border-[#CBD5E1] focus:border-[#5A5FF0]'
               }
             `}
             placeholder="Enter a descriptive title..."
             maxLength={100}
             autoFocus
           />
-          {/* Animated underline */}
-          <div className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] transition-all duration-300 ${isTitleValid ? 'w-full' : 'w-0'}`} />
         </div>
         {!isTitleValid && (
-          <p className="text-xs text-red-400 flex items-center gap-1.5">
-            <span className="w-1 h-1 rounded-full bg-red-400" />
+          <p className="text-[12px] text-[#EF4444] flex items-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-[#EF4444]" />
             Title must be between 3 and 100 characters
           </p>
         )}
@@ -121,11 +119,11 @@ export default function NodeEditor({
       {/* Content textarea */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-300">
+          <label className="text-[14px] font-medium text-[#1A1D2E]">
             Content
-            <span className="text-gray-500 ml-1.5">(optional)</span>
+            <span className="text-[#64748B] ml-1.5">(optional)</span>
           </label>
-          <span className={`text-xs font-mono ${contentLength > 450 ? 'text-orange-400' : 'text-gray-500'}`}>
+          <span className={`text-[12px] font-mono ${contentLength > 450 ? 'text-[#F59E0B]' : 'text-[#64748B]'}`}>
             {contentLength}/500
           </span>
         </div>
@@ -135,15 +133,15 @@ export default function NodeEditor({
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
             className={`
-              w-full px-4 py-3.5 rounded-xl
-              bg-[#0d1117] border-2 transition-all duration-200
-              text-white placeholder-gray-600
-              focus:outline-none focus:ring-2 focus:ring-[#a8d5d5]/30
+              w-full px-4 py-3 rounded-lg text-[15px]
+              bg-[#F8FAFB] border-2 transition-all duration-200
+              text-[#1A1D2E] placeholder-[#94A3B8]
+              focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/20
               resize-none
               ${
                 !isContentValid
-                  ? 'border-red-500/50 focus:border-red-500'
-                  : 'border-[#30363d] focus:border-[#a8d5d5]'
+                  ? 'border-[#EF4444]/50 focus:border-[#EF4444]'
+                  : 'border-[#CBD5E1] focus:border-[#5A5FF0]'
               }
             `}
             placeholder="Add additional details or context..."
@@ -152,8 +150,8 @@ export default function NodeEditor({
           />
         </div>
         {!isContentValid && (
-          <p className="text-xs text-red-400 flex items-center gap-1.5">
-            <span className="w-1 h-1 rounded-full bg-red-400" />
+          <p className="text-[12px] text-[#EF4444] flex items-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-[#EF4444]" />
             Content must be 500 characters or less
           </p>
         )}
@@ -161,8 +159,8 @@ export default function NodeEditor({
 
       {/* Error message */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3.5 animate-in slide-in-from-top duration-200">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="bg-[#EF4444]/5 border border-[#EF4444]/30 rounded-lg p-3.5 animate-in slide-in-from-top duration-200">
+          <p className="text-[14px] text-[#EF4444]">{error}</p>
         </div>
       )}
 
@@ -171,7 +169,7 @@ export default function NodeEditor({
         <button
           onClick={handleSave}
           disabled={isSaving || !isTitleValid || !isContentValid}
-          className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium transition-all duration-200 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] text-white hover:shadow-lg hover:shadow-[#a8d5d5]/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-[15px] transition-all duration-200 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Save className="w-4 h-4" />
           {isSaving ? 'Saving...' : 'Save Changes'}
@@ -179,23 +177,23 @@ export default function NodeEditor({
         <button
           onClick={handleClose}
           disabled={isSaving}
-          className="px-6 py-3.5 rounded-xl font-medium transition-all duration-200 bg-[#21262d] border border-[#30363d] text-gray-400 hover:text-white hover:border-[#a8d5d5]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 rounded-lg font-semibold text-[15px] transition-all duration-200 bg-white border border-[#CBD5E1] text-[#1A1D2E] hover:bg-[#F1F5F9] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
       </div>
 
       {/* Keyboard shortcuts hint */}
-      <div className="flex items-center justify-center gap-4 pt-2 text-xs text-gray-600">
+      <div className="flex items-center justify-center gap-4 pt-2 text-[12px] text-[#94A3B8]">
         <span className="flex items-center gap-1.5">
-          <kbd className="px-2 py-1 rounded bg-[#21262d] border border-[#30363d] font-mono">Ctrl</kbd>
+          <kbd className="px-2 py-1 rounded bg-[#F8FAFB] border border-[#CBD5E1] font-mono text-[11px]">Ctrl</kbd>
           <span>+</span>
-          <kbd className="px-2 py-1 rounded bg-[#21262d] border border-[#30363d] font-mono">Enter</kbd>
+          <kbd className="px-2 py-1 rounded bg-[#F8FAFB] border border-[#CBD5E1] font-mono text-[11px]">Enter</kbd>
           <span>to save</span>
         </span>
-        <span className="w-px h-3 bg-[#30363d]" />
+        <span className="w-px h-3 bg-[#E2E8F0]" />
         <span className="flex items-center gap-1.5">
-          <kbd className="px-2 py-1 rounded bg-[#21262d] border border-[#30363d] font-mono">Esc</kbd>
+          <kbd className="px-2 py-1 rounded bg-[#F8FAFB] border border-[#CBD5E1] font-mono text-[11px]">Esc</kbd>
           <span>to cancel</span>
         </span>
       </div>
@@ -210,26 +208,26 @@ export default function NodeEditor({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
           onClick={handleClose}
         >
           <motion.div
-            initial={{ scale: 0.9, y: 20, opacity: 0 }}
+            initial={{ scale: 0.95, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 10, opacity: 0 }}
-            transition={{ type: 'spring', duration: 0.4, bounce: 0.3 }}
+            transition={{ type: 'spring', duration: 0.3, bounce: 0.2 }}
             className="relative w-full max-w-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Glow effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#a8d5d5]/20 via-[#8bc5c5]/20 to-[#a8d5d5]/20 rounded-2xl blur-xl" />
+            {/* Paper stack effect */}
+            <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
             
             {/* Main modal */}
-            <div className="relative bg-gradient-to-br from-[#161b22] to-[#0d1117] rounded-2xl border-2 border-[#30363d] shadow-2xl p-8">
+            <div className="relative bg-white rounded-xl border border-[#E2E8F0] shadow-[0_8px_32px_rgba(15,23,42,0.12)] p-8">
               {/* Close button */}
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center bg-[#21262d] border border-[#30363d] text-gray-500 hover:text-white hover:border-[#a8d5d5]/50 transition-all duration-200"
+                className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center bg-[#F8FAFB] border border-[#CBD5E1] text-[#64748B] hover:text-[#1A1D2E] hover:border-[#5A5FF0]/50 transition-all duration-200"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -244,8 +242,8 @@ export default function NodeEditor({
 
   return (
     <div className="relative">
-      <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50" />
-      <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
+      <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+      <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
         {editorContent}
       </div>
     </div>

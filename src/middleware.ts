@@ -5,10 +5,13 @@ export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
 
   // Define protected routes that require authentication
-  const protectedRoutes = ['/dashboard', '/profile', '/settings']
+  const protectedRoutes = ['/dashboard', '/profile', '/settings', '/study-packs', '/review', '/practice', '/upload']
   
   // Define auth routes that should redirect to dashboard if already logged in
   const authRoutes = ['/login', '/signup']
+  
+  // Define marketing routes that should redirect to dashboard if already logged in
+  const marketingRoutes = ['/waitlist']
   
   const { pathname } = request.nextUrl
 
@@ -17,6 +20,9 @@ export async function middleware(request: NextRequest) {
   
   // Check if the current path is an auth route
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
+  
+  // Check if the current path is a marketing route
+  const isMarketingRoute = pathname === '/' || marketingRoutes.some(route => pathname.startsWith(route))
 
   // If user is not authenticated and trying to access protected route, redirect to login
   if (isProtectedRoute && !user) {
@@ -26,8 +32,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
-  // If user is authenticated and trying to access auth routes, redirect to dashboard
-  if (isAuthRoute && user) {
+  // If user is authenticated and trying to access auth or marketing routes, redirect to dashboard
+  if ((isAuthRoute || isMarketingRoute) && user) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/dashboard'
     return NextResponse.redirect(redirectUrl)

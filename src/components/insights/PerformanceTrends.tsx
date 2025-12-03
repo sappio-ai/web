@@ -43,11 +43,11 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
 
   if (isLoading) {
     return (
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
-          <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-6" />
-          <div className="h-64 bg-white/5 rounded-lg animate-pulse" />
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+          <div className="h-6 w-48 bg-[#F1F5F9] rounded animate-pulse mb-6" />
+          <div className="h-64 bg-[#F1F5F9] rounded-lg animate-pulse" />
         </div>
       </div>
     )
@@ -55,15 +55,15 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
 
   if (performance.length < 2) {
     return (
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex flex-col items-center justify-center py-12">
             <Orb pose="quiz-master" size="lg" />
-            <h3 className="text-xl font-bold text-white mt-6 mb-2">
+            <h3 className="text-[20px] font-bold text-[#1A1D2E] mt-6 mb-2">
               Take More Quizzes
             </h3>
-            <p className="text-gray-400 text-center text-sm max-w-md">
+            <p className="text-[#64748B] text-center text-[14px] max-w-md">
               Complete at least 2 quizzes to see your performance trends and
               track your improvement over time.
             </p>
@@ -116,32 +116,32 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
   const trend = lastScore > firstScore ? 'improving' : lastScore < firstScore ? 'declining' : 'stable'
 
   return (
-    <div className="relative group">
-      <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-      <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+    <div className="relative">
+      <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+      <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             {trend === 'improving' ? (
               <Orb pose="progress-growth" size="sm" />
             ) : (
-              <TrendingUp className="w-6 h-6 text-[#a8d5d5]" />
+              <TrendingUp className="w-6 h-6 text-[#5A5FF0]" />
             )}
-            <h3 className="text-xl font-bold text-white">Performance Trends</h3>
+            <h3 className="text-[20px] font-bold text-[#1A1D2E]">Performance Trends</h3>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-xs text-gray-400">Average Score</p>
-              <p className="text-lg font-bold text-white">{Math.round(avgScore)}%</p>
+              <p className="text-[11px] text-[#64748B] uppercase tracking-wider font-semibold">Average Score</p>
+              <p className="text-[18px] font-bold text-[#1A1D2E]">{Math.round(avgScore)}%</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-400">Trend</p>
+              <p className="text-[11px] text-[#64748B] uppercase tracking-wider font-semibold">Trend</p>
               <p
-                className={`text-lg font-bold ${
+                className={`text-[18px] font-bold ${
                   trend === 'improving'
-                    ? 'text-green-400'
+                    ? 'text-[#10B981]'
                     : trend === 'declining'
-                      ? 'text-red-400'
-                      : 'text-gray-400'
+                      ? 'text-[#DC2626]'
+                      : 'text-[#64748B]'
                 }`}
               >
                 {trend === 'improving' ? '↗' : trend === 'declining' ? '↘' : '→'}
@@ -149,7 +149,7 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
             </div>
           </div>
         </div>
-        <p className="text-gray-400 text-sm mb-6">
+        <p className="text-[#64748B] text-[14px] mb-6">
           Track your quiz performance over time
         </p>
 
@@ -163,15 +163,15 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
             <defs>
               {/* Gradient for the line */}
               <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#10b981" />
-                <stop offset="50%" stopColor="#f59e0b" />
-                <stop offset="100%" stopColor="#ef4444" />
+                <stop offset="0%" stopColor="#10B981" />
+                <stop offset="50%" stopColor="#F59E0B" />
+                <stop offset="100%" stopColor="#DC2626" />
               </linearGradient>
               {/* Gradient for the area fill */}
               <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
-                <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.1" />
-                <stop offset="100%" stopColor="#ef4444" stopOpacity="0.05" />
+                <stop offset="0%" stopColor="#10B981" stopOpacity="0.15" />
+                <stop offset="50%" stopColor="#F59E0B" stopOpacity="0.1" />
+                <stop offset="100%" stopColor="#DC2626" stopOpacity="0.05" />
               </linearGradient>
             </defs>
 
@@ -188,14 +188,14 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
                     y1={y}
                     x2={padding.left + innerWidth}
                     y2={y}
-                    stroke="rgba(255,255,255,0.1)"
+                    stroke="#E2E8F0"
                     strokeWidth="1"
                   />
                   <text
                     x={padding.left - 10}
                     y={y + 4}
                     textAnchor="end"
-                    fill="rgba(255,255,255,0.5)"
+                    fill="#64748B"
                     fontSize="12"
                   >
                     {value}%
@@ -233,13 +233,13 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
                   cx={point.x}
                   cy={point.y}
                   r={hoveredPoint === index ? 8 : 6}
-                  fill="#0A0F1A"
+                  fill="#FFFFFF"
                   stroke={
                     point.score >= 70
-                      ? '#10b981'
+                      ? '#10B981'
                       : point.score >= 50
-                        ? '#f59e0b'
-                        : '#ef4444'
+                        ? '#F59E0B'
+                        : '#DC2626'
                   }
                   strokeWidth="3"
                   initial={{ scale: 0 }}
@@ -266,7 +266,7 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
                   x={point.x}
                   y={padding.top + innerHeight + 20}
                   textAnchor="middle"
-                  fill="rgba(255,255,255,0.5)"
+                  fill="#64748B"
                   fontSize="12"
                 >
                   {new Date(point.date).toLocaleDateString('en-US', {
@@ -288,17 +288,17 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
                 transform: 'translate(-50%, calc(-100% - 16px))',
               }}
             >
-              <div className="bg-[#1a1f2e] border border-white/20 rounded-lg p-3 shadow-xl whitespace-nowrap">
-                <p className="text-xs font-bold text-white mb-1">
+              <div className="bg-[#1A1D2E] border border-[#334155] rounded-lg p-3 shadow-xl whitespace-nowrap">
+                <p className="text-[11px] font-bold text-white mb-1">
                   {new Date(points[hoveredPoint].date).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                   })}
                 </p>
-                <p className="text-sm font-bold text-[#a8d5d5] mb-1">
+                <p className="text-[14px] font-bold text-[#5A5FF0] mb-1">
                   Score: {Math.round(points[hoveredPoint].score)}%
                 </p>
-                <div className="flex items-center gap-1 text-xs text-gray-400">
+                <div className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
                   <Clock className="w-3 h-3" />
                   <span>
                     {Math.floor(points[hoveredPoint].duration / 60)}m{' '}
@@ -311,25 +311,25 @@ export default function PerformanceTrends({ packId }: PerformanceTrendsProps) {
         </div>
 
         {/* Summary */}
-        <div className="mt-6 pt-6 border-t border-white/10">
-          <div className="flex items-center justify-between text-sm">
-            <p className="text-gray-400">
-              <span className="text-white font-medium">{performance.length}</span> quiz
+        <div className="mt-6 pt-6 border-t border-[#E2E8F0]">
+          <div className="flex items-center justify-between text-[14px]">
+            <p className="text-[#64748B]">
+              <span className="text-[#1A1D2E] font-semibold">{performance.length}</span> quiz
               {performance.length === 1 ? '' : 'zes'} completed
             </p>
-            <p className="text-gray-400">
+            <p className="text-[#64748B]">
               {trend === 'improving' && (
-                <span className="text-green-400 font-medium">
+                <span className="text-[#10B981] font-semibold">
                   📈 Keep up the great work!
                 </span>
               )}
               {trend === 'declining' && (
-                <span className="text-orange-400 font-medium">
+                <span className="text-[#F59E0B] font-semibold">
                   💪 Review your weak topics
                 </span>
               )}
               {trend === 'stable' && (
-                <span className="text-gray-400 font-medium">
+                <span className="text-[#64748B] font-semibold">
                   📊 Consistent performance
                 </span>
               )}

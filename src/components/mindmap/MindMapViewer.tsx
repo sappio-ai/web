@@ -225,9 +225,9 @@ export default function MindMapViewer({
           type: 'mindmapEdge',
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: '#a8d5d5',
-            width: 18,
-            height: 18,
+            color: '#5A5FF0',
+            width: 16,
+            height: 16,
           },
         })
       }
@@ -308,30 +308,22 @@ export default function MindMapViewer({
 
   return (
     <div 
-      className="relative w-full h-[700px] rounded-2xl overflow-hidden border-2 border-[#30363d] bg-[#0d1117] shadow-2xl"
+      className="relative w-full h-[700px] rounded-xl overflow-hidden border border-[#E2E8F0] bg-[#F8FAFB] shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)]"
       role="application"
       aria-label="Interactive mind map visualization"
     >
-      {/* Animated dot matrix background */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle, #a8d5d5 1px, transparent 1px)`,
-          backgroundSize: '30px 30px',
-          backgroundPosition: '0 0, 15px 15px',
-        }} />
-        <div className="absolute inset-0 animate-pulse-slow" style={{
-          backgroundImage: `radial-gradient(circle, #8bc5c5 1px, transparent 1px)`,
-          backgroundSize: '30px 30px',
-          backgroundPosition: '15px 0, 0 15px',
-        }} />
-      </div>
+      {/* Subtle paper texture */}
+      <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.4\'/%3E%3C/svg%3E")'
+      }} />
 
-      {/* Radial gradient overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_#0d1117_100%)] pointer-events-none" />
-      
-      {/* Animated scan lines */}
-      <div className="absolute inset-0 pointer-events-none opacity-5">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#a8d5d5] to-transparent h-32 animate-scan-slow" />
+      {/* Subtle dot pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle, #5A5FF0 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+          backgroundPosition: '0 0',
+        }} />
       </div>
       
       <ReactFlow
@@ -360,63 +352,40 @@ export default function MindMapViewer({
       >
         <Controls
           showInteractive={false}
-          className="!bg-[#161b22]/95 !backdrop-blur-xl !border-2 !border-[#30363d] !rounded-xl !shadow-2xl"
+          className="!bg-white !border !border-[#E2E8F0] !rounded-lg !shadow-[0_2px_8px_rgba(15,23,42,0.06)]"
           aria-label="Mind map controls"
         >
           <button 
-            className="react-flow__controls-button !border-[#30363d] hover:!bg-[#a8d5d5]/10 !transition-all"
+            className="react-flow__controls-button !border-[#E2E8F0] hover:!bg-[#F1F5F9] !transition-all"
             aria-label="Zoom in"
             title="Zoom in (Ctrl/Cmd + Plus)"
           >
-            <ZoomIn className="w-4 h-4 text-[#a8d5d5]" />
+            <ZoomIn className="w-4 h-4 text-[#5A5FF0]" />
           </button>
           <button 
-            className="react-flow__controls-button !border-[#30363d] hover:!bg-[#a8d5d5]/10 !transition-all"
+            className="react-flow__controls-button !border-[#E2E8F0] hover:!bg-[#F1F5F9] !transition-all"
             aria-label="Zoom out"
             title="Zoom out (Ctrl/Cmd + Minus)"
           >
-            <ZoomOut className="w-4 h-4 text-[#a8d5d5]" />
+            <ZoomOut className="w-4 h-4 text-[#5A5FF0]" />
           </button>
           <button 
-            className="react-flow__controls-button !border-[#30363d] hover:!bg-[#a8d5d5]/10 !transition-all"
+            className="react-flow__controls-button !border-[#E2E8F0] hover:!bg-[#F1F5F9] !transition-all"
             aria-label="Fit view"
             title="Fit view to screen"
           >
-            <Maximize2 className="w-4 h-4 text-[#a8d5d5]" />
+            <Maximize2 className="w-4 h-4 text-[#5A5FF0]" />
           </button>
         </Controls>
         <MiniMap
-          nodeColor="#a8d5d5"
-          maskColor="rgba(13, 17, 23, 0.95)"
-          className="!bg-[#161b22]/95 !backdrop-blur-xl !border-2 !border-[#30363d] !rounded-xl !shadow-2xl"
+          nodeColor="#5A5FF0"
+          maskColor="rgba(248, 250, 251, 0.95)"
+          className="!bg-white !border !border-[#E2E8F0] !rounded-lg !shadow-[0_2px_8px_rgba(15,23,42,0.06)]"
           aria-label="Mind map minimap overview"
         />
       </ReactFlow>
 
-      <style jsx>{`
-        @keyframes pulse-slow {
-          0%, 100% {
-            opacity: 0.3;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-        @keyframes scan-slow {
-          0% {
-            transform: translateY(-100%);
-          }
-          100% {
-            transform: translateY(100vh);
-          }
-        }
-        .animate-pulse-slow {
-          animation: pulse-slow 4s ease-in-out infinite;
-        }
-        .animate-scan-slow {
-          animation: scan-slow 8s linear infinite;
-        }
-      `}</style>
+
     </div>
   )
 }

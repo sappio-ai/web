@@ -22,8 +22,8 @@ export default function TimerDisplay({ timeRemaining }: TimerDisplayProps) {
       <div
         className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
           isLowTime
-            ? 'bg-red-500/10 border-red-500/30 text-red-400'
-            : 'bg-orange-500/10 border-orange-500/30 text-orange-400'
+            ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'
+            : 'bg-[#F59E0B]/10 border-[#F59E0B]/30 text-[#F59E0B]'
         }`}
       >
         <svg
@@ -39,14 +39,14 @@ export default function TimerDisplay({ timeRemaining }: TimerDisplayProps) {
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span className="font-mono font-bold text-lg">
+        <span className="font-mono font-bold text-[16px]">
           {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </span>
       </div>
 
       {/* Low Time Warning */}
       {isLowTime && (
-        <span className="text-red-400 text-sm font-medium animate-pulse">
+        <span className="text-[#EF4444] text-[14px] font-semibold animate-pulse">
           Hurry!
         </span>
       )}

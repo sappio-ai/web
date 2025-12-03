@@ -12,12 +12,12 @@ export default function Footer() {
           <div className="col-span-1">
             <div className="flex items-center gap-3 mb-4">
               {/* Logo */}
-              <div className="relative w-11 h-11 flex items-center justify-center">
+              <div className="relative w-16 h-16 flex items-center justify-center">
                 <Image
-                  src="/logo.svg"
+                  src="/applogo.png"
                   alt="Sappio"
-                  width={44}
-                  height={44}
+                  width={64}
+                  height={64}
                   className="object-contain opacity-90"
                 />
               </div>

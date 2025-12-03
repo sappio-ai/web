@@ -108,14 +108,14 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
     return (
       <div className="space-y-6 animate-in fade-in duration-500">
         {/* Header Skeleton */}
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50" />
-          <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+        <div className="relative">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+          <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
             <div className="flex items-center gap-4 mb-6">
               <Orb pose="processing-thinking" size="md" />
               <div className="flex-1">
-                <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-2" />
-                <div className="h-4 w-64 bg-white/5 rounded animate-pulse" />
+                <div className="h-6 w-48 bg-[#F1F5F9] rounded animate-pulse mb-2" />
+                <div className="h-4 w-64 bg-[#F1F5F9] rounded animate-pulse" />
               </div>
             </div>
 
@@ -123,7 +123,7 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-20 bg-white/5 rounded-lg animate-pulse"
+                  className="h-20 bg-[#F1F5F9] rounded-lg animate-pulse"
                   style={{ animationDelay: `${i * 100}ms` }}
                 />
               ))}
@@ -132,16 +132,16 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
         </div>
 
         {/* Progress Chart Skeleton */}
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50" />
-          <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
-            <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-6" />
-            <div className="h-8 w-full bg-white/5 rounded-lg animate-pulse mb-4" />
+        <div className="relative">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+          <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+            <div className="h-6 w-48 bg-[#F1F5F9] rounded animate-pulse mb-6" />
+            <div className="h-8 w-full bg-[#F1F5F9] rounded-lg animate-pulse mb-4" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-20 bg-white/5 rounded-lg animate-pulse"
+                  className="h-20 bg-[#F1F5F9] rounded-lg animate-pulse"
                   style={{ animationDelay: `${i * 100}ms` }}
                 />
               ))}
@@ -150,15 +150,15 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
         </div>
 
         {/* Additional Skeleton Cards */}
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50" />
-          <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
-            <div className="h-6 w-48 bg-white/5 rounded animate-pulse mb-6" />
+        <div className="relative">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+          <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+            <div className="h-6 w-48 bg-[#F1F5F9] rounded animate-pulse mb-6" />
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-24 bg-white/5 rounded-lg animate-pulse"
+                  className="h-24 bg-[#F1F5F9] rounded-lg animate-pulse"
                   style={{ animationDelay: `${i * 100}ms` }}
                 />
               ))}
@@ -171,12 +171,12 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
 
   if (error) {
     return (
-      <div className="relative group animate-in fade-in duration-500">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative animate-in fade-in duration-500">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Orb pose="error-confused" size="lg" />
-            <p className="text-red-400 mt-4">{error}</p>
+            <p className="text-[#EF4444] font-semibold mt-4">{error}</p>
           </div>
         </div>
       </div>
@@ -186,42 +186,42 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Pack Overview Stats */}
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex items-center gap-3 mb-6">
             <Orb pose="analytics-dashboard" size="sm" />
-            <h3 className="text-xl font-bold text-white">Study Pack Stats</h3>
+            <h3 className="text-[20px] font-bold text-[#1A1D2E]">Study Pack Stats</h3>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-              <p className="text-gray-400 text-xs mb-1">Coverage</p>
-              <p className="text-white text-xl font-bold capitalize">
+            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+              <p className="text-[#64748B] text-[12px] mb-1">Coverage</p>
+              <p className="text-[#1A1D2E] text-[20px] font-bold capitalize">
                 {packStats?.coverage || 'N/A'}
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-              <p className="text-gray-400 text-xs mb-1">Flashcards</p>
-              <p className="text-white text-xl font-bold">
+            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+              <p className="text-[#64748B] text-[12px] mb-1">Flashcards</p>
+              <p className="text-[#1A1D2E] text-[20px] font-bold">
                 {packStats?.cardCount || 0}
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-              <p className="text-gray-400 text-xs mb-1">Quiz Attempts</p>
-              <p className="text-white text-xl font-bold">
+            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+              <p className="text-[#64748B] text-[12px] mb-1">Quiz Attempts</p>
+              <p className="text-[#1A1D2E] text-[20px] font-bold">
                 {quizResults.length}
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-4 border border-white/5">
-              <p className="text-gray-400 text-xs mb-1">Avg Quiz Score</p>
+            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+              <p className="text-[#64748B] text-[12px] mb-1">Avg Quiz Score</p>
               <p
-                className={`text-xl font-bold ${
+                className={`text-[20px] font-bold ${
                   overallQuizScore >= 70
-                    ? 'text-green-400'
+                    ? 'text-[#10B981]'
                     : overallQuizScore > 0
-                      ? 'text-orange-400'
-                      : 'text-gray-400'
+                      ? 'text-[#F59E0B]'
+                      : 'text-[#64748B]'
                 }`}
               >
                 {quizResults.length > 0
@@ -256,13 +256,13 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
 
       {/* Quiz Performance by Topic */}
       {quizResults.length > 0 && sortedTopics.length > 0 && (
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-          <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
-            <h3 className="text-xl font-bold text-white mb-2">
+        <div className="relative">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+          <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+            <h3 className="text-[20px] font-bold text-[#1A1D2E] mb-2">
               Quiz Performance by Topic
             </h3>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-[#64748B] text-[14px] mb-6">
               Aggregated across all {quizResults.length} quiz attempt
               {quizResults.length > 1 ? 's' : ''}
             </p>
@@ -273,40 +273,40 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
                   key={topic.topic}
                   className={`rounded-lg p-4 border transition-all ${
                     topic.isWeak
-                      ? 'bg-red-500/10 border-red-500/30 hover:bg-red-500/20'
-                      : 'bg-white/5 border-white/5 hover:bg-white/10'
+                      ? 'bg-[#FEF2F2] border-[#FCA5A5] hover:bg-[#FEE2E2]'
+                      : 'bg-[#F8FAFB] border-[#E2E8F0] hover:bg-[#F1F5F9]'
                   }`}
                 >
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-white font-medium text-sm">
+                      <span className="text-[#1A1D2E] font-semibold text-[14px]">
                         {topic.topic}
                       </span>
                       {topic.isWeak && (
-                        <span className="px-2 py-0.5 bg-orange-500/20 text-orange-400 text-xs rounded-full font-medium">
+                        <span className="px-2 py-0.5 bg-[#FED7AA] text-[#C2410C] text-[11px] rounded-full font-semibold">
                           Needs work
                         </span>
                       )}
                     </div>
                     <span
-                      className={`font-bold text-sm ${
-                        topic.isWeak ? 'text-red-400' : 'text-green-400'
+                      className={`font-bold text-[14px] ${
+                        topic.isWeak ? 'text-[#DC2626]' : 'text-[#10B981]'
                       }`}
                     >
                       {Math.round(topic.accuracy)}%
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-2">
+                  <div className="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden mb-2">
                     <div
                       className={`h-full transition-all ${
                         topic.isWeak
-                          ? 'bg-red-500'
-                          : 'bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5]'
+                          ? 'bg-[#DC2626]'
+                          : 'bg-gradient-to-r from-[#10B981] to-[#059669]'
                       }`}
                       style={{ width: `${topic.accuracy}%` }}
                     />
                   </div>
-                  <p className="text-gray-400 text-xs">
+                  <p className="text-[#64748B] text-[12px]">
                     {Math.round(topic.accuracy)}% average across{' '}
                     {quizResults.length} attempt
                     {quizResults.length > 1 ? 's' : ''}
@@ -317,10 +317,10 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
 
             {/* Tip for weak topics */}
             {sortedTopics.some((t) => t.isWeak) && (
-              <div className="mt-6 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 flex items-center gap-3">
+              <div className="mt-6 bg-[#FEF3C7] border border-[#FCD34D] rounded-lg p-4 flex items-center gap-3">
                 <Orb pose="weak-area-supportive" size="sm" />
-                <p className="text-gray-300 text-sm">
-                  <strong>Tip:</strong> Use &quot;Retest Weak Topics&quot; in the Quiz
+                <p className="text-[#78350F] text-[14px]">
+                  <strong className="font-semibold">Tip:</strong> Use &quot;Retest Weak Topics&quot; in the Quiz
                   tab to focus on areas below 70%
                 </p>
               </div>
@@ -331,15 +331,15 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
 
       {/* No Quiz Data */}
       {quizResults.length === 0 && (
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-          <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+        <div className="relative">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+          <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
             <div className="flex flex-col items-center justify-center py-12">
               <Orb pose="quiz-master" size="lg" />
-              <h3 className="text-xl font-bold text-white mt-4 mb-2">
+              <h3 className="text-[20px] font-bold text-[#1A1D2E] mt-4 mb-2">
                 No Quiz Data Yet
               </h3>
-              <p className="text-gray-400 text-center text-sm max-w-md">
+              <p className="text-[#64748B] text-center text-[14px] max-w-md">
                 Take your first quiz to see detailed performance insights and
                 topic analysis here
               </p>

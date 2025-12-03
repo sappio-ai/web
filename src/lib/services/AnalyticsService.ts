@@ -146,4 +146,19 @@ export class AnalyticsService {
       packId,
     })
   }
+
+  // Waitlist Events
+  static trackWaitlistJoined(email: string, studying?: string): void {
+    this.trackEvent('waitlist_joined', {
+      email,
+      studying: studying || null,
+    })
+  }
+
+  static trackWaitlistShared(referralCode: string, method: 'copy' | 'twitter'): void {
+    this.trackEvent('waitlist_shared', {
+      referralCode,
+      method,
+    })
+  }
 }

@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['pdf.js-extract', 'canvas'],
-  },
+  serverExternalPackages: ['pdf.js-extract', 'canvas'],
 };
 
 export default nextConfig;

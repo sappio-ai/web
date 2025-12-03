@@ -45,13 +45,13 @@ export default function PackCompletenessScore({
 
   if (isLoading) {
     return (
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
-          <div className="h-5 w-40 bg-white/5 rounded animate-pulse mb-4" />
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+          <div className="h-5 w-40 bg-[#F1F5F9] rounded animate-pulse mb-4" />
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
-            <div className="flex-1 h-3 bg-white/5 rounded animate-pulse" />
+            <div className="w-12 h-12 rounded-full bg-[#F1F5F9] animate-pulse" />
+            <div className="flex-1 h-3 bg-[#F1F5F9] rounded animate-pulse" />
           </div>
         </div>
       </div>
@@ -61,37 +61,37 @@ export default function PackCompletenessScore({
   if (!completeness) return null
 
   const items = [
-    { key: 'notes', label: 'Notes', icon: FileText, color: 'text-[#a8d5d5]' },
-    { key: 'flashcards', label: 'Flashcards', icon: BookOpen, color: 'text-blue-400' },
-    { key: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-purple-400' },
-    { key: 'mindmap', label: 'Mind Map', icon: Map, color: 'text-green-400' },
+    { key: 'notes', label: 'Notes', icon: FileText, color: 'text-[#5A5FF0]' },
+    { key: 'flashcards', label: 'Flashcards', icon: BookOpen, color: 'text-[#22C55E]' },
+    { key: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-[#F59E0B]' },
+    { key: 'mindmap', label: 'Mind Map', icon: Map, color: 'text-[#8B5CF6]' },
   ]
 
   const completedCount = Object.values(completeness.items).filter(Boolean).length
 
   return (
-    <div className="relative group">
-      <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-      <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
+    <div className="relative">
+      <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+      <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
         {/* Compact Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-white">Pack Completeness</h3>
+          <h3 className="text-[16px] font-bold text-[#1A1D2E]">Pack Completeness</h3>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">{completedCount}/4</span>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#a8d5d5]/20 to-[#8bc5c5]/20 border border-[#a8d5d5]/30 flex items-center justify-center">
-              <span className="text-lg font-black text-white">{completeness.score}%</span>
+            <span className="text-[12px] text-[#64748B] font-medium">{completedCount}/4</span>
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5A5FF0]/10 to-[#22C55E]/10 border-2 border-[#5A5FF0]/30 flex items-center justify-center">
+              <span className="text-[16px] font-black text-[#1A1D2E]">{completeness.score}%</span>
             </div>
           </div>
         </div>
 
         {/* Compact Progress Bar */}
         <div className="mb-4">
-          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${completeness.score}%` }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="h-full bg-gradient-to-r from-[#a8d5d5] via-blue-400 to-purple-400"
+              className="h-full bg-gradient-to-r from-[#5A5FF0] via-[#22C55E] to-[#F59E0B]"
             />
           </div>
         </div>
@@ -112,20 +112,20 @@ export default function PackCompletenessScore({
               >
                 <div className={`relative p-3 rounded-lg border transition-all ${
                   isComplete
-                    ? 'bg-white/[0.05] border-white/20'
-                    : 'bg-white/[0.02] border-white/10'
+                    ? 'bg-[#F8FAFB] border-[#CBD5E1]'
+                    : 'bg-[#F8FAFB]/50 border-[#E2E8F0]'
                 }`}>
                   <div className="flex flex-col items-center gap-1.5">
                     <div className="relative">
-                      <Icon className={`w-4 h-4 ${isComplete ? item.color : 'text-gray-600'}`} />
+                      <Icon className={`w-4 h-4 ${isComplete ? item.color : 'text-[#94A3B8]'}`} />
                       {isComplete && (
                         <div className="absolute -top-1 -right-1">
-                          <CheckCircle className="w-3 h-3 text-green-400 fill-green-400/20" />
+                          <CheckCircle className="w-3 h-3 text-[#10B981] fill-[#10B981]/20" />
                         </div>
                       )}
                     </div>
-                    <span className={`text-xs font-medium ${
-                      isComplete ? 'text-white' : 'text-gray-500'
+                    <span className={`text-[11px] font-semibold ${
+                      isComplete ? 'text-[#1A1D2E]' : 'text-[#94A3B8]'
                     }`}>
                       {item.label}
                     </span>

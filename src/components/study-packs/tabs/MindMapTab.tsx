@@ -76,12 +76,12 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="relative group animate-in fade-in duration-500">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative animate-in fade-in duration-500">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Orb pose="processing-thinking" size="lg" />
-            <p className="text-gray-400 mt-4">Loading mind map...</p>
+            <p className="text-[#64748B] mt-4">Loading mind map...</p>
           </div>
         </div>
       </div>
@@ -91,13 +91,13 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
   // Error state
   if (error) {
     return (
-      <div className="relative group animate-in fade-in duration-500">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-red-500/30 shadow-2xl p-8">
+      <div className="relative animate-in fade-in duration-500">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#EF4444]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#EF4444]/30">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Orb pose="error-confused" size="lg" />
-            <p className="text-red-400 mt-4 font-semibold">Error loading mind map</p>
-            <p className="text-gray-400 mt-2 text-sm">{error}</p>
+            <p className="text-[#EF4444] mt-4 font-semibold">Error loading mind map</p>
+            <p className="text-[#64748B] mt-2 text-sm">{error}</p>
           </div>
         </div>
       </div>
@@ -107,15 +107,15 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
   // Empty state
   if (!data || !data.nodes || data.nodes.length === 0) {
     return (
-      <div className="relative group animate-in fade-in duration-500">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-8">
+      <div className="relative animate-in fade-in duration-500">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Orb pose="empty-state-inviting" size="lg" />
-            <p className="text-gray-400 mt-4 text-center">
+            <p className="text-[#64748B] mt-4 text-center">
               No mind map available yet
             </p>
-            <p className="text-gray-500 mt-2 text-sm text-center max-w-md">
+            <p className="text-[#94A3B8] mt-2 text-sm text-center max-w-md">
               Mind maps are automatically generated when you upload study material.
               Try uploading a document to get started!
             </p>
@@ -125,22 +125,21 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
     )
   }
 
-  // Main content - for now just show the nodes in a list
-  // This will be replaced with the actual MindMapViewer component in task 5
+  // Main content
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Header with stats */}
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           <div className="flex items-center gap-3">
             <Orb pose="explorer-magnifying-glass" size="sm" />
             <div>
-              <h3 className="text-xl font-bold text-white">{data.mindmap.title}</h3>
-              <p className="text-gray-400 text-sm mt-1">
+              <h3 className="text-[20px] font-bold text-[#1A1D2E]">{data.mindmap.title}</h3>
+              <p className="text-[#64748B] text-[14px] mt-1">
                 {data.nodes.length} of {data.nodeCount} nodes
                 {data.isLimited && (
-                  <span className="text-orange-400 ml-2">
+                  <span className="text-[#F59E0B] ml-2">
                     (Limited by plan)
                   </span>
                 )}
@@ -152,16 +151,16 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
 
       {/* Plan limit warning */}
       {data.isLimited && (
-        <div className="relative group z-50">
-          <div className="absolute -inset-0.5 bg-gradient-to-br from-orange-500/10 to-yellow-500/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-          <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-xl rounded-2xl border border-orange-500/30 shadow-2xl p-6">
+        <div className="relative z-50">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#F59E0B]/40" />
+          <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#F59E0B]/50">
             <div className="flex items-start gap-4">
               <Orb pose="upgrade-prompt" size="sm" />
               <div className="flex-1">
-                <h4 className="text-lg font-bold text-orange-400 mb-2">
+                <h4 className="text-[18px] font-bold text-[#F59E0B] mb-2">
                   Upgrade to see more nodes
                 </h4>
-                <p className="text-gray-300 text-sm">
+                <p className="text-[#64748B] text-[14px]">
                   Your current plan limits you to {data.nodeLimit} nodes. Upgrade to Student Pro or Pro+ to unlock the full mind map with {data.nodeCount} nodes.
                 </p>
               </div>

@@ -44,33 +44,38 @@ export default function QuizInterface({
       <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
         <div className="flex flex-col items-center mb-8">
           <Orb pose="processing-thinking" size="lg" />
-          <p className="text-gray-400 mt-4">Loading quiz...</p>
+          <p className="text-[#64748B] mt-4">Loading quiz...</p>
         </div>
 
         {/* Loading Skeleton */}
         <div className="flex justify-between items-center mb-6">
-          <div className="h-6 w-48 bg-white/5 rounded animate-pulse" />
-          <div className="h-8 w-24 bg-white/5 rounded animate-pulse" />
+          <div className="h-6 w-48 bg-[#F1F5F9] rounded animate-pulse" />
+          <div className="h-8 w-24 bg-[#F1F5F9] rounded animate-pulse" />
         </div>
-        <div className="w-full h-96 bg-white/5 rounded-2xl animate-pulse mb-6" />
-        <div className="w-full h-12 bg-white/5 rounded-xl animate-pulse" />
+        <div className="w-full h-96 bg-[#F1F5F9] rounded-2xl animate-pulse mb-6" />
+        <div className="w-full h-12 bg-[#F1F5F9] rounded-xl animate-pulse" />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[500px]">
-        <Orb pose="error-confused" size="lg" />
-        <p className="text-red-400 mt-4">{error}</p>
-        {onExit && (
-          <button
-            onClick={onExit}
-            className="mt-4 px-6 py-2 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] text-white rounded-lg hover:shadow-lg transition-all"
-          >
-            Back to Quiz Tab
-          </button>
-        )}
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+          <div className="flex flex-col items-center justify-center min-h-[500px]">
+            <Orb pose="error-confused" size="lg" />
+            <p className="text-[#EF4444] mt-4">{error}</p>
+            {onExit && (
+              <button
+                onClick={onExit}
+                className="mt-4 px-6 py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[15px] font-semibold rounded-lg transition-colors duration-150 shadow-sm"
+              >
+                Back to Quiz Tab
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     )
   }
@@ -85,9 +90,14 @@ export default function QuizInterface({
 
   if (!currentQuestion) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[500px]">
-        <Orb pose="neutral" size="lg" />
-        <p className="text-gray-400 mt-4">No questions available</p>
+      <div className="relative">
+        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+          <div className="flex flex-col items-center justify-center min-h-[500px]">
+            <Orb pose="neutral" size="lg" />
+            <p className="text-[#64748B] mt-4">No questions available</p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -106,15 +116,18 @@ export default function QuizInterface({
 
       {/* Weak Topic Quiz Banner */}
       {isWeakTopicQuiz && (
-        <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl p-4 mb-6">
-          <div className="flex items-center gap-3">
-            <Orb pose="teacher-pointer" size="sm" />
-            <div>
-              <h3 className="text-white font-bold">Weak Topic Review</h3>
-              <p className="text-gray-300 text-sm">
-                Focus on improving your understanding of:{' '}
-                {providedQuiz?.weakTopics?.join(', ')}
-              </p>
+        <div className="relative mb-6">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#F59E0B]/40" />
+          <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#F59E0B]/50">
+            <div className="flex items-center gap-3">
+              <Orb pose="teacher-pointer" size="sm" />
+              <div>
+                <h3 className="text-[#1A1D2E] font-bold text-[16px]">Weak Topic Review</h3>
+                <p className="text-[#64748B] text-[14px]">
+                  Focus on improving your understanding of:{' '}
+                  <span className="text-[#F59E0B] font-medium">{providedQuiz?.weakTopics?.join(', ')}</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -128,7 +141,7 @@ export default function QuizInterface({
             pose={isWeakTopicQuiz ? 'teacher-pointer' : 'quiz-master'}
             size="sm"
           />
-          <p className="text-gray-400 text-lg">
+          <p className="text-[#64748B] text-[16px] font-medium">
             Question {progress.current} of {progress.total}
           </p>
         </div>
@@ -153,7 +166,7 @@ export default function QuizInterface({
         <button
           onClick={nextQuestion}
           disabled={isSubmitting}
-          className="mt-6 w-full px-8 py-4 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] text-white text-lg font-medium rounded-xl hover:shadow-lg hover:shadow-[#a8d5d5]/30 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+          className="mt-6 w-full px-8 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

@@ -26,29 +26,16 @@ function MindMapEdgeComponent({
 
   return (
     <>
-      {/* Outer glow */}
-      <BaseEdge
-        id={`${id}-glow`}
-        path={edgePath}
-        style={{
-          ...style,
-          stroke: '#a8d5d5',
-          strokeWidth: 4,
-          opacity: 0.1,
-          filter: 'blur(4px)',
-        }}
-      />
-      {/* Main edge with dashed style */}
+      {/* Main edge */}
       <BaseEdge
         id={id}
         path={edgePath}
         markerEnd={markerEnd}
         style={{
           ...style,
-          stroke: '#a8d5d5',
+          stroke: '#5A5FF0',
           strokeWidth: 2,
-          opacity: 0.4,
-          strokeDasharray: '5,5',
+          opacity: 0.3,
         }}
       />
     </>

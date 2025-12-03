@@ -36,28 +36,21 @@ function MindMapNodeComponent({ data }: MindMapNodeProps) {
         aria-hidden="true"
       />
 
-      {/* Hexagonal card design */}
+      {/* Paper stack effect */}
+      <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-lg border border-[#CBD5E1]/40" />
+      
+      {/* Main card */}
       <div
         className={`
-          relative w-[280px] p-5 transition-all duration-300
-          bg-[#161b22] border-l-4
-          clip-path-hexagon
+          relative w-[280px] p-5 transition-all duration-200
+          bg-white rounded-lg border-l-4 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)]
           ${
             isSelected
-              ? 'border-l-[#a8d5d5] shadow-[0_8px_32px_rgba(168,213,213,0.3)] scale-[1.02]'
-              : 'border-l-[#30363d] hover:border-l-[#a8d5d5]/60 hover:shadow-[0_4px_20px_rgba(168,213,213,0.15)]'
+              ? 'border-l-[#5A5FF0] shadow-[0_4px_16px_rgba(90,95,240,0.15)] scale-[1.02]'
+              : 'border-l-[#CBD5E1] hover:border-l-[#5A5FF0]/60 hover:shadow-[0_4px_12px_rgba(15,23,42,0.08)]'
           }
         `}
-        style={{
-          clipPath: 'polygon(0 10%, 100% 0, 100% 90%, 0 100%)',
-        }}
       >
-        {/* Animated scan line effect */}
-        {isSelected && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#a8d5d5]/10 to-transparent animate-scan" />
-          </div>
-        )}
 
         {/* Content */}
         <div className="relative z-10 space-y-3">
@@ -74,8 +67,8 @@ function MindMapNodeComponent({ data }: MindMapNodeProps) {
                   transition-all duration-200 border
                   ${
                     isCollapsed
-                      ? 'bg-[#21262d] border-[#30363d] text-gray-500 hover:border-[#a8d5d5]/50 hover:text-[#a8d5d5]'
-                      : 'bg-[#a8d5d5]/10 border-[#a8d5d5]/30 text-[#a8d5d5] hover:bg-[#a8d5d5]/20'
+                      ? 'bg-[#F8FAFB] border-[#CBD5E1] text-[#64748B] hover:border-[#5A5FF0]/50 hover:text-[#5A5FF0]'
+                      : 'bg-[#5A5FF0]/10 border-[#5A5FF0]/30 text-[#5A5FF0] hover:bg-[#5A5FF0]/20'
                   }
                 `}
                 aria-label={isCollapsed ? 'Expand node' : 'Collapse node'}
@@ -91,7 +84,7 @@ function MindMapNodeComponent({ data }: MindMapNodeProps) {
             )}
             
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-semibold text-white leading-tight break-words">
+              <h4 className="text-[14px] font-semibold text-[#1A1D2E] leading-tight break-words">
                 {node.title}
               </h4>
             </div>
@@ -102,7 +95,7 @@ function MindMapNodeComponent({ data }: MindMapNodeProps) {
                 e.stopPropagation()
                 data.onEdit()
               }}
-              className="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-[#21262d] border border-[#30363d] text-gray-500 opacity-0 group-hover:opacity-100 hover:border-[#a8d5d5]/50 hover:text-[#a8d5d5] transition-all duration-200"
+              className="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center bg-[#F8FAFB] border border-[#CBD5E1] text-[#64748B] opacity-0 group-hover:opacity-100 hover:border-[#5A5FF0]/50 hover:text-[#5A5FF0] transition-all duration-200"
               aria-label={`Edit ${node.title}`}
               title="Edit node (Enter)"
             >
@@ -112,7 +105,7 @@ function MindMapNodeComponent({ data }: MindMapNodeProps) {
 
           {/* Content preview */}
           {node.content && (
-            <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 pl-10">
+            <p className="text-[12px] text-[#64748B] leading-relaxed line-clamp-2 pl-10">
               {node.content}
             </p>
           )}
@@ -124,24 +117,21 @@ function MindMapNodeComponent({ data }: MindMapNodeProps) {
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
-                    className="w-2 h-2 rounded-full bg-[#a8d5d5]/30 border border-[#a8d5d5]/50"
+                    className="w-2 h-2 rounded-full bg-[#5A5FF0]/30 border border-[#5A5FF0]/50"
                   />
                 ))}
               </div>
-              <span className="text-[10px] text-[#a8d5d5]/60 uppercase tracking-wider">
+              <span className="text-[10px] text-[#5A5FF0]/60 uppercase tracking-wider font-semibold">
                 Collapsed
               </span>
             </div>
           )}
         </div>
 
-        {/* Corner accent */}
-        <div className="absolute top-0 right-0 w-12 h-12 overflow-hidden">
-          <div className={`absolute -top-6 -right-6 w-12 h-12 rotate-45 bg-gradient-to-br from-[#a8d5d5]/20 to-transparent transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
-        </div>
-
-        {/* Bottom glow line */}
-        <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#a8d5d5] to-transparent transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
+        {/* Selected indicator */}
+        {isSelected && (
+          <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#5A5FF0] animate-pulse" />
+        )}
       </div>
 
       {/* Output handle - small and non-interactive */}
@@ -155,19 +145,7 @@ function MindMapNodeComponent({ data }: MindMapNodeProps) {
         />
       )}
 
-      <style jsx>{`
-        @keyframes scan {
-          0% {
-            transform: translateY(-100%);
-          }
-          100% {
-            transform: translateY(100%);
-          }
-        }
-        .animate-scan {
-          animation: scan 2s ease-in-out infinite;
-        }
-      `}</style>
+
     </div>
   )
 }

@@ -28,10 +28,10 @@ export default function ShortAnswerInput({
         onKeyPress={handleKeyPress}
         disabled={disabled}
         placeholder="Type your answer here..."
-        className="w-full px-6 py-4 bg-white/5 border-2 border-white/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#a8d5d5] focus:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-6 py-4 bg-[#F8FAFB] border-2 border-[#CBD5E1] rounded-lg text-[#1A1D2E] placeholder-[#94A3B8] focus:outline-none focus:border-[#5A5FF0] focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-[15px]"
       />
       {!disabled && (
-        <p className="text-gray-400 text-sm mt-2">
+        <p className="text-[#64748B] text-[13px] mt-2">
           Press Enter to submit your answer
         </p>
       )}
