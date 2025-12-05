@@ -35,9 +35,10 @@ interface StudyPackViewProps {
       tags?: string[]
     }
   }
+  userPlan: string
 }
 
-export default function StudyPackView({ pack }: StudyPackViewProps) {
+export default function StudyPackView({ pack, userPlan }: StudyPackViewProps) {
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab') as TabType | null
   
@@ -68,11 +69,11 @@ export default function StudyPackView({ pack }: StudyPackViewProps) {
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
         <div className="mt-8">
-          {activeTab === 'notes' && <NotesTab notes={pack.stats.notes} studyPackId={pack.id} />}
-          {activeTab === 'flashcards' && <FlashcardsTab packId={pack.id} />}
-          {activeTab === 'quiz' && <QuizTab packId={pack.id} />}
+          {activeTab === 'notes' && <NotesTab notes={pack.stats.notes} studyPackId={pack.id} userPlan={userPlan} />}
+          {activeTab === 'flashcards' && <FlashcardsTab packId={pack.id} userPlan={userPlan} />}
+          {activeTab === 'quiz' && <QuizTab packId={pack.id} userPlan={userPlan} />}
           {activeTab === 'mindmap' && <MindMapTab packId={pack.id} />}
-          {activeTab === 'insights' && <InsightsTab packId={pack.id} />}
+          {activeTab === 'insights' && <InsightsTab packId={pack.id} userPlan={userPlan} />}
         </div>
       </div>
     </div>

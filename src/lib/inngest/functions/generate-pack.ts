@@ -14,6 +14,15 @@ export const generatePack = inngest.createFunction(
     id: 'generate-pack',
     name: 'Generate Study Pack',
     retries: 1,
+    // TODO: Re-enable priority processing after Inngest version update
+    // priority: {
+    //   run: async (event) => {
+    //     const { userId } = event.data
+    //     const supabase = createServiceRoleClient()
+    //     const { data: user } = await supabase.from('users').select('plan').eq('id', userId).single()
+    //     return user?.plan === 'student_pro' || user?.plan === 'pro_plus' ? 100 : 0
+    //   },
+    // },
   },
   { event: 'pack/generate' },
   async ({ event, step }) => {
@@ -77,19 +86,25 @@ export const generatePack = inngest.createFunction(
       }
     )
 
-    // Step 2: Create study pack record
+    // Step 2: Generate AI title from content
+    const generatedTitle = await step.run('generate-title', async () => {
+      console.log('Generating title from content')
+      return await GenerationService.generateTitle(chunks)
+    })
+
+    // Step 3: Create study pack record
     const studyPackId = await step.run('create-study-pack', async () => {
       // Use service role for background job
       const supabase = createServiceRoleClient()
 
-      console.log('Creating study pack record')
+      console.log('Creating study pack record with title:', generatedTitle)
 
       const { data: pack, error } = await supabase
         .from('study_packs')
         .insert({
           user_id: userId,
           material_id: materialId,
-          title: material.meta_json?.filename || 'Study Pack',
+          title: generatedTitle,
           summary: '',
           stats_json: {},
         })
@@ -108,12 +123,12 @@ export const generatePack = inngest.createFunction(
       return pack.id
     })
 
-    // Step 3: Get plan limits
+    // Step 4: Get plan limits
     const limits = await step.run('get-plan-limits', async () => {
       return await UsageService.getPlanLimits(userPlan)
     })
 
-    // Step 4: Generate all content in parallel
+    // Step 5: Generate all content in parallel
     const results = await step.run('generate-content', async () => {
       try {
         const [notes, learningData, , , ] = await Promise.all([
@@ -145,7 +160,7 @@ export const generatePack = inngest.createFunction(
       }
     })
 
-    // Step 5: Calculate coverage and update pack
+    // Step 6: Calculate coverage and update pack
     await step.run('finalize-pack', async () => {
       // Use service role for background job
       const supabase = createServiceRoleClient()
@@ -202,7 +217,7 @@ export const generatePack = inngest.createFunction(
       }
     })
 
-    // Step 6: Consume quota and log completion
+    // Step 7: Consume quota and log completion
     await step.run('consume-quota-and-log', async () => {
       console.log('[generate-pack] Study pack generation complete:', studyPackId)
       

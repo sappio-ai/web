@@ -1,23 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Check, Copy, Share2, ChevronDown, Sparkles, Target, TrendingUp } from 'lucide-react'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import BookmarkCorner from '@/components/ui/BookmarkNotch'
 import Highlight from '@/components/ui/InkHighlight'
-import DecorArt from '@/components/ui/DecorArt'
+import { useSearchParams } from 'next/navigation'
 
 export default function WaitlistClient() {
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     email: '',
     studying: '',
-    currentTool: ''
+    currentTool: '',
+    wantsEarlyAccess: true
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const [referralCode, setReferralCode] = useState('')
   const [copied, setCopied] = useState(false)
+  const [referredBy, setReferredBy] = useState<string | null>(null)
+
+  // Capture referral code from URL on mount
+  useEffect(() => {
+    const ref = searchParams.get('ref')
+    if (ref) {
+      setReferredBy(ref)
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,8 +40,11 @@ export default function WaitlistClient() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
-          wantsEarlyAccess: true
+          email: formData.email,
+          studying: formData.studying,
+          currentTool: formData.currentTool,
+          wantsEarlyAccess: formData.wantsEarlyAccess,
+          referredBy: referredBy
         })
       })
 
@@ -99,6 +113,38 @@ export default function WaitlistClient() {
               </div>
             </div>
 
+            {formData.wantsEarlyAccess && (
+              <div className="bg-gradient-to-br from-[var(--accent)]/5 to-[var(--primary)]/5 rounded-xl p-6 border border-[var(--accent)]/20 mb-8">
+                <h3 className="text-base font-bold text-[var(--ink)] mb-3 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-[var(--accent)]" />
+                  Your founding member benefits
+                </h3>
+                <ul className="space-y-2.5">
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--ink)]">Early access invitation</p>
+                      <p className="text-xs text-[var(--text)]">Get in before everyone else</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--ink)]">12-month founding price lock</p>
+                      <p className="text-xs text-[var(--text)]">Lock in today&apos;s prices for a full year</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--ink)]">7-day Student Pro trial</p>
+                      <p className="text-xs text-[var(--text)]">Full access to all premium features</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            )}
+
             <div>
               <h3 className="text-base font-bold text-[var(--ink)] mb-4">What happens next?</h3>
               <ul className="space-y-3">
@@ -106,13 +152,13 @@ export default function WaitlistClient() {
                   <div className="w-6 h-6 rounded-full bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-xs font-bold text-[var(--primary)]">1</span>
                   </div>
-                  <p className="text-base text-[var(--text)]">We&apos;ll send you updates as we get closer to launch</p>
+                  <p className="text-base text-[var(--text)]">You&apos;ll receive an invite email when early access opens</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-xs font-bold text-[var(--primary)]">2</span>
                   </div>
-                  <p className="text-base text-[var(--text)]">You&apos;ll get early access before the public launch</p>
+                  <p className="text-base text-[var(--text)]">Sign up and your benefits will be applied automatically</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 rounded-full bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -245,6 +291,22 @@ export default function WaitlistClient() {
                         <option value="PDFs">PDFs</option>
                         <option value="Other">Other</option>
                       </select>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-3 bg-[var(--bg)] rounded-xl">
+                      <input
+                        type="checkbox"
+                        id="wantsEarlyAccess"
+                        checked={formData.wantsEarlyAccess}
+                        onChange={(e) => setFormData({ ...formData, wantsEarlyAccess: e.target.checked })}
+                        className="mt-1 w-4 h-4 text-[var(--primary)] bg-white border-[var(--border)] rounded focus:ring-2 focus:ring-[var(--primary)]/20"
+                      />
+                      <label htmlFor="wantsEarlyAccess" className="text-sm text-[var(--ink)] cursor-pointer">
+                        <span className="font-semibold">I want early access benefits</span>
+                        <span className="block text-xs text-[var(--text)] mt-1">
+                          Get founding member perks: 12-month price lock, 7-day Pro trial, and priority access
+                        </span>
+                      </label>
                     </div>
                   </div>
                 </details>

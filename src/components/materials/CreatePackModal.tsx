@@ -249,6 +249,7 @@ export default function CreatePackModal({
         onClose={() => setShowPaywall(false)}
         usage={paywallUsage}
         trigger="upload"
+        currentPlan="free"
       />
 
       <div

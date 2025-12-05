@@ -9,7 +9,7 @@ function generateReferralCode(): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, studying, currentTool, wantsEarlyAccess } = body
+    const { email, studying, currentTool, wantsEarlyAccess, referredBy } = body
 
     if (!email) {
       return NextResponse.json(
@@ -40,8 +40,9 @@ export async function POST(request: NextRequest) {
           email,
           studying: studying || null,
           current_tool: currentTool || null,
-          wants_early_access: wantsEarlyAccess || false,
+          wants_early_access: wantsEarlyAccess !== undefined ? wantsEarlyAccess : true,
           referral_code: referralCode,
+          referred_by: referredBy || null,
           meta_json: {}
         })
         .select()
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
       })
     } else {
       // Fallback: In-memory store (for development)
-      console.log('Waitlist signup (in-memory):', { email, studying, currentTool, wantsEarlyAccess })
+      console.log('Waitlist signup (in-memory):', { email, studying, currentTool, wantsEarlyAccess, referredBy })
       
       const referralCode = generateReferralCode()
       

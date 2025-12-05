@@ -9,13 +9,15 @@ import LapseTracking from '@/components/insights/LapseTracking'
 import DueLoadForecast from '@/components/insights/DueLoadForecast'
 import PerformanceTrends from '@/components/insights/PerformanceTrends'
 import SessionDepthAnalytics from '@/components/insights/SessionDepthAnalytics'
+import UpgradePrompt from '@/components/paywall/UpgradePrompt'
 import type { QuizResult, TopicPerformance } from '@/lib/types/quiz'
 
 interface InsightsTabProps {
   packId: string
+  userPlan?: string
 }
 
-export default function InsightsTab({ packId }: InsightsTabProps) {
+export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
   const [quizResults, setQuizResults] = useState<QuizResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -236,17 +238,35 @@ export default function InsightsTab({ packId }: InsightsTabProps) {
       {/* Pack Completeness Score */}
       <PackCompletenessScore packId={packId} />
 
-      {/* Due Load Forecast */}
-      <DueLoadForecast packId={packId} />
+      {/* Advanced Analytics - Pro Plus Only */}
+      {userPlan === 'pro_plus' ? (
+        <>
+          {/* Due Load Forecast */}
+          <DueLoadForecast packId={packId} />
 
-      {/* Lapse Tracking */}
-      <LapseTracking packId={packId} />
+          {/* Lapse Tracking */}
+          <LapseTracking packId={packId} />
 
-      {/* Performance Trends */}
-      <PerformanceTrends packId={packId} />
+          {/* Performance Trends */}
+          <PerformanceTrends packId={packId} />
 
-      {/* Session Depth Analytics */}
-      <SessionDepthAnalytics packId={packId} />
+          {/* Session Depth Analytics */}
+          <SessionDepthAnalytics packId={packId} />
+        </>
+      ) : (
+        <UpgradePrompt
+          featureName="Advanced Analytics"
+          requiredPlan="pro_plus"
+          benefits={[
+            'Due load forecasting for better planning',
+            'Lapse tracking to identify problem areas',
+            'Performance trends over time',
+            'Session depth analytics',
+            'Detailed retention insights',
+          ]}
+          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+        />
+      )}
 
       {/* Flashcard Progress */}
       <ProgressChart packId={packId} />

@@ -26,7 +26,7 @@ export default async function StudyPackPage({
     .select(
       `
       *,
-      users!inner(id, auth_user_id),
+      users!inner(id, auth_user_id, plan),
       materials(id, kind, source_url, page_count, status)
     `
     )
@@ -37,6 +37,9 @@ export default async function StudyPackPage({
   if (packError || !pack) {
     notFound()
   }
+
+  // Get user plan
+  const userPlan = pack.users?.plan || 'free'
 
   // Get counts for stats
   const { count: flashcardCount } = await supabase
@@ -94,6 +97,6 @@ export default async function StudyPackPage({
     },
   }
 
-  return <StudyPackView pack={packData} />
+  return <StudyPackView pack={packData} userPlan={userPlan} />
 }
 

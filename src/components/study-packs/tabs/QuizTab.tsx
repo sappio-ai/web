@@ -5,13 +5,16 @@ import QuizInterface from '@/components/quiz/QuizInterface'
 import QuizHistory from '@/components/quiz/QuizHistory'
 import WeakTopics from '@/components/quiz/WeakTopics'
 import Orb from '@/components/orb/Orb'
+import { PaywallModal } from '@/components/paywall/PaywallModal'
+import { Crown } from 'lucide-react'
 import type { Quiz } from '@/lib/types/quiz'
 
 interface QuizTabProps {
   packId: string
+  userPlan: string
 }
 
-export default function QuizTab({ packId }: QuizTabProps) {
+export default function QuizTab({ packId, userPlan }: QuizTabProps) {
   const [quiz, setQuiz] = useState<Quiz | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -21,6 +24,7 @@ export default function QuizTab({ packId }: QuizTabProps) {
   const [isLoadingWeakQuiz, setIsLoadingWeakQuiz] = useState(false)
   const [latestWeakTopics, setLatestWeakTopics] = useState<string[]>([])
   const [activeQuiz, setActiveQuiz] = useState<Quiz | null>(null)
+  const [showPaywall, setShowPaywall] = useState(false)
 
   useEffect(() => {
     fetchQuiz()
@@ -91,6 +95,12 @@ export default function QuizTab({ packId }: QuizTabProps) {
 
   const handleStartWeakTopicQuiz = async () => {
     if (!quiz || latestWeakTopics.length === 0) return
+
+    // Check if user has access to weak topics feature
+    if (userPlan === 'free') {
+      setShowPaywall(true)
+      return
+    }
 
     try {
       setIsLoadingWeakQuiz(true)
@@ -194,6 +204,7 @@ export default function QuizTab({ packId }: QuizTabProps) {
           quizId={activeQuiz.id}
           quiz={activeQuiz}
           onExit={handleExitQuiz}
+          userPlan={userPlan}
         />
       </div>
     )
@@ -297,7 +308,11 @@ export default function QuizTab({ packId }: QuizTabProps) {
               <button
                 onClick={handleStartWeakTopicQuiz}
                 disabled={isLoadingWeakQuiz}
-                className="w-full px-8 py-4 bg-[#F59E0B] hover:bg-[#D97706] text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className={`w-full px-8 py-4 text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                  userPlan === 'free' 
+                    ? 'bg-[#94A3B8] hover:bg-[#64748B]' 
+                    : 'bg-[#F59E0B] hover:bg-[#D97706]'
+                }`}
               >
                 {isLoadingWeakQuiz ? (
                   <>
@@ -325,21 +340,27 @@ export default function QuizTab({ packId }: QuizTabProps) {
                   </>
                 ) : (
                   <>
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                      />
-                    </svg>
+                    {userPlan === 'free' ? (
+                      <Crown className="w-5 h-5" />
+                    ) : (
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                    )}
                     <span>
-                      Retest Weak Topics ({latestWeakTopics.length})
+                      {userPlan === 'free' 
+                        ? 'Upgrade to Retest Weak Topics' 
+                        : `Retest Weak Topics (${latestWeakTopics.length})`}
                     </span>
                   </>
                 )}
@@ -351,6 +372,14 @@ export default function QuizTab({ packId }: QuizTabProps) {
 
       {/* Quiz History */}
       <QuizHistory quizId={quiz.id} />
+
+      {/* Paywall Modal */}
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        trigger="general"
+        currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+      />
     </div>
   )
 }

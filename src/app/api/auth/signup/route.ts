@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendWelcomeEmail } from '@/lib/email/send'
 import { validateEmail, validatePassword } from '@/lib/auth/validation'
+import { WaitlistService } from '@/lib/services/WaitlistService'
+import { BenefitService } from '@/lib/services/BenefitService'
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,6 +62,39 @@ export async function POST(request: NextRequest) {
 
     // Note: public.users record is automatically created by database trigger
     // (handle_new_user function triggered on auth.users INSERT)
+
+    // Check if user is on waitlist and apply benefits
+    try {
+      const waitlistEntry = await WaitlistService.checkWaitlistMembership(email)
+      
+      if (waitlistEntry) {
+        console.log(`[Signup] User ${email} found on waitlist, applying benefits`)
+        
+        // Get the user profile ID (wait a moment for trigger to complete)
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        const { data: profile } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_user_id', data.user.id)
+          .single()
+        
+        if (profile) {
+          // Apply waitlist benefits
+          await BenefitService.applyWaitlistBenefits(profile.id, email)
+          
+          // Mark waitlist entry as converted
+          await WaitlistService.markAsConverted(email)
+          
+          console.log(`[Signup] Benefits applied successfully for ${email}`)
+        } else {
+          console.error('[Signup] User profile not found after signup')
+        }
+      }
+    } catch (benefitError) {
+      // Log error but don't fail signup
+      console.error('[Signup] Error applying waitlist benefits:', benefitError)
+    }
 
     // Send welcome email (non-blocking)
     sendWelcomeEmail(email).catch((err) => {

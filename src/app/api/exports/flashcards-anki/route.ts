@@ -50,8 +50,10 @@ export async function POST(request: NextRequest) {
     if (userPlan === 'free') {
       return NextResponse.json(
         {
-          error: 'Anki export requires Student Pro or Pro+ plan',
+          error: 'Anki export requires Student or Pro plan',
           code: 'PLAN_UPGRADE_REQUIRED',
+          currentPlan: userPlan,
+          requiredPlan: 'student_pro',
         },
         { status: 403 }
       )

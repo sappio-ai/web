@@ -4,6 +4,40 @@ This checklist breaks down the Sappio V2 project into logical phases. Each phase
 
 ---
 
+## Phase 0: Waitlist & Launch Preparation ✓
+
+**Status:** Database schema complete, waitlist active
+
+**Database Tables:**
+- ✓ `public.waitlist` - Waitlist signups with referral tracking
+
+**Features:**
+- ✓ Waitlist signup form
+- ✓ Referral code generation
+- ✓ Email collection
+- ✓ Optional survey questions (studying, current tool)
+- [ ] Waitlist benefits tracking
+  - [ ] Early access flag (priority invite)
+  - [ ] Founding price lock (12-month protection)
+  - [ ] 7-day Pro trial eligibility at launch
+- [ ] Admin waitlist management
+  - [ ] View all signups
+  - [ ] Export waitlist to CSV
+  - [ ] Send invite emails
+  - [ ] Track invite status
+- [ ] Waitlist mode enforcement
+  - [ ] Block auth pages for non-admins during waitlist
+  - [ ] Admin bypass mechanism
+  - [ ] Launch toggle to open platform
+
+**API Endpoints:**
+- ✓ POST `/api/waitlist` - Join waitlist
+- [ ] GET `/api/admin/waitlist` - View all signups
+- [ ] POST `/api/admin/waitlist/invite` - Send invites
+- [ ] POST `/api/admin/waitlist/export` - Export to CSV
+
+---
+
 ## Phase 1: Foundation & Authentication ✓
 
 **Status:** Database schema complete
@@ -18,6 +52,11 @@ This checklist breaks down the Sappio V2 project into logical phases. Each phase
 - [ ] User registration and login (email/password)
 - [ ] User profile management
 - [ ] Plan tier assignment (free/student_pro/pro_plus)
+- [ ] Waitlist benefits application
+  - [ ] Check if user email is on waitlist
+  - [ ] Apply founding price lock (store lock_expires_at in users.meta_json)
+  - [ ] Grant 7-day Pro trial automatically
+  - [ ] Track early access status
 - [ ] Basic authentication middleware
 - [ ] Session management
 - [ ] User settings (locale, preferences)

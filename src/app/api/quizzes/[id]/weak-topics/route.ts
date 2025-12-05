@@ -18,6 +18,30 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check user plan for weak topics feature
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('plan')
+      .eq('auth_user_id', user.id)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // Weak topics requires student_pro or pro_plus plan
+    if (userData.plan === 'free') {
+      return NextResponse.json(
+        {
+          error: 'Weak topics practice requires Student Pro or Pro plan',
+          code: 'PLAN_UPGRADE_REQUIRED',
+          currentPlan: userData.plan,
+          requiredPlan: 'student_pro',
+        },
+        { status: 403 }
+      )
+    }
+
     // Get weak topics from request body
     const body = await request.json()
     const { weakTopics } = body

@@ -21,6 +21,12 @@
 
 ## 2. Value/Plan Tiers
 
+### **Waitlist Benefits**
+Users who join the waitlist receive:
+- **Early access** - Priority invite before public launch
+- **Founding price lock** - Lock in current pricing for 12 months (protection against future price increases)
+- **7-day Pro trial** - Full Pro features at launch to test the platform
+
 ### **Free**
 - **5 packs/month**
 - **80 cards/pack**

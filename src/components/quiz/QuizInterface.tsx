@@ -11,12 +11,14 @@ interface QuizInterfaceProps {
   quizId: string
   quiz?: any
   onExit?: () => void
+  userPlan?: string
 }
 
 export default function QuizInterface({
   quizId,
   quiz: providedQuiz,
   onExit,
+  userPlan = 'free',
 }: QuizInterfaceProps) {
   const {
     mode,
@@ -81,7 +83,7 @@ export default function QuizInterface({
   }
 
   if (!mode) {
-    return <ModeSelector onSelectMode={selectMode} />
+    return <ModeSelector onSelectMode={selectMode} userPlan={userPlan} />
   }
 
   if (isComplete && results) {

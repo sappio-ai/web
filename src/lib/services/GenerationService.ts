@@ -15,6 +15,63 @@ interface Chunk {
 
 export class GenerationService {
   /**
+   * Generates a concise, descriptive title from content
+   */
+  static async generateTitle(chunks: Chunk[]): Promise<string> {
+    if (chunks.length === 0) {
+      return 'Study Pack'
+    }
+
+    try {
+      // Use first 3 chunks for title generation
+      const selectedChunks = chunks.slice(0, Math.min(3, chunks.length))
+      const context = selectedChunks.map((c) => c.content).join('\n\n')
+
+      const prompt = `Analyze the following educational content and generate a concise, descriptive title (3-8 words).
+
+Content:
+${context.substring(0, 2000)}
+
+Generate a title that:
+- Captures the main topic or subject
+- Is 3-8 words long
+- Is clear and descriptive
+- Uses title case
+- Does NOT include "Study Pack" or similar phrases
+
+Return ONLY the title, nothing else.`
+
+      const response = await generateChatCompletion(
+        [
+          {
+            role: 'system',
+            content: 'You are an expert at creating clear, concise titles for educational content.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        {
+          model: 'gpt-4o-mini',
+          temperature: 0.3,
+          maxTokens: 20,
+        }
+      )
+
+      const title = response.trim()
+      
+      // Validate title length
+      if (title.length < 3 || title.length > 100) {
+        console.warn('[GenerationService] Generated title out of range, using default')
+        return 'Study Pack'
+      }
+
+      return title
+    } catch (error) {
+      console.error('[GenerationService] Error generating title:', error)
+      return 'Study Pack'
+    }
+  }
+
+  /**
    * Selects chunks evenly distributed across the document
    */
   private static selectDistributedChunks(
@@ -273,7 +330,9 @@ Requirements:
 - Mix of Q&A and cloze deletion types
 - Front: 10-150 characters
 - Back: 20-500 characters
-- Assign relevant topic tags
+- Group cards into 5-10 broad topic categories (e.g., "Core Concepts", "Key Terms", "Processes", "Applications")
+- Use the same topic name for related cards to enable effective filtering
+- Avoid creating unique topics for each card
 - Focus on key concepts, definitions, and important facts
 
 Return ONLY valid JSON, no markdown or explanations.`
@@ -432,7 +491,8 @@ Requirements:
 - Only 1 option should be correct
 - The "answer" field must match one of the options exactly
 - Explanations should be 100-300 characters
-- Assign relevant topic tags based on content
+- Group questions into 3-5 broad topic categories
+- Use the same topic name for related questions
 - Focus on understanding and application, not just memorization
 - Vary difficulty levels (easy, medium, hard)
 

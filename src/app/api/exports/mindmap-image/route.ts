@@ -38,14 +38,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get mind map with ownership verification
+    // Get mind map with ownership verification and user plan
     const { data: mindmap, error: mindmapError } = await supabase
       .from('mindmaps')
       .select(`
         *,
         study_packs!inner(
           id,
-          users!inner(id, auth_user_id)
+          users!inner(id, auth_user_id, plan)
         )
       `)
       .eq('id', mindmapId)
@@ -56,6 +56,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Mind map not found' },
         { status: 404 }
+      )
+    }
+
+    // Check plan (Student Pro or Pro+ required for exports)
+    const userPlan = mindmap.study_packs.users.plan || 'free'
+    if (userPlan === 'free') {
+      return NextResponse.json(
+        {
+          error: 'Mind map image export requires Student or Pro plan',
+          code: 'PLAN_UPGRADE_REQUIRED',
+          currentPlan: userPlan,
+          requiredPlan: 'student_pro',
+        },
+        { status: 403 }
       )
     }
 

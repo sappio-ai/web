@@ -30,10 +30,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get study pack with ownership verification
+    // Get study pack with ownership verification and user plan
     const { data: pack, error: packError } = await supabase
       .from('study_packs')
-      .select('*, users!inner(id, auth_user_id)')
+      .select('*, users!inner(id, auth_user_id, plan)')
       .eq('id', studyPackId)
       .eq('users.auth_user_id', user.id)
       .single()
@@ -42,6 +42,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Study pack not found' },
         { status: 404 }
+      )
+    }
+
+    // Check plan (Student Pro or Pro+ required for exports)
+    const userPlan = pack.users.plan || 'free'
+    if (userPlan === 'free') {
+      return NextResponse.json(
+        {
+          error: 'PDF export requires Student or Pro plan',
+          code: 'PLAN_UPGRADE_REQUIRED',
+          currentPlan: userPlan,
+          requiredPlan: 'student_pro',
+        },
+        { status: 403 }
       )
     }
 

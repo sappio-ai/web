@@ -6,13 +6,16 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@react-email/components": "^0.5.7",
     "@react-email/render": "^1.4.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.75.1",
+    "@vercel/analytics": "^1.6.1",
     "assemblyai": "^4.18.2",
     "canvas": "^3.2.0",
     "cheerio": "^1.1.0",
@@ -30,7 +33,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "reactflow": "^11.10.0",
-    "resend": "^6.1.3",
+    "resend": "^6.5.2",
     "word-extractor": "^1.0.4",
     "youtube-transcript": "^1.2.1",
     "youtubei.js": "^16.0.1"
@@ -38,13 +41,19 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/word-extractor": "^1.0.6",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.6",
+    "fast-check": "^4.3.0",
+    "jest": "^30.2.0",
+    "jest-environment-node": "^30.2.0",
     "tailwindcss": "^4",
+    "ts-jest": "^29.4.6",
     "typescript": "^5"
   }
 }

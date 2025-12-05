@@ -12,22 +12,22 @@ export default function PricingSection() {
     { 
       name: 'Free', 
       desc: 'Get started', 
-      features: ['5 study packs/month', '20 cards per pack', 'Basic quizzes', 'Progress tracking'],
-      bestFor: 'Casual',
+      features: ['5 packs/month', '40 cards per pack', '15-question quizzes', '80 mind map nodes', 'No exports'],
+      bestFor: 'Casual learners',
       highlight: false
     },
     { 
-      name: 'Student', 
+      name: 'Student Pro', 
       desc: 'Most popular', 
-      features: ['Unlimited study packs', '100 cards per pack', 'Advanced quizzes', 'Mind maps', 'Priority support'],
+      features: ['60 packs/month', '120 cards per pack', '30-question quizzes', '250 mind map nodes', 'All export formats', 'Timed quiz mode', 'Weak topics practice', 'Priority processing'],
       bestFor: 'Exam season',
       highlight: true
     },
     { 
       name: 'Pro', 
       desc: 'For power users', 
-      features: ['Everything in Student', 'Unlimited cards', 'API access', 'Custom integrations'],
-      bestFor: 'Power user',
+      features: ['300 packs/month', '300 cards per pack', '60-question quizzes', '800 mind map nodes', 'All export formats', 'Advanced analytics', 'Priority processing', 'API access (coming soon)'],
+      bestFor: 'Power users',
       highlight: false
     }
   ]
