@@ -7,6 +7,7 @@ import { inngest } from '@/lib/inngest/client'
 import { processMaterial } from '@/lib/inngest/functions/process-material'
 import { generatePack } from '@/lib/inngest/functions/generate-pack'
 import { expirePlans } from '@/lib/inngest/functions/expire-plans'
+import { expireExtraPacks } from '@/lib/inngest/functions/expire-extra-packs'
 
 // Force Node.js runtime (required for Buffer, native deps like pdf-parse)
 export const runtime = 'nodejs'
@@ -14,5 +15,5 @@ export const runtime = 'nodejs'
 // Register all Inngest functions
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [processMaterial, generatePack, expirePlans],
+  functions: [processMaterial, generatePack, expirePlans, expireExtraPacks],
 })

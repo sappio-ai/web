@@ -1,10 +1,14 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getUser } from '@/lib/auth/session'
+import { getUserProfile } from '@/lib/auth/session'
+import { createClient } from '@/lib/supabase/server'
 import UserMenu from './UserMenu'
+import PlanBadge from './PlanBadge'
 
 export default async function Navbar() {
-  const user = await getUser()
+  const profile = await getUserProfile()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 ${user ? 'bg-white/95' : 'bg-white'} backdrop-blur-md border-b border-[#E2E8F0]`}>
@@ -55,6 +59,11 @@ export default async function Navbar() {
           <div className="flex items-center gap-4">
             {user ? (
               <>
+                {/* Plan Badge */}
+                {profile?.plan && (
+                  <PlanBadge plan={profile.plan as 'free' | 'student_pro' | 'pro_plus'} />
+                )}
+                
                 <Link
                   href="/dashboard/new"
                   className="px-4 py-2 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[14px] font-semibold rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2 flex items-center gap-2"

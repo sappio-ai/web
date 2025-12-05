@@ -69,11 +69,13 @@ const MESSAGES = {
   general: { title: 'Upgrade Your Plan', orbPose: 'upgrade-prompt' as const },
 }
 
-export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', currentPlan = 'free' }: PaywallModalProps) {
+export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', currentPlan: propCurrentPlan }: PaywallModalProps) {
   const message = MESSAGES[trigger]
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly')
   const [isClosing, setIsClosing] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [currentPlan, setCurrentPlan] = useState<'free' | 'student_pro' | 'pro_plus'>(propCurrentPlan || 'free')
+  const [fetchingPlan, setFetchingPlan] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -84,6 +86,41 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
       console.log('[PaywallModal] Component unmounted')
     }
   }, [])
+
+  // Fetch user's plan when modal opens if not provided
+  useEffect(() => {
+    if (isOpen && !propCurrentPlan && !fetchingPlan) {
+      setFetchingPlan(true)
+      
+      const fetchUserPlan = async () => {
+        try {
+          const { createBrowserClient } = await import('@/lib/supabase/client')
+          const supabase = createBrowserClient()
+          
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            const { data: profile } = await supabase
+              .from('users')
+              .select('plan')
+              .eq('auth_user_id', user.id)
+              .single()
+            
+            if (profile?.plan) {
+              setCurrentPlan(profile.plan as 'free' | 'student_pro' | 'pro_plus')
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching user plan:', error)
+        } finally {
+          setFetchingPlan(false)
+        }
+      }
+      
+      fetchUserPlan()
+    } else if (propCurrentPlan) {
+      setCurrentPlan(propCurrentPlan)
+    }
+  }, [isOpen, propCurrentPlan, fetchingPlan])
 
   const handleClose = () => {
     console.log('[PaywallModal] Closing modal')
@@ -212,82 +249,91 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[100] bg-[#1A1D2E]/60 backdrop-blur-sm transition-opacity duration-300 ${
           isClosing ? 'opacity-0' : 'opacity-100'
         }`}
         onClick={handleClose}
       />
 
-      {/* Centered Modal */}
+      {/* Centered Modal with Paper Stack Effect */}
       <div
-        ref={modalRef}
         style={{
           position: 'fixed',
           top: '50%',
           left: '50%',
-          transform: `translate(-50%, -50%) scale(${isClosing ? 0.95 : 1})`,
+          transform: `translate(-50%, -50%)`,
           zIndex: 101,
           width: '95vw',
           maxWidth: '42rem',
           maxHeight: '90vh',
         }}
-        className={`bg-white rounded-2xl shadow-2xl transition-all duration-300 ease-out overflow-hidden flex flex-col
-          ${isClosing ? 'opacity-0' : 'opacity-100'}`}
       >
-        {/* Scrollable content */}
-        <div className="overflow-y-auto flex-1">
-          {/* Header */}
-          <div className="bg-white px-6 pt-6 pb-4 border-b border-gray-200 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Orb pose={message.orbPose} size="sm" animated={true} />
-                <h2 className="text-xl font-bold text-gray-900">{message.title}</h2>
+        {/* Paper stack backing */}
+        <div className="absolute top-[6px] left-[6px] right-[-6px] h-full bg-white/40 rounded-2xl border border-[#94A3B8]/25" />
+        
+        <div
+          ref={modalRef}
+          className={`relative bg-white rounded-2xl shadow-[0_8px_32px_rgba(15,23,42,0.15),0_2px_8px_rgba(15,23,42,0.08)] border-2 border-[#5A5FF0]/30 transition-all duration-300 ease-out overflow-hidden flex flex-col
+            ${isClosing ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+          style={{ maxHeight: '90vh' }}
+        >
+          {/* Highlight accent line */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#5A5FF0] to-transparent" />
+          
+          {/* Scrollable content */}
+          <div className="overflow-y-auto flex-1">
+            {/* Header */}
+            <div className="bg-gradient-to-br from-white to-[#F8FAFB] px-6 pt-6 pb-4 border-b border-[#E2E8F0] flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Orb pose={message.orbPose} size="sm" animated={true} />
+                  <h2 className="text-xl font-bold text-[#1A1D2E]">{message.title}</h2>
+                </div>
+                <button
+                  onClick={handleClose}
+                  className="p-2 hover:bg-[#F1F5F9] rounded-lg transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5 text-[#64748B]" />
+                </button>
               </div>
-              <button
-                onClick={handleClose}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
 
-            {/* Usage bar */}
-            {usage && (
-              <div className="mt-4 bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Monthly Usage</span>
-                  <span className="text-sm font-bold text-gray-900">
-                    {usage.currentUsage} / {usage.limit}
-                  </span>
-                </div>
-                <div className="h-2 bg-white rounded-full overflow-hidden border border-gray-200">
-                  <div
-                    className={`h-full transition-all ${
-                      isOverLimit ? 'bg-orange-500' : 'bg-blue-600'
-                    }`}
-                    style={{ width: `${Math.min((usage.currentUsage / usage.limit) * 100, 100)}%` }}
-                  />
-                </div>
-                {isOverLimit && (
-                  <div className="mt-2 flex items-center gap-2 text-orange-900 text-xs font-medium bg-orange-50 px-2 py-1.5 rounded border border-orange-200">
-                    <Gift className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span>You got 1 bonus pack! Upgrade for more.</span>
+              {/* Usage bar */}
+              {usage && (
+                <div className="mt-4 bg-white rounded-xl p-4 border border-[#E2E8F0] shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#64748B]">Monthly Usage</span>
+                    <span className="text-sm font-bold text-[#1A1D2E]">
+                      {usage.currentUsage} / {usage.limit}
+                    </span>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+                  <div className="h-2 bg-[#F1F5F9] rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${
+                        isOverLimit ? 'bg-[#F59E0B]' : 'bg-[#5A5FF0]'
+                      }`}
+                      style={{ width: `${Math.min((usage.currentUsage / usage.limit) * 100, 100)}%` }}
+                    />
+                  </div>
+                  {isOverLimit && (
+                    <div className="mt-2 flex items-center gap-2 text-[#92400E] text-xs font-semibold bg-[#FFFBEB] px-2 py-1.5 rounded border border-[#FCD34D]">
+                      <Gift className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span>You got 1 bonus pack! Upgrade for more.</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
           {/* Billing Toggle */}
           <div className="px-6 pt-6 pb-4">
-            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-gray-100 border border-gray-200">
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-[#F1F5F9] border border-[#E2E8F0]">
               <button
                 onClick={() => setBillingCycle('monthly')}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                   billingCycle === 'monthly'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-[#1A1D2E] shadow-sm'
+                    : 'text-[#64748B] hover:text-[#1A1D2E]'
                 }`}
               >
                 Monthly
@@ -296,13 +342,13 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
                 onClick={() => setBillingCycle('yearly')}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all relative ${
                   billingCycle === 'yearly'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-[#1A1D2E] shadow-sm'
+                    : 'text-[#64748B] hover:text-[#1A1D2E]'
                 }`}
               >
                 Yearly
-                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-green-500 text-white text-[9px] font-bold rounded-full shadow-sm">
-                  SAVE
+                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-[#10B981] text-white text-[9px] font-bold rounded-full shadow-sm uppercase tracking-wide">
+                  Save
                 </span>
               </button>
             </div>
@@ -312,56 +358,55 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
           <div className="px-6 space-y-4 pb-4">
             {/* Student Pro - Highlighted */}
             <div className="relative">
-              {currentPlan === 'student_pro' ? (
-                <div className="absolute -top-2 left-4 px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-full shadow-sm z-10">
-                  CURRENT PLAN
-                </div>
-              ) : (
-                <div className="absolute -top-2 left-4 px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full shadow-sm z-10">
-                  MOST POPULAR
+              {/* Paper stack backing */}
+              <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#5A5FF0]/25" />
+              
+              {currentPlan === 'student_pro' && (
+                <div className="absolute -top-2 left-4 px-3 py-1 bg-[#10B981] text-white text-xs font-bold rounded-full shadow-sm z-20 uppercase tracking-wide">
+                  Current Plan
                 </div>
               )}
               
-              <div className={`relative rounded-xl border-2 ${currentPlan === 'student_pro' ? 'border-green-600 bg-gradient-to-br from-white to-green-50' : 'border-blue-600 bg-gradient-to-br from-white to-blue-50'} p-5 shadow-lg`}>
+              <div className={`relative rounded-xl border-2 ${currentPlan === 'student_pro' ? 'border-[#10B981] bg-gradient-to-br from-white to-[#ECFDF5]' : 'border-[#5A5FF0] bg-gradient-to-br from-white to-[#EEF2FF]'} p-5 shadow-[0_4px_16px_rgba(90,95,240,0.15)]`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-bold text-gray-900">{PLANS.student_pro.name}</h3>
+                      <h3 className="text-lg font-bold text-[#1A1D2E]">{PLANS.student_pro.name}</h3>
                       {currentPlan === 'student_pro' && (
-                        <Check className="w-5 h-5 text-green-600" strokeWidth={3} />
+                        <Check className="w-5 h-5 text-[#10B981]" strokeWidth={3} />
                       )}
                     </div>
                     <div className="flex items-baseline gap-1 mb-1">
-                      <span className="text-3xl font-bold text-gray-900">
+                      <span className="text-3xl font-bold text-[#1A1D2E]">
                         {billingCycle === 'monthly' ? PLANS.student_pro.monthlyPrice : PLANS.student_pro.yearlyPrice}
                       </span>
-                      <span className="text-sm text-gray-600">/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
+                      <span className="text-sm text-[#64748B]">/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
                     </div>
                     {billingCycle === 'yearly' && (
-                      <p className="text-green-600 text-xs font-bold">{PLANS.student_pro.savingsText}</p>
+                      <p className="text-[#10B981] text-xs font-bold">{PLANS.student_pro.savingsText}</p>
                     )}
                     {billingCycle === 'monthly' && (
-                      <p className="text-blue-600 text-xs font-bold">or {PLANS.student_pro.semesterPrice}/semester</p>
+                      <p className="text-[#5A5FF0] text-xs font-bold">or {PLANS.student_pro.semesterPrice}/semester</p>
                     )}
                   </div>
-                  <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-sm flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-[#5A5FF0] flex items-center justify-center shadow-sm flex-shrink-0">
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                 </div>
                 <ul className="space-y-2 mb-4">
                   {PLANS.student_pro.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-gray-900 text-sm font-medium">
-                      <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" strokeWidth={2.5} />
+                    <li key={i} className="flex items-start gap-2 text-[#1A1D2E] text-sm font-medium">
+                      <Check className="w-4 h-4 text-[#5A5FF0] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
                 {currentPlan === 'student_pro' ? (
-                  <div className="w-full py-3 bg-green-100 text-green-800 font-bold rounded-lg text-sm text-center border-2 border-green-600">
+                  <div className="w-full py-3 bg-[#ECFDF5] text-[#10B981] font-bold rounded-lg text-sm text-center border-2 border-[#10B981]">
                     Your Current Plan
                   </div>
                 ) : (
-                  <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group">
+                  <button className="w-full py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group">
                     <span>Upgrade to Student Pro</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                   </button>
@@ -371,49 +416,52 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
 
             {/* Pro */}
             <div className="relative">
+              {/* Paper stack backing */}
+              <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#F59E0B]/25" />
+              
               {currentPlan === 'pro_plus' && (
-                <div className="absolute -top-2 left-4 px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-full shadow-sm z-10">
-                  CURRENT PLAN
+                <div className="absolute -top-2 left-4 px-3 py-1 bg-[#10B981] text-white text-xs font-bold rounded-full shadow-sm z-20 uppercase tracking-wide">
+                  Current Plan
                 </div>
               )}
               
-              <div className={`relative rounded-xl border-2 ${currentPlan === 'pro_plus' ? 'border-green-600 bg-gradient-to-br from-white to-green-50' : 'border-gray-200 bg-white hover:border-orange-500'} p-5 transition-all shadow-lg`}>
+              <div className={`relative rounded-xl border-2 ${currentPlan === 'pro_plus' ? 'border-[#10B981] bg-gradient-to-br from-white to-[#ECFDF5]' : 'border-[#E2E8F0] bg-white hover:border-[#F59E0B]/40'} p-5 transition-all shadow-sm`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-bold text-gray-900">{PLANS.pro_plus.name}</h3>
+                      <h3 className="text-lg font-bold text-[#1A1D2E]">{PLANS.pro_plus.name}</h3>
                       {currentPlan === 'pro_plus' && (
-                        <Check className="w-5 h-5 text-green-600" strokeWidth={3} />
+                        <Check className="w-5 h-5 text-[#10B981]" strokeWidth={3} />
                       )}
                     </div>
                   <div className="flex items-baseline gap-1 mb-1">
-                    <span className="text-3xl font-bold text-gray-900">
+                    <span className="text-3xl font-bold text-[#1A1D2E]">
                       {billingCycle === 'monthly' ? PLANS.pro_plus.monthlyPrice : PLANS.pro_plus.yearlyPrice}
                     </span>
-                    <span className="text-sm text-gray-600">/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
+                    <span className="text-sm text-[#64748B]">/{billingCycle === 'monthly' ? 'mo' : 'yr'}</span>
                   </div>
                   {billingCycle === 'yearly' && (
-                    <p className="text-green-600 text-xs font-bold">{PLANS.pro_plus.savingsText}</p>
+                    <p className="text-[#10B981] text-xs font-bold">{PLANS.pro_plus.savingsText}</p>
                   )}
                 </div>
-                <div className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center shadow-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-[#F59E0B] flex items-center justify-center shadow-sm flex-shrink-0">
                   <Crown className="w-5 h-5 text-white" />
                 </div>
               </div>
               <ul className="space-y-2 mb-4">
                 {PLANS.pro_plus.features.map((f, i) => (
-                  <li key={i} className="flex items-start gap-2 text-gray-700 text-sm">
-                    <Check className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2 text-[#1A1D2E] text-sm">
+                    <Check className="w-4 h-4 text-[#F59E0B] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
                     <span>{f}</span>
                   </li>
                 ))}
               </ul>
                 {currentPlan === 'pro_plus' ? (
-                  <div className="w-full py-3 bg-green-100 text-green-800 font-bold rounded-lg text-sm text-center border-2 border-green-600">
+                  <div className="w-full py-3 bg-[#ECFDF5] text-[#10B981] font-bold rounded-lg text-sm text-center border-2 border-[#10B981]">
                     Your Current Plan
                   </div>
                 ) : (
-                  <button className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group">
+                  <button className="w-full py-3 bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group">
                     <span>Upgrade to Pro</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                   </button>
@@ -424,25 +472,28 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
             {/* Free Plan - Collapsed */}
             {currentPlan === 'free' && (
               <div className="relative">
-                <div className="absolute -top-2 left-4 px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-full shadow-sm z-10">
-                  CURRENT PLAN
+                {/* Paper stack backing */}
+                <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#10B981]/25" />
+                
+                <div className="absolute -top-2 left-4 px-3 py-1 bg-[#10B981] text-white text-xs font-bold rounded-full shadow-sm z-20 uppercase tracking-wide">
+                  Current Plan
                 </div>
                 
-                <div className="relative rounded-xl border-2 border-green-600 bg-gradient-to-br from-white to-green-50 p-4 shadow-lg">
+                <div className="relative rounded-xl border-2 border-[#10B981] bg-gradient-to-br from-white to-[#ECFDF5] p-4 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-green-600" />
+                      <div className="w-8 h-8 rounded-lg bg-[#10B981]/10 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-[#10B981]" strokeWidth={2.5} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-bold text-gray-900">{PLANS.free.name}</h3>
-                          <Check className="w-4 h-4 text-green-600" strokeWidth={3} />
+                          <h3 className="text-sm font-bold text-[#1A1D2E]">{PLANS.free.name}</h3>
+                          <Check className="w-4 h-4 text-[#10B981]" strokeWidth={3} />
                         </div>
-                        <p className="text-xs text-green-600 font-semibold">Your Current Plan</p>
+                        <p className="text-xs text-[#10B981] font-semibold">Your Current Plan</p>
                       </div>
                     </div>
-                    <span className="text-lg font-bold text-gray-900">{PLANS.free.monthlyPrice}</span>
+                    <span className="text-lg font-bold text-[#1A1D2E]">{PLANS.free.monthlyPrice}</span>
                   </div>
                 </div>
               </div>
@@ -450,15 +501,16 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex-shrink-0">
-            <p className="text-gray-600 text-xs text-center">
+          <div className="px-6 py-4 bg-[#F8FAFB] border-t border-[#E2E8F0] flex-shrink-0">
+            <p className="text-[#64748B] text-xs text-center">
               All plans include secure storage, AI-powered generation, and mobile access
             </p>
-            <p className="text-gray-500 text-[10px] text-center mt-1">
+            <p className="text-[#94A3B8] text-[10px] text-center mt-1">
               Cancel anytime • No hidden fees • Student verification available
             </p>
           </div>
         </div>
+      </div>
       </div>
     </>
   )

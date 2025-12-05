@@ -6,11 +6,14 @@ import StreakDisplay from '@/components/flashcards/StreakDisplay'
 import PackSearchBar from '@/components/dashboard/PackSearchBar'
 import PackFilters from '@/components/dashboard/PackFilters'
 import PackSortDropdown from '@/components/dashboard/PackSortDropdown'
+import ExtraPacksBalance from '@/components/dashboard/ExtraPacksBalance'
+import ContinuePanel from '@/components/dashboard/ContinuePanel'
 import Orb from '@/components/orb/Orb'
 import { useOrb } from '@/lib/contexts/OrbContext'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import { Package, BookOpen, Target, TrendingUp, Clock, Flame, Plus } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useDebounce } from '@/lib/hooks/useDebounce'
 import { useRouter } from 'next/navigation'
 
@@ -170,51 +173,7 @@ export default function DashboardClient({
                     </div>
 
                     {/* Dynamic Hero CTA - Paper Stack Style */}
-                    {hasPacks && hasDueCards ? (
-                        // Due Cards Hero - Use amber/gold for urgency, not red
-                        <div className="mb-8 relative">
-                            {/* Paper stack layers */}
-                            <div className="absolute top-[6px] left-[6px] right-[-6px] h-full bg-white/40 rounded-xl border border-[#94A3B8]/25" />
-                            
-                            <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_12px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.06)] border border-[#F59E0B]/20 bg-gradient-to-br from-white to-[#FEF3C7]/10">
-                                {/* Bookmark Tab - Gold for momentum */}
-                                <div className="absolute -top-0 right-12 w-[28px] h-[22px] bg-[#F59E0B] rounded-b-[5px] shadow-sm">
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[20px] h-[3px] bg-[#D97706] rounded-t-sm" />
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-xl bg-[#FEF3C7] flex items-center justify-center">
-                                            <Flame className="w-7 h-7 text-[#F59E0B]" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h2 className="text-[24px] font-bold text-[#1A1D2E] mb-1">
-                                                Keep Your Streak Going!
-                                            </h2>
-                                            <p className="text-[15px] text-[#64748B]">
-                                                <span className="font-semibold text-[#1A1D2E]">{dueCount} flashcard{dueCount !== 1 ? 's' : ''}</span> ready across <span className="font-semibold text-[#1A1D2E]">{packsWithDueCards} pack{packsWithDueCards !== 1 ? 's' : ''}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Link
-                                            href="/review"
-                                            className="px-6 py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[15px] font-semibold rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2 flex items-center gap-2"
-                                        >
-                                            <Flame className="w-5 h-5" />
-                                            Review Now
-                                        </Link>
-                                        <button
-                                            onClick={() => setIsModalOpen(true)}
-                                            className="px-6 py-3 bg-white hover:bg-[#F8FAFB] text-[#1A1D2E] text-[15px] font-medium rounded-lg border border-[#CBD5E1] transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40"
-                                        >
-                                            + New Pack
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ) : !hasPacks ? (
+                    {!hasPacks ? (
                         // First Pack Hero
                         <div className="mb-8 relative">
                             {/* Paper stack layers */}
@@ -249,6 +208,79 @@ export default function DashboardClient({
                             </div>
                         </div>
                     ) : null}
+
+                    {/* Create New Pack and Continue/Balance Panels */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        {/* Create New Pack CTA - Less prominent when cards are due */}
+                        {hasPacks && (
+                            <div className="md:col-span-1">
+                                <div className="relative h-full">
+                                    {/* Paper stack effect */}
+                                    <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+                                    
+                                    <button
+                                        onClick={() => setIsModalOpen(true)}
+                                        className={`relative w-full h-full rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border transition-all duration-200 group active:scale-[0.99] flex flex-col items-center justify-center text-center overflow-hidden ${
+                                            hasDueCards
+                                                ? 'bg-white hover:bg-[#F8FAFB] border-[#94A3B8]/30 hover:border-[#5A5FF0]/40'
+                                                : 'bg-gradient-to-br from-[#1A1D2E] to-[#2A2D3E] hover:from-[#2A2D3E] hover:to-[#1A1D2E] border-[#5A5FF0]/30 hover:border-[#5A5FF0]/50 shadow-[0_2px_12px_rgba(90,95,240,0.15)]'
+                                        }`}
+                                    >
+                                        {/* Highlight accent line - only when no due cards */}
+                                        {!hasDueCards && (
+                                            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#5A5FF0] to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
+                                        )}
+                                        
+                                        {/* Decorative Orb Image - Bottom Right */}
+                                        <div className="absolute -bottom-8 -right-8 w-48 h-48 opacity-25 group-hover:opacity-35 transition-opacity">
+                                            <Image
+                                                src="/orb/sp_ds.png"
+                                                alt=""
+                                                width={192}
+                                                height={192}
+                                                className="object-contain"
+                                            />
+                                        </div>
+                                        
+                                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform mb-3 relative z-10 ${
+                                            hasDueCards
+                                                ? 'bg-[#5A5FF0]/10 border border-[#5A5FF0]/30'
+                                                : 'bg-[#5A5FF0]/20 border border-[#5A5FF0]/40'
+                                        }`}>
+                                            <Plus className={`w-7 h-7 ${hasDueCards ? 'text-[#5A5FF0]' : 'text-[#5A5FF0]'}`} strokeWidth={2.5} />
+                                        </div>
+                                        <h3 className={`text-[18px] font-bold mb-2 relative z-10 ${
+                                            hasDueCards ? 'text-[#1A1D2E]' : 'text-white'
+                                        }`}>
+                                            Create New Pack
+                                        </h3>
+                                        <p className={`text-[13px] mb-3 relative z-10 ${
+                                            hasDueCards ? 'text-[#64748B]' : 'text-[#94A3B8]'
+                                        }`}>
+                                            Upload materials or paste URLs
+                                        </p>
+                                        <div className={`flex items-center gap-2 font-semibold text-[13px] group-hover:gap-3 transition-all relative z-10 ${
+                                            hasDueCards ? 'text-[#5A5FF0]' : 'text-[#5A5FF0]'
+                                        }`}>
+                                            <span>Get Started</span>
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                            </svg>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        
+                        <div className={hasPacks ? "md:col-span-2 space-y-6" : "md:col-span-3 space-y-6"}>
+                            <ContinuePanel 
+                                lastPackId={studyPacks[0]?.id}
+                                lastPackTitle={studyPacks[0]?.title}
+                                dueCountInPack={studyPacks[0]?.dueCount || 0}
+                            />
+                            <ExtraPacksBalance userId={userData?.id} userPlan={userData?.plan as 'free' | 'student_pro' | 'pro_plus'} />
+                        </div>
+                    </div>
 
                     {/* Stats Grid - Paper Cards with Consistent Styling */}
                     {hasPacks && (
@@ -382,50 +414,61 @@ export default function DashboardClient({
                                                     <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
                                                     
                                                     {/* Main card */}
-                                                    <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#94A3B8]/30 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(15,23,42,0.12),0_2px_4px_rgba(15,23,42,0.08)]">
+                                                    <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#94A3B8]/30 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(15,23,42,0.12),0_2px_4px_rgba(15,23,42,0.08)] overflow-hidden">
                                                         {/* Bookmark Tab - Amber for "needs attention" */}
                                                         {dueCardsInPack > 0 && (
-                                                            <div className="absolute -top-0 right-8 w-[20px] h-[16px] bg-[#F59E0B] rounded-b-[3px] shadow-sm">
+                                                            <div className="absolute -top-0 right-8 w-[20px] h-[16px] bg-[#F59E0B] rounded-b-[3px] shadow-sm z-20">
                                                                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[14px] h-[2px] bg-[#D97706] rounded-t-sm" />
                                                             </div>
                                                         )}
 
+                                                        {/* Decorative Orb Image - Bottom Right */}
+                                                        <div className="absolute -bottom-6 -right-6 w-32 h-32 opacity-[0.18] group-hover:opacity-[0.24] transition-opacity pointer-events-none">
+                                                            <Image
+                                                                src="/orb/sp_ds.png"
+                                                                alt=""
+                                                                width={128}
+                                                                height={128}
+                                                                className="object-contain"
+                                                            />
+                                                        </div>
+
                                                         {/* Header */}
-                                                        <div className="flex items-start justify-between mb-4">
+                                                        <div className="flex items-start justify-between mb-4 relative z-10">
                                                             <div className="w-10 h-10 rounded-lg bg-[#5A5FF0]/10 flex items-center justify-center">
                                                                 <Package className="w-5 h-5 text-[#5A5FF0]" strokeWidth={2} />
                                                             </div>
                                                         </div>
 
                                                         {/* Title */}
-                                                        <h3 className="text-[18px] font-bold text-[#1A1D2E] mb-2 line-clamp-2 group-hover:text-[#5A5FF0] transition-colors">
+                                                        <h3 className="text-[18px] font-bold text-[#1A1D2E] mb-2 line-clamp-2 group-hover:text-[#5A5FF0] transition-colors relative z-10">
                                                             {pack.title}
                                                         </h3>
 
                                                         {/* Summary */}
                                                         {pack.summary && (
-                                                            <p className="text-[14px] text-[#64748B] line-clamp-2 mb-4">
+                                                            <p className="text-[14px] text-[#64748B] line-clamp-2 mb-4 relative z-10">
                                                                 {pack.summary}
                                                             </p>
                                                         )}
 
                                                         {/* Stats */}
-                                                        <div className="flex items-center gap-4 text-[13px] text-[#64748B] pt-4 border-t border-[#E2E8F0]">
+                                                        <div className="flex items-center gap-4 text-[13px] text-[#64748B] pt-4 border-t border-[#E2E8F0] relative z-10">
                                                             <div className="flex items-center gap-1.5">
                                                                 <BookOpen className="w-4 h-4" strokeWidth={2} />
                                                                 <span>{cardCount} cards</span>
                                                             </div>
                                                             {dueCardsInPack > 0 && (
-                                                                <div className="flex items-center gap-1.5 text-[#F59E0B] font-medium">
+                                                                <div className="flex items-center gap-1.5 text-[#F59E0B] font-semibold">
                                                                     <Clock className="w-4 h-4" strokeWidth={2} />
-                                                                    <span>{dueCardsInPack} due</span>
+                                                                    <span>Next due: {dueCardsInPack}</span>
                                                                 </div>
                                                             )}
                                                         </div>
 
                                                         {/* Progress Bar */}
                                                         {progress > 0 && (
-                                                            <div className="mt-4">
+                                                            <div className="mt-4 relative z-10">
                                                                 <div className="flex items-center justify-between text-[12px] text-[#64748B] mb-1.5">
                                                                     <span>Progress</span>
                                                                     <span className="font-semibold">{progress}%</span>

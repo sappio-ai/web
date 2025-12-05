@@ -34,6 +34,7 @@
     "react-dom": "19.1.0",
     "reactflow": "^11.10.0",
     "resend": "^6.5.2",
+    "stripe": "^20.0.0",
     "word-extractor": "^1.0.4",
     "youtube-transcript": "^1.2.1",
     "youtubei.js": "^16.0.1"

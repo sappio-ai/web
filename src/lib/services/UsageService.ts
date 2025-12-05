@@ -10,6 +10,7 @@ import type {
   UserProfile,
 } from '../types/usage'
 import { DEFAULT_PLAN_LIMITS as FALLBACK_LIMITS } from '../types/usage'
+import { ExtraPacksService } from './ExtraPacksService'
 
 // Cache for plan limits (5 minute TTL)
 const planLimitsCache = new Map<
@@ -187,12 +188,13 @@ export class UsageService {
   }
 
   /**
-   * Checks if user can create a pack (with grace window)
+   * Checks if user can create a pack (with grace window and extra packs)
    */
   static async canCreatePack(userId: string): Promise<{
     allowed: boolean
     reason?: string
     usage?: UsageStats
+    consumptionSource?: 'monthly' | 'extra' | 'grace'
   }> {
     try {
       const user = await this.getUserProfile(userId)
@@ -204,6 +206,9 @@ export class UsageService {
       const periodEnd = this.calculatePeriodEnd(periodStart, user.billingAnchor)
       const currentUsage = await this.getUsageForPeriod(userId, periodStart)
 
+      // Get extra packs balance
+      const extraPacksBalance = await ExtraPacksService.getAvailableBalance(userId)
+
       const usage: UsageStats = {
         currentUsage,
         limit: limits.packsPerMonth,
@@ -214,23 +219,48 @@ export class UsageService {
         isAtLimit: currentUsage >= limits.packsPerMonth,
         isNearLimit: currentUsage >= limits.packsPerMonth * 0.8,
         hasGraceWindow: currentUsage === limits.packsPerMonth, // Allow 1 extra
+        extraPacksAvailable: extraPacksBalance.total,
+        totalAvailable: Math.max(0, limits.packsPerMonth - currentUsage) + extraPacksBalance.total,
       }
 
-      // Allow if under limit or in grace window (1 extra pack)
+      // Add expiration warning if packs expire within 30 days
+      if (extraPacksBalance.nearestExpiration) {
+        const daysUntilExpiration = Math.floor(
+          (extraPacksBalance.nearestExpiration.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        )
+        if (daysUntilExpiration <= 30 && daysUntilExpiration > 0) {
+          usage.extraPacksNearExpiration = {
+            count: extraPacksBalance.total,
+            expiresAt: extraPacksBalance.nearestExpiration,
+          }
+        }
+      }
+
+      // Priority 1: Allow if under monthly limit
       if (currentUsage < limits.packsPerMonth) {
-        return { allowed: true, usage }
+        return { allowed: true, usage, consumptionSource: 'monthly' }
       }
 
-      // Grace window: allow 1 extra pack for better conversion
+      // Priority 2: Grace window (allow 1 extra pack for better conversion)
       if (currentUsage === limits.packsPerMonth) {
         return {
           allowed: true,
           usage,
           reason: 'grace_window',
+          consumptionSource: 'grace',
         }
       }
 
-      // Over limit
+      // Priority 3: Check extra packs
+      if (extraPacksBalance.total > 0) {
+        return {
+          allowed: true,
+          usage,
+          consumptionSource: 'extra',
+        }
+      }
+
+      // Over limit and no extra packs
       return {
         allowed: false,
         usage,
@@ -246,7 +276,7 @@ export class UsageService {
   }
 
   /**
-   * Consumes pack quota with idempotency
+   * Consumes pack quota with idempotency (monthly first, then extra packs)
    */
   static async consumePackQuota(
     userId: string,
@@ -254,6 +284,7 @@ export class UsageService {
   ): Promise<{
     success: boolean
     newCount: number
+    source: 'monthly' | 'extra'
     usage?: UsageStats
   }> {
     try {
@@ -264,53 +295,92 @@ export class UsageService {
         user.timezone
       )
       const periodEnd = this.calculatePeriodEnd(periodStart, user.billingAnchor)
+      const currentUsage = await this.getUsageForPeriod(userId, periodStart)
 
-      // Use service role for background jobs
-      const supabase = createServiceRoleClient()
+      // Check if we should consume from monthly quota or extra packs
+      // Priority: monthly quota first (including grace window)
+      if (currentUsage <= limits.packsPerMonth) {
+        // Consume from monthly quota
+        const supabase = createServiceRoleClient()
+        const periodStartStr = periodStart.toISOString().split('T')[0]
+        const periodEndStr = periodEnd.toISOString().split('T')[0]
 
-      // Call the atomic increment function
-      const periodStartStr = periodStart.toISOString().split('T')[0]
-      const periodEndStr = periodEnd.toISOString().split('T')[0]
+        console.log('Consuming monthly pack quota for user:', userId)
 
-      console.log('Consuming pack quota for user:', userId)
+        const { data, error } = await supabase.rpc('increment_usage_counter', {
+          p_user_id: userId,
+          p_period_start: periodStartStr,
+          p_period_end: periodEndStr,
+          p_idempotency_key: idempotencyKey,
+        })
 
-      const { data, error } = await supabase.rpc('increment_usage_counter', {
-        p_user_id: userId,
-        p_period_start: periodStartStr,
-        p_period_end: periodEndStr,
-        p_idempotency_key: idempotencyKey,
-      })
+        if (error) {
+          console.error('Error consuming monthly pack quota:', error)
+          return { success: false, newCount: 0, source: 'monthly' }
+        }
 
-      if (error) {
-        console.error('Error consuming pack quota:', error)
-        return { success: false, newCount: 0 }
+        const newCount = data as number
+        console.log('Monthly pack quota consumed, new count:', newCount)
+
+        // Get extra packs for complete usage stats
+        const extraPacksBalance = await ExtraPacksService.getAvailableBalance(userId)
+
+        const usage: UsageStats = {
+          currentUsage: newCount,
+          limit: limits.packsPerMonth,
+          percentUsed: (newCount / limits.packsPerMonth) * 100,
+          remaining: limits.packsPerMonth - newCount,
+          periodStart,
+          periodEnd,
+          isAtLimit: newCount >= limits.packsPerMonth,
+          isNearLimit: newCount >= limits.packsPerMonth * 0.8,
+          hasGraceWindow: newCount === limits.packsPerMonth,
+          extraPacksAvailable: extraPacksBalance.total,
+          totalAvailable: Math.max(0, limits.packsPerMonth - newCount) + extraPacksBalance.total,
+        }
+
+        return { success: true, newCount, source: 'monthly', usage }
+      } else {
+        // Consume from extra packs
+        console.log('Consuming extra pack for user:', userId)
+
+        const result = await ExtraPacksService.consumeExtraPacks(
+          userId,
+          1,
+          idempotencyKey
+        )
+
+        if (!result.success) {
+          console.error('Error consuming extra pack')
+          return { success: false, newCount: 0, source: 'extra' }
+        }
+
+        console.log('Extra pack consumed, new balance:', result.newBalance)
+
+        const usage: UsageStats = {
+          currentUsage,
+          limit: limits.packsPerMonth,
+          percentUsed: (currentUsage / limits.packsPerMonth) * 100,
+          remaining: limits.packsPerMonth - currentUsage,
+          periodStart,
+          periodEnd,
+          isAtLimit: currentUsage >= limits.packsPerMonth,
+          isNearLimit: currentUsage >= limits.packsPerMonth * 0.8,
+          hasGraceWindow: false,
+          extraPacksAvailable: result.newBalance,
+          totalAvailable: Math.max(0, limits.packsPerMonth - currentUsage) + result.newBalance,
+        }
+
+        return { success: true, newCount: result.newBalance, source: 'extra', usage }
       }
-
-      console.log('Pack quota consumed, new count:', data)
-
-      const newCount = data as number
-
-      const usage: UsageStats = {
-        currentUsage: newCount,
-        limit: limits.packsPerMonth,
-        percentUsed: (newCount / limits.packsPerMonth) * 100,
-        remaining: limits.packsPerMonth - newCount,
-        periodStart,
-        periodEnd,
-        isAtLimit: newCount >= limits.packsPerMonth,
-        isNearLimit: newCount >= limits.packsPerMonth * 0.8,
-        hasGraceWindow: newCount === limits.packsPerMonth,
-      }
-
-      return { success: true, newCount, usage }
     } catch (error) {
       console.error('Error consuming pack quota:', error)
-      return { success: false, newCount: 0 }
+      return { success: false, newCount: 0, source: 'monthly' }
     }
   }
 
   /**
-   * Gets detailed usage statistics for a user
+   * Gets detailed usage statistics for a user (including extra packs)
    */
   static async getUsageStats(userId: string): Promise<UsageStats> {
     const user = await this.getUserProfile(userId)
@@ -322,7 +392,10 @@ export class UsageService {
     const periodEnd = this.calculatePeriodEnd(periodStart, user.billingAnchor)
     const currentUsage = await this.getUsageForPeriod(userId, periodStart)
 
-    return {
+    // Get extra packs balance
+    const extraPacksBalance = await ExtraPacksService.getAvailableBalance(userId)
+
+    const stats: UsageStats = {
       currentUsage,
       limit: limits.packsPerMonth,
       percentUsed: (currentUsage / limits.packsPerMonth) * 100,
@@ -332,7 +405,24 @@ export class UsageService {
       isAtLimit: currentUsage >= limits.packsPerMonth,
       isNearLimit: currentUsage >= limits.packsPerMonth * 0.8,
       hasGraceWindow: currentUsage === limits.packsPerMonth,
+      extraPacksAvailable: extraPacksBalance.total,
+      totalAvailable: Math.max(0, limits.packsPerMonth - currentUsage) + extraPacksBalance.total,
     }
+
+    // Add expiration warning if packs expire within 30 days
+    if (extraPacksBalance.nearestExpiration) {
+      const daysUntilExpiration = Math.floor(
+        (extraPacksBalance.nearestExpiration.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      )
+      if (daysUntilExpiration <= 30 && daysUntilExpiration > 0) {
+        stats.extraPacksNearExpiration = {
+          count: extraPacksBalance.total,
+          expiresAt: extraPacksBalance.nearestExpiration,
+        }
+      }
+    }
+
+    return stats
   }
 
   /**
@@ -413,6 +503,42 @@ export class UsageService {
       mindmapNodesLimit: row.mindmap_nodes_limit,
       priorityProcessing: row.priority_processing,
     }))
+  }
+
+  /**
+   * Gets expiration warning for extra packs (if any expire within 30 days)
+   */
+  static async getExpirationWarning(userId: string): Promise<{
+    hasWarning: boolean
+    count?: number
+    expiresAt?: Date
+    daysRemaining?: number
+  }> {
+    try {
+      const extraPacksBalance = await ExtraPacksService.getAvailableBalance(userId)
+
+      if (!extraPacksBalance.nearestExpiration || extraPacksBalance.total === 0) {
+        return { hasWarning: false }
+      }
+
+      const daysUntilExpiration = Math.floor(
+        (extraPacksBalance.nearestExpiration.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      )
+
+      if (daysUntilExpiration <= 30 && daysUntilExpiration > 0) {
+        return {
+          hasWarning: true,
+          count: extraPacksBalance.total,
+          expiresAt: extraPacksBalance.nearestExpiration,
+          daysRemaining: daysUntilExpiration,
+        }
+      }
+
+      return { hasWarning: false }
+    } catch (error) {
+      console.error('Error getting expiration warning:', error)
+      return { hasWarning: false }
+    }
   }
 
   /**

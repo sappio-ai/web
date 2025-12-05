@@ -7,11 +7,13 @@ import { usePathname } from 'next/navigation'
 import { createBrowserClient } from '@/lib/supabase/client'
 import UserMenu from './UserMenu'
 import CreatePackModal from '@/components/materials/CreatePackModal'
+import PlanBadge from './PlanBadge'
 import type { User } from '@supabase/supabase-js'
 import { Menu, X } from 'lucide-react'
 
 export default function NavbarClient() {
   const [user, setUser] = useState<User | null>(null)
+  const [userPlan, setUserPlan] = useState<'free' | 'student_pro' | 'pro_plus'>('free')
   const [loading, setLoading] = useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -23,6 +25,20 @@ export default function NavbarClient() {
     const getSession = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
+      
+      // Get user plan
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('plan')
+          .eq('auth_user_id', user.id)
+          .single()
+        
+        if (profile?.plan) {
+          setUserPlan(profile.plan as 'free' | 'student_pro' | 'pro_plus')
+        }
+      }
+      
       setLoading(false)
     }
 
@@ -135,6 +151,8 @@ export default function NavbarClient() {
                 <div className="w-32 h-8 bg-[#F1F5F9] animate-pulse rounded-lg" />
               ) : user ? (
                 <>
+                  <PlanBadge plan={userPlan} />
+                  
                   <button
                     onClick={() => setIsCreateModalOpen(true)}
                     className="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-sm font-semibold rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 focus:ring-offset-2 flex items-center gap-2 active:scale-[0.98] shadow-sm whitespace-nowrap"

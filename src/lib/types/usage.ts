@@ -34,6 +34,13 @@ export interface UsageStats {
   isAtLimit: boolean
   isNearLimit: boolean // 80% threshold
   hasGraceWindow: boolean
+  // Extra packs fields
+  extraPacksAvailable?: number
+  extraPacksNearExpiration?: {
+    count: number
+    expiresAt: Date
+  }
+  totalAvailable?: number // remaining + extraPacksAvailable
 }
 
 export interface UserProfile {

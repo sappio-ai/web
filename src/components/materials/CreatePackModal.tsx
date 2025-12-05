@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import UploadZone from './UploadZone'
 import Orb from '../orb/Orb'
 import { PaywallModal } from '../paywall/PaywallModal'
+import { QuotaExhaustedPaywall } from '../paywall/QuotaExhaustedPaywall'
 import { isValidUrl } from '@/lib/utils/files'
 import { X, Upload, Link2, FileText } from 'lucide-react'
 import type { UsageStats } from '@/lib/types/usage'
@@ -244,11 +245,10 @@ export default function CreatePackModal({
 
   return (
     <>
-      <PaywallModal
+      <QuotaExhaustedPaywall
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
         usage={paywallUsage}
-        trigger="upload"
         currentPlan="free"
       />
 
