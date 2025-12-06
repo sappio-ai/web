@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Check, Copy, Share2, ChevronDown, Sparkles, Target, TrendingUp } from 'lucide-react'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import BookmarkCorner from '@/components/ui/BookmarkNotch'
@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation'
 
 export default function WaitlistClient() {
   const searchParams = useSearchParams()
+  const videoRef = useRef<HTMLVideoElement>(null)
   const [formData, setFormData] = useState({
     email: '',
     studying: '',
@@ -21,6 +22,29 @@ export default function WaitlistClient() {
   const [referralCode, setReferralCode] = useState('')
   const [copied, setCopied] = useState(false)
   const [referredBy, setReferredBy] = useState<string | null>(null)
+
+  // Video lazy loading
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {})
+          } else {
+            video.pause()
+            video.currentTime = 0
+          }
+        })
+      },
+      { threshold: 0.25 }
+    )
+
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
 
   // Capture referral code from URL on mount
   useEffect(() => {
@@ -220,8 +244,34 @@ export default function WaitlistClient() {
             </div>
           </div>
 
-          {/* Right: Form */}
-          <div className="relative z-10">
+          {/* Right: Video + Form */}
+          <div className="relative z-10 space-y-8">
+            {/* Video with browser frame */}
+            <div className="relative">
+              <div className="relative bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+                <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <div className="flex-1 mx-4 bg-white rounded-md px-3 py-1 text-xs text-gray-500 border border-gray-200">
+                    sappio.ai
+                  </div>
+                </div>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto"
+                >
+                  <source src="/hero2.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
+
             <BookmarkCorner size="md" />
             
             <div 

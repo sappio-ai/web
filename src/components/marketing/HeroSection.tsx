@@ -1,9 +1,33 @@
+'use client'
+
 import Link from 'next/link'
-import { Shield, Lock, Target, Award } from 'lucide-react'
-import HeroPreviewCard from '@/components/ui/HeroPreviewCard'
-import DecorArt from '@/components/ui/DecorArt'
+import { Shield, Lock, Target } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 export default function HeroSection() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {})
+          } else {
+            video.pause()
+            video.currentTime = 0
+          }
+        })
+      },
+      { threshold: 0.25 }
+    )
+
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
   return (
     <section className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-visible">
       <div className="max-w-7xl mx-auto">
@@ -51,15 +75,36 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right: Hero mascot image at 100% opacity */}
+          {/* Right: Hero video */}
           <div className="relative flex items-center justify-center">
-            <DecorArt 
-              src="/brand/mascot/mascot-hero-3x2.png"
-              alt="Sappio mascot with study materials"
-              variant="float"
-              width={600}
-              height={400}
-            />
+            <div className="relative" style={{ maxWidth: '600px' }}>
+              {/* Browser frame */}
+              <div className="relative bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+                {/* Browser chrome */}
+                <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <div className="flex-1 mx-4 bg-white rounded-md px-3 py-1 text-xs text-gray-500 border border-gray-200">
+                    sappio.ai
+                  </div>
+                </div>
+                
+                {/* Video */}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-auto"
+                >
+                  <source src="/hero2.mp4" type="video/mp4" />
+                </video>
+              </div>
+            </div>
           </div>
         </div>
       </div>
