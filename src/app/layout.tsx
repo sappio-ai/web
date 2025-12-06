@@ -13,10 +13,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://sappio.ai'),
   title: {
-    default: "Sappio - Your AI Study Companion",
+    default: "Sappio - Turn Your Notes Into Perfect Study Packs",
     template: "%s | Sappio"
   },
-  description: "Upload once, learn everything. Transform your study materials into smart notes, flashcards, quizzes, and mind maps.",
+  description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds. AI-powered study companion for students.",
   keywords: ["AI study tool", "flashcards", "study notes", "quiz generator", "mind maps", "spaced repetition", "exam prep"],
   authors: [{ name: "Sappio" }],
   openGraph: {
@@ -24,22 +24,22 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://sappio.ai",
     siteName: "Sappio",
-    title: "Sappio - Your AI Study Companion",
-    description: "Upload once, learn everything. Transform your study materials into smart notes, flashcards, quizzes, and mind maps.",
+    title: "Sappio - Turn Your Notes Into Perfect Study Packs",
+    description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds. AI-powered study companion for students.",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://sappio.ai/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Sappio - AI Study Companion"
+        alt: "Sappio - Turn Your Notes Into Perfect Study Packs"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sappio - Your AI Study Companion",
-    description: "Upload once, learn everything. Transform your study materials into smart notes, flashcards, quizzes, and mind maps.",
-    images: ["/og-image.png"],
+    title: "Sappio - Turn Your Notes Into Perfect Study Packs",
+    description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds. AI-powered study companion for students.",
+    images: ["https://sappio.ai/og-image.png"],
     creator: "@sappio_ai"
   },
   robots: {
