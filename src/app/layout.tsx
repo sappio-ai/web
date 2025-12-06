@@ -11,8 +11,48 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Sappio - Your AI Study Companion",
+  metadataBase: new URL('https://sappio.ai'),
+  title: {
+    default: "Sappio - Your AI Study Companion",
+    template: "%s | Sappio"
+  },
   description: "Upload once, learn everything. Transform your study materials into smart notes, flashcards, quizzes, and mind maps.",
+  keywords: ["AI study tool", "flashcards", "study notes", "quiz generator", "mind maps", "spaced repetition", "exam prep"],
+  authors: [{ name: "Sappio" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://sappio.ai",
+    siteName: "Sappio",
+    title: "Sappio - Your AI Study Companion",
+    description: "Upload once, learn everything. Transform your study materials into smart notes, flashcards, quizzes, and mind maps.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Sappio - AI Study Companion"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sappio - Your AI Study Companion",
+    description: "Upload once, learn everything. Transform your study materials into smart notes, flashcards, quizzes, and mind maps.",
+    images: ["/og-image.png"],
+    creator: "@sappio_ai"
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({

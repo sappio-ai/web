@@ -1,3 +1,4 @@
+import { Metadata } from 'next'
 import HeroSection from '@/components/marketing/HeroSection'
 import StepTimeline from '@/components/marketing/StepTimeline'
 import SeeTheOutput from '@/components/marketing/SeeTheOutput'
@@ -5,6 +6,20 @@ import WhatYouGet from '@/components/marketing/WhatYouGet'
 import PricingSection from '@/components/marketing/PricingSection'
 import FAQAccordion from '@/components/marketing/FAQAccordion'
 import FinalCTA from '@/components/marketing/FinalCTA'
+
+export const metadata: Metadata = {
+  title: "Sappio - Turn Your Notes Into Perfect Study Packs",
+  description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds. AI-powered study companion for university students.",
+  openGraph: {
+    title: "Sappio - Turn Your Notes Into Perfect Study Packs",
+    description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds.",
+    url: "https://sappio.ai",
+  },
+  twitter: {
+    title: "Sappio - Turn Your Notes Into Perfect Study Packs",
+    description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds.",
+  }
+}
 
 export default function LandingPage() {
   return (
