@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds. AI-powered study companion for students.",
     images: [
       {
-        url: "https://sappio.ai/og-image.png",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Sappio - Turn Your Notes Into Perfect Study Packs"
