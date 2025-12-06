@@ -1,108 +1,154 @@
 'use client'
 
-import { useState } from 'react'
-import { Check } from 'lucide-react'
-import BookmarkCorner from '@/components/ui/BookmarkNotch'
+import { Check, X, Sparkles, Zap, GraduationCap, Crown } from 'lucide-react'
 import Link from 'next/link'
 
 export default function PricingSection() {
-  const [isYearly, setIsYearly] = useState(false)
-  
   const tiers = [
-    { 
-      name: 'Free', 
-      desc: 'Get started', 
-      features: ['5 packs/month', '40 cards per pack', '15-question quizzes', '80 mind map nodes', 'No exports'],
-      bestFor: 'Casual learners',
-      highlight: false
+    {
+      name: 'Free',
+      price: '$0',
+      period: '/mo',
+      desc: 'For casual learning',
+      features: [
+        '5 packs / month',
+        '40 cards per pack',
+        'Basic quizzes',
+        'No exports'
+      ],
+      cta: 'Start for free',
+      href: '/waitlist',
+      popular: false,
+      color: 'bg-white',
+      border: 'border-slate-200',
+      text: 'text-slate-900',
+      button: 'bg-slate-100 text-slate-900 hover:bg-slate-200'
     },
-    { 
-      name: 'Student Pro', 
-      desc: 'Most popular', 
-      features: ['60 packs/month', '120 cards per pack', '30-question quizzes', '250 mind map nodes', 'All export formats', 'Timed quiz mode', 'Weak topics practice', 'Priority processing'],
-      bestFor: 'Exam season',
-      highlight: true
+    {
+      name: 'Student Pro',
+      price: '$9',
+      period: '/mo',
+      desc: 'For serious students',
+      features: [
+        '60 packs / month',
+        'Unlimited cards',
+        'Advanced quizzes',
+        'Spaced repetition',
+        'All export formats',
+        'Priority support'
+      ],
+      cta: 'Join Waitlist',
+      href: '/waitlist',
+      popular: true,
+      color: 'bg-[#1A1D2E]',  // Dark Mode
+      border: 'border-[#1A1D2E]',
+      text: 'text-white',
+      button: 'bg-[#5A5FF0] text-white hover:bg-[#4A4FD0]'
     },
-    { 
-      name: 'Pro', 
-      desc: 'For power users', 
-      features: ['300 packs/month', '300 cards per pack', '60-question quizzes', '800 mind map nodes', 'All export formats', 'Advanced analytics', 'Priority processing', 'API access (coming soon)'],
-      bestFor: 'Power users',
-      highlight: false
+    {
+      name: 'Pro Plus',
+      price: '$19',
+      period: '/mo',
+      desc: 'For heavy research',
+      features: [
+        '300 packs / month',
+        'Everything in Student Pro',
+        'API Access',
+        'Deep research mode',
+        'Team attributes'
+      ],
+      cta: 'Join Waitlist',
+      href: '/waitlist',
+      popular: false,
+      color: 'bg-white',
+      border: 'border-slate-200',
+      text: 'text-slate-900',
+      button: 'bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-900'
     }
   ]
-  
+
   return (
-    <div>
-      {/* Monthly/Yearly toggle */}
-      <div className="flex items-center justify-center gap-3 mb-12">
-        <span className={`text-sm font-semibold ${!isYearly ? 'text-[var(--ink)]' : 'text-[var(--text)]'}`}>
-          Monthly
-        </span>
-        <button
-          onClick={() => setIsYearly(!isYearly)}
-          className="relative w-14 h-7 bg-[var(--bg)] border-2 border-[var(--border)] rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40"
-        >
-          <div 
-            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[var(--primary)] rounded-full transition-transform ${
-              isYearly ? 'translate-x-7' : 'translate-x-0'
-            }`}
-          />
-        </button>
-        <span className={`text-sm font-semibold ${isYearly ? 'text-[var(--ink)]' : 'text-[var(--text)]'}`}>
-          Yearly
-        </span>
+    <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="text-center mb-16">
+        <h2 className="text-[40px] md:text-[56px] font-bold text-[#1A1D2E] mb-6 tracking-[-0.02em]">
+          Choose later, free to start
+        </h2>
+        <p className="text-xl text-[#64748B]">
+          Start free, upgrade when you need more packs and faster generation.
+        </p>
       </div>
-      
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+
+      <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-center">
         {tiers.map((tier, i) => (
-          <div 
-            key={i} 
-            className={`relative rounded-2xl p-8 transition-all duration-200 ${
-              tier.highlight 
-                ? 'border-2 border-[var(--primary)] hover:-translate-y-1' 
-                : 'border border-[var(--border)] hover:border-[var(--primary)] hover:-translate-y-0.5'
-            }`}
-            style={{ 
-              backgroundColor: 'white',
-              boxShadow: tier.highlight ? '0 0 0 4px rgba(91, 108, 255, 0.08), var(--shadow-lg)' : 'var(--shadow)'
-            }}
+          <div
+            key={i}
+            className={`
+                relative p-8 rounded-[32px] transition-all duration-300 flex flex-col h-full
+                ${tier.popular ? 'scale-105 shadow-2xl z-10' : 'scale-100 shadow-xl z-0'}
+                ${tier.color} ${tier.popular ? 'border-none' : `border ${tier.border}`}
+            `}
           >
-            {tier.highlight && <BookmarkCorner size="md" />}
-            
-            <h3 className="text-2xl font-bold text-[var(--ink)] mb-1 mt-2">{tier.name}</h3>
-            <p className="text-sm text-[var(--text)] mb-8">{tier.desc}</p>
-            <ul className="space-y-3 mb-8">
-              {tier.features.map((f, j) => (
-                <li key={j} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 mt-0.5 flex-shrink-0 text-[var(--primary)]" />
-                  <span className="text-sm text-[var(--text)]">{f}</span>
-                </li>
-              ))}
-            </ul>
-            
-            <div className="space-y-3">
-              <Link
-                href="/waitlist"
-                className="block w-full px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-sm font-semibold rounded-xl transition-all text-center"
-              >
-                Join waitlist
-              </Link>
-              <button className="w-full px-6 py-3 bg-white hover:bg-[var(--bg)] text-[var(--text)] text-sm font-semibold rounded-xl border border-[var(--border)] transition-all">
-                Notify me
-              </button>
+            {tier.popular && (
+              <div className="absolute -top-5 left-0 right-0 flex justify-center">
+                <div className="bg-gradient-to-r from-[#5A5FF0] to-[#6366f1] text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-1.5 ring-4 ring-white">
+                  <Sparkles className="w-3.5 h-3.5 fill-current" />
+                  Most Popular
+                </div>
+              </div>
+            )}
+
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tier.popular ? 'bg-white/10' : 'bg-slate-100'}`}>
+                  {tier.name === 'Free' && <Zap className={`w-5 h-5 ${tier.popular ? 'text-white' : 'text-slate-600'}`} />}
+                  {tier.popular && <GraduationCap className="w-5 h-5 text-white" />}
+                  {(tier.name === 'Pro Plus' || tier.name === 'Power') && <Crown className="w-5 h-5 text-slate-600" />}
+                </div>
+                <h3 className={`text-xl font-bold ${tier.text}`}>{tier.name}</h3>
+              </div>
+
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className={`text-5xl font-bold tracking-tight ${tier.text}`}>
+                  {tier.price}
+                </span>
+                {tier.period && (
+                  <span className={`text-lg font-medium opacity-60 ${tier.text}`}>
+                    {tier.period}
+                  </span>
+                )}
+              </div>
+              <p className={`font-medium opacity-80 ${tier.text}`}>{tier.desc}</p>
             </div>
-            
-            <p className="text-xs text-[var(--text)] text-center mt-4">
-              Best for: <span className="font-semibold">{tier.bestFor}</span>
-            </p>
+
+            <div className="space-y-4 mb-8 flex-1">
+              {tier.features.map((feat, j) => (
+                <div key={j} className="flex items-start gap-3">
+                  <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${tier.popular ? 'bg-[#5A5FF0] text-white' : 'bg-slate-100 text-slate-600'}`}>
+                    <Check className="w-3 h-3" strokeWidth={3} />
+                  </div>
+                  <span className={`text-[15px] font-medium opacity-90 ${tier.text}`}>
+                    {feat}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <Link
+              href={tier.href}
+              className={`w-full py-4 rounded-2xl font-bold text-[16px] text-center transition-all duration-200 shadow-sm hover:shadow-md ${tier.button}`}
+            >
+              {tier.cta}
+            </Link>
           </div>
         ))}
       </div>
-      
-      <p className="text-sm text-center text-[var(--primary)] font-semibold">
-        💰 Early access pricing will be discounted for waitlist members
-      </p>
+
+      <div className="mt-16 text-center">
+        <p className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-slate-600 font-semibold text-sm shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          Early access pricing is discounted for waitlist members
+        </p>
+      </div>
     </div>
   )
 }

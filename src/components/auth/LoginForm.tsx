@@ -206,16 +206,18 @@ export default function LoginForm() {
                                 <p className="text-[15px] text-[#4A5568]">Pick up where you left off</p>
                             </div>
 
-                            {/* Paper Stack Container */}
+                            {/* Paper Shadow Container */}
                             <div className="relative">
-                                {/* Backing sheet - document layer */}
-                                <div className="absolute top-[6px] left-[6px] right-[-6px] h-full bg-white/40 rounded-xl border border-[#94A3B8]/25" />
+                                {/* Paper Shadow Effect */}
+                                <div className="absolute inset-0 bg-[#1A1D2E] rounded-3xl translate-y-3 translate-x-3" />
                                 
-                                {/* Top sheet - main card with hover lift */}
-                                <div className="relative bg-white rounded-xl shadow-[0_2px_12px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.06)] border border-[#94A3B8]/30 transition-all duration-200 hover:translate-y-[-1px] hover:shadow-[0_4px_16px_rgba(15,23,42,0.12),0_2px_4px_rgba(15,23,42,0.08)] overflow-visible">
-                                    {/* Bookmark Tab - attached to paper with notch */}
+                                {/* Main card */}
+                                <div className="relative bg-white rounded-3xl border-2 border-[#1A1D2E] overflow-hidden">
+                                    {/* Decorative Corner Accent */}
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFDE59] rounded-bl-[60px] opacity-20" />
+                                    
+                                    {/* Bookmark Tab */}
                                     <div className="absolute -top-[2px] right-12 w-[28px] h-[22px] bg-[#5A5FF0] rounded-b-[5px] shadow-[0_2px_4px_rgba(90,95,240,0.3)]">
-                                        {/* Notch detail for attachment */}
                                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[20px] h-[3px] bg-[#4A4FD0] rounded-t-sm" />
                                     </div>
                                     
@@ -303,13 +305,17 @@ export default function LoginForm() {
                                             </div>
                                         </div>
 
-                                        <button
-                                            type="submit"
-                                            disabled={!isFormValid || loading}
-                                            className="w-full h-12 mt-6 px-6 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-semibold text-[15px] rounded-xl transition-all duration-150 disabled:bg-[#E2E8F0] disabled:text-[#94A3B8] disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2"
-                                        >
-                                            {loading ? 'Signing in...' : 'Sign in'}
-                                        </button>
+                                        {/* Button with Paper Shadow */}
+                                        <div className="relative group/btn mt-6">
+                                            <div className="absolute inset-0 bg-[#1A1D2E] rounded-xl translate-y-1.5 translate-x-1.5 transition-transform group-hover/btn:translate-y-2 group-hover/btn:translate-x-2" />
+                                            <button
+                                                type="submit"
+                                                disabled={!isFormValid || loading}
+                                                className="relative w-full h-12 px-6 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-semibold text-[15px] rounded-xl border-2 border-[#1A1D2E] transition-colors disabled:bg-[#E2E8F0] disabled:text-[#94A3B8] disabled:cursor-not-allowed disabled:border-[#E2E8F0]"
+                                            >
+                                                {loading ? 'Signing in...' : 'Sign in'}
+                                            </button>
+                                        </div>
                                     </form>
 
                                         {/* Switch link */}

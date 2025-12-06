@@ -1,56 +1,58 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import { ArrowRight, Sparkles } from 'lucide-react'
 
 export default function FinalCTA() {
   return (
-    <div className="relative">
-      {/* Orbit motif background */}
-      <svg 
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-10" 
-        viewBox="0 0 800 400"
-      >
-        <ellipse cx="400" cy="200" rx="300" ry="150" stroke="var(--primary)" strokeWidth="2" fill="none" strokeDasharray="12 8" />
-        <ellipse cx="400" cy="200" rx="200" ry="100" stroke="var(--primary)" strokeWidth="2" fill="none" strokeDasharray="8 6" />
-        <circle cx="400" cy="50" r="6" fill="var(--primary)" />
-        <circle cx="100" cy="200" r="6" fill="var(--primary)" />
-        <circle cx="700" cy="200" r="6" fill="var(--primary)" />
-        <circle cx="400" cy="350" r="6" fill="var(--primary)" />
-      </svg>
-      
-      {/* Mascot sticker */}
-      <div className="absolute top-8 right-8 w-24 h-24 hidden md:block z-10">
-        <Image
-          src="/brand/mascot/mascot-orbit-1x1.png"
-          alt="Sappio mascot"
-          width={96}
-          height={96}
-          className="object-contain"
-        />
-      </div>
-      
-      <div 
-        className="relative bg-white rounded-3xl p-16 border border-[var(--border)] text-center"
-        style={{ boxShadow: 'var(--shadow-lg)' }}
-      >
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-[48px] font-bold text-[var(--ink)] mb-4 tracking-[-0.01em]">
-            Ready to transform your studying?
-          </h2>
-          <p className="text-lg text-[var(--text)] mb-8">
-            Join the waitlist and be the first to know when we launch
-          </p>
+    <div className="relative py-24 md:py-32 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Paper Shadow Effect */}
+        <div className="relative group">
+          <div className="absolute inset-0 bg-[#1A1D2E] rounded-3xl translate-y-3 translate-x-3 transition-transform duration-300 group-hover:translate-y-4 group-hover:translate-x-4" />
           
-          <Link
-            href="/waitlist"
-            className="inline-block px-10 py-5 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-lg font-semibold rounded-xl transition-all duration-150 shadow-lg hover:shadow-xl active:scale-[0.98] relative overflow-hidden group"
-          >
-            <span className="relative z-10">Join the waitlist →</span>
-            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          </Link>
-          
-          <p className="text-sm text-[var(--text)] mt-6">
-            No spam. One email when you&apos;re in.
-          </p>
+          <div className="relative bg-white rounded-3xl border-2 border-[#1A1D2E] p-12 md:p-20 text-center overflow-hidden">
+            {/* Decorative Corner Accent */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFDE59] rounded-bl-[100px] opacity-20" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#5A5FF0] rounded-tr-[80px] opacity-10" />
+
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F8FAFB] border border-[#E2E8F0] mb-8">
+                <Sparkles className="w-4 h-4 text-[#5A5FF0]" />
+                <span className="text-sm font-semibold text-[#1A1D2E]">Limited Early Access</span>
+              </div>
+
+              <h2 className="text-[48px] md:text-[64px] font-bold text-[#1A1D2E] mb-6 tracking-[-0.03em] leading-[1.05] max-w-2xl mx-auto">
+                Ready to ace <br className="hidden md:block" /> your exams?
+              </h2>
+
+              <p className="text-xl text-[#64748B] mb-12 max-w-lg mx-auto leading-relaxed">
+                Stop stressing over messy notes. Convert them into clear, actionable study packs in seconds.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                {/* Primary CTA with Paper Shadow */}
+                <div className="relative w-full sm:w-auto group/btn">
+                  <div className="absolute inset-0 bg-[#1A1D2E] rounded-xl translate-y-1.5 translate-x-1.5 transition-transform group-hover/btn:translate-y-2 group-hover/btn:translate-x-2" />
+                  <Link
+                    href="/waitlist"
+                    className="relative flex items-center justify-center px-8 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-lg font-bold rounded-xl border-2 border-[#1A1D2E] transition-colors shadow-sm"
+                  >
+                    <span className="flex items-center gap-2">
+                      Join the waitlist
+                      <ArrowRight className="w-5 h-5" />
+                    </span>
+                  </Link>
+                </div>
+
+                {/* Secondary CTA */}
+                <Link
+                  href="/#how-it-works"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-[#F8FAFB] text-[#1A1D2E] text-lg font-bold rounded-xl border-2 border-[#E2E8F0] hover:border-[#CBD5E1] transition-all duration-200"
+                >
+                  See how it works
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
