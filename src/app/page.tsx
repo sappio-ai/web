@@ -14,10 +14,20 @@ export const metadata: Metadata = {
     title: "Sappio - Turn Your Notes Into Perfect Study Packs",
     description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds.",
     url: "https://sappio.ai",
+    images: [
+      {
+        url: "https://sappio.ai/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Sappio - Turn Your Notes Into Perfect Study Packs"
+      }
+    ]
   },
   twitter: {
+    card: "summary_large_image",
     title: "Sappio - Turn Your Notes Into Perfect Study Packs",
     description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds.",
+    images: ["https://sappio.ai/og-image.png"],
   }
 }
 
