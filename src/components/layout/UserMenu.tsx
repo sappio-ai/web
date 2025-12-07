@@ -8,9 +8,10 @@ import type { User } from '@supabase/supabase-js'
 
 interface UserMenuProps {
   user: User
+  plan?: 'free' | 'student_pro' | 'pro_plus'
 }
 
-export default function UserMenu({ user }: UserMenuProps) {
+export default function UserMenu({ user, plan = 'free' }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -20,6 +21,18 @@ export default function UserMenu({ user }: UserMenuProps) {
   const getInitials = () => {
     const email = user.email || ''
     return email.charAt(0).toUpperCase()
+  }
+
+  // Get plan display name
+  const getPlanLabel = () => {
+    switch (plan) {
+      case 'student_pro':
+        return 'Student Pro'
+      case 'pro_plus':
+        return 'Pro Plus'
+      default:
+        return 'Free Plan'
+    }
   }
 
   // Close menu when clicking outside
@@ -68,7 +81,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           {/* User Info */}
           <div className="px-4 py-3 border-b border-[#E2E8F0]">
             <p className="text-[13px] font-medium text-[#1A1D2E] truncate">{user.email}</p>
-            <p className="text-[11px] text-[#64748B] mt-0.5">Free Plan</p>
+            <p className="text-[11px] text-[#64748B] mt-0.5">{getPlanLabel()}</p>
           </div>
 
           {/* Menu Items */}

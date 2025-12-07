@@ -163,7 +163,7 @@ export default function NavbarClient() {
                     <span className="hidden lg:inline">New Pack</span>
                     <span className="lg:hidden">New</span>
                   </button>
-                  <UserMenu user={user} />
+                  <UserMenu user={user} plan={userPlan} />
                 </>
               ) : (
                 <>
@@ -281,7 +281,9 @@ export default function NavbarClient() {
                       <div className="px-3 py-2 bg-[#F8FAFB] rounded-lg mx-2 mb-2">
                         <div className="text-xs text-[#64748B] mb-1">Signed in as</div>
                         <div className="text-sm font-semibold text-[#1A1D2E] truncate">{user.email}</div>
-                        <div className="text-xs text-[#64748B] mt-1">Free Plan</div>
+                        <div className="text-xs text-[#64748B] mt-1">
+                          {userPlan === 'student_pro' ? 'Student Pro' : userPlan === 'pro_plus' ? 'Pro Plus' : 'Free Plan'}
+                        </div>
                       </div>
 
                       <Link
