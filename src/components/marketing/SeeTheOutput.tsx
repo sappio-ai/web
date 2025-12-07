@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Check, Clock, Star, ChevronRight, Sparkles } from 'lucide-react'
 import DotPattern from '@/components/ui/DotPattern'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function SeeTheOutput() {
   const [activeTab, setActiveTab] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   const tabs = [
     {
@@ -89,7 +90,7 @@ export default function SeeTheOutput() {
 
         <div className="grid lg:grid-cols-[400px_1fr] gap-12 items-start">
           {/* Left: Tabs + bullets */}
-          <div className="sticky top-24">
+          <div className="lg:sticky lg:top-24">
             {/* Tabs */}
             <div className="flex flex-col gap-3 mb-8">
               {tabs.map((tab, i) => (
@@ -98,6 +99,12 @@ export default function SeeTheOutput() {
                   onClick={() => {
                     setActiveTab(i)
                     setIsFlipped(false)
+                    // Scroll to preview on mobile
+                    if (window.innerWidth < 1024 && previewRef.current) {
+                      setTimeout(() => {
+                        previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                      }, 100)
+                    }
                   }}
                   className={`relative px-6 py-4 text-left text-base font-bold rounded-xl transition-all duration-300 ${activeTab === i
                     ? 'bg-[#1A1D2E] text-white shadow-lg translate-x-2'
@@ -158,7 +165,7 @@ export default function SeeTheOutput() {
           </div>
 
           {/* Right: Big demo preview */}
-          <div className="relative isolate group">
+          <div ref={previewRef} className="relative isolate group scroll-mt-24">
             {/* Paper Stack Effect */}
             <div className="absolute top-[8px] left-[8px] right-[-8px] bottom-[-8px] bg-white rounded-2xl border border-[#94A3B8]/20 -z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:translate-y-1" />
             <div className="absolute top-[16px] left-[16px] right-[-16px] bottom-[-16px] bg-white/40 rounded-2xl border border-[#94A3B8]/20 -z-20 transition-transform duration-300 group-hover:translate-x-2 group-hover:translate-y-2" />

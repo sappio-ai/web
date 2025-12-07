@@ -140,7 +140,7 @@ export default function WhatYouGet() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group h-[320px] flex flex-col"
+              className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group min-h-[320px] md:h-[320px] flex flex-col"
             >
               {/* Window Header */}
               <div className="h-10 border-b border-[#F1F5F9] bg-white flex items-center justify-between px-4 shrink-0">
@@ -152,9 +152,9 @@ export default function WhatYouGet() {
                 <MoreHorizontal className="w-4 h-4 text-slate-300" />
               </div>
 
-              <div className="flex-1 flex flex-col md:flex-row">
+              <div className="flex-1 flex flex-col md:flex-row min-h-0">
                 {/* Content Side */}
-                <div className="p-8 flex flex-col justify-center md:w-1/2 z-10 relative bg-white">
+                <div className="p-6 md:p-8 flex flex-col justify-center md:w-1/2 z-10 relative bg-white">
                   <div className="w-12 h-12 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center mb-4 text-[#5A5FF0]">
                     <feature.icon className="w-6 h-6" />
                   </div>
@@ -165,7 +165,7 @@ export default function WhatYouGet() {
                 </div>
 
                 {/* Visual Side */}
-                <div className="md:w-1/2 bg-slate-50 border-l border-[#F1F5F9] relative overflow-hidden group-hover:bg-slate-50/80 transition-colors">
+                <div className="md:w-1/2 bg-slate-50 md:border-l border-t md:border-t-0 border-[#F1F5F9] relative overflow-hidden group-hover:bg-slate-50/80 transition-colors min-h-[200px]">
                   {feature.visual}
                 </div>
               </div>
