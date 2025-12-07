@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/profile/ProfileForm'
-import { ArrowLeft, Sparkles, Zap, Crown, AlertCircle, Calendar } from 'lucide-react'
+import { ArrowLeft, Sparkles, Zap, Crown, Calendar } from 'lucide-react'
 
 export default async function ProfilePage() {
   const supabase = await createClient()

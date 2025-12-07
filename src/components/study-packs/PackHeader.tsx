@@ -63,7 +63,7 @@ export default function PackHeader({ pack }: PackHeaderProps) {
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
           <span className="text-[15px] font-medium">Back to Dashboard</span>
         </Link>
-        
+
         <StreakDisplay variant="compact" />
       </div>
 
@@ -71,7 +71,7 @@ export default function PackHeader({ pack }: PackHeaderProps) {
       <div className="relative">
         {/* Paper stack layers */}
         <div className="absolute top-[6px] left-[6px] right-[-6px] h-full bg-white/40 rounded-xl border border-[#94A3B8]/25" />
-        
+
         <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_12px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.06)] border border-[#E2E8F0]">
           {/* Bookmark Tab */}
           <div className="absolute -top-0 right-12 w-[28px] h-[22px] bg-[#5A5FF0] rounded-b-[5px] shadow-sm">

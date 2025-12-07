@@ -83,7 +83,7 @@ export default function NotesTab({ notes, studyPackId, userPlan = 'free' }: Note
                 <ChevronDown className="w-5 h-5 text-[#64748B]" />
               )}
             </button>
-            
+
             <AnimatePresence>
               {expandedSections.overview && (
                 <motion.div
@@ -127,7 +127,7 @@ export default function NotesTab({ notes, studyPackId, userPlan = 'free' }: Note
                 <ChevronDown className="w-5 h-5 text-[#64748B]" />
               )}
             </button>
-            
+
             <AnimatePresence>
               {expandedSections.concepts && (
                 <motion.div
@@ -185,7 +185,7 @@ export default function NotesTab({ notes, studyPackId, userPlan = 'free' }: Note
                 <ChevronDown className="w-5 h-5 text-[#64748B]" />
               )}
             </button>
-            
+
             <AnimatePresence>
               {expandedSections.definitions && (
                 <motion.div
@@ -243,7 +243,7 @@ export default function NotesTab({ notes, studyPackId, userPlan = 'free' }: Note
                 <ChevronDown className="w-5 h-5 text-[#64748B]" />
               )}
             </button>
-            
+
             <AnimatePresence>
               {expandedSections.questions && (
                 <motion.div
@@ -301,7 +301,7 @@ export default function NotesTab({ notes, studyPackId, userPlan = 'free' }: Note
                 <ChevronDown className="w-5 h-5 text-[#64748B]" />
               )}
             </button>
-            
+
             <AnimatePresence>
               {expandedSections.pitfalls && (
                 <motion.div

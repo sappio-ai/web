@@ -80,19 +80,19 @@ export default async function Navbar() {
                 {/* Logged out center links */}
                 <div className="hidden md:flex items-center gap-6">
                   <Link
-                    href="/how-it-works"
+                    href="/#how-it-works"
                     className="text-[14px] font-semibold text-[#4A5568] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded px-2 py-1"
                   >
                     How it works
                   </Link>
                   <Link
-                    href="/features"
+                    href="/#features"
                     className="text-[14px] font-semibold text-[#4A5568] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded px-2 py-1"
                   >
                     Features
                   </Link>
                   <Link
-                    href="/pricing"
+                    href="/#pricing"
                     className="text-[14px] font-semibold text-[#4A5568] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded px-2 py-1"
                   >
                     Pricing

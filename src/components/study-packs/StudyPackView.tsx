@@ -41,7 +41,7 @@ interface StudyPackViewProps {
 export default function StudyPackView({ pack, userPlan }: StudyPackViewProps) {
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab') as TabType | null
-  
+
   // Initialize with tab from URL or default to 'notes'
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     if (tabParam && ['notes', 'flashcards', 'quiz', 'mindmap', 'insights'].includes(tabParam)) {
