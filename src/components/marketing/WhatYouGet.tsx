@@ -121,7 +121,7 @@ const features = [
 
 export default function WhatYouGet() {
   return (
-    <section className="py-24 md:py-32 px-4 sm:px-6 lg:px-8 bg-[#F8FAFB]">
+    <section id="features" className="py-24 md:py-32 px-4 sm:px-6 lg:px-8 bg-[#F8FAFB]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-[40px] md:text-[56px] font-bold text-[#1A1D2E] mb-6 tracking-[-0.02em] leading-tight">

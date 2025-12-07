@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   description: "Upload any PDF or slide deck. We'll generate exam-ready flashcards, quizzes, and mind maps in seconds. AI-powered study companion for students.",
   keywords: ["AI study tool", "flashcards", "study notes", "quiz generator", "mind maps", "spaced repetition", "exam prep"],
   authors: [{ name: "Sappio" }],
+  verification: {
+    google: "YOUR_VERIFICATION_CODE", // Replace with your Google Search Console verification code
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

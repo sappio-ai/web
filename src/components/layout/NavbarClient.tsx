@@ -168,24 +168,24 @@ export default function NavbarClient() {
               ) : (
                 <>
                   <div className="flex items-center gap-6">
-                    <a
-                      href="#how-it-works"
+                    <Link
+                      href="/#how-it-works"
                       className="text-sm font-semibold text-[var(--text)] hover:text-[var(--primary)] hover:underline decoration-2 underline-offset-4 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 rounded px-2 py-1 whitespace-nowrap"
                     >
                       How it works
-                    </a>
-                    <a
-                      href="#features"
+                    </Link>
+                    <Link
+                      href="/#features"
                       className="text-sm font-semibold text-[var(--text)] hover:text-[var(--primary)] hover:underline decoration-2 underline-offset-4 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 rounded px-2 py-1"
                     >
                       Features
-                    </a>
-                    <a
-                      href="#pricing"
+                    </Link>
+                    <Link
+                      href="/#pricing"
                       className="text-sm font-semibold text-[var(--text)] hover:text-[var(--primary)] hover:underline decoration-2 underline-offset-4 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 rounded px-2 py-1"
                     >
                       Pricing
-                    </a>
+                    </Link>
                   </div>
                   
                   <Link
@@ -337,27 +337,27 @@ export default function NavbarClient() {
                 ) : (
                   /* Logged Out Mobile Menu */
                   <>
-                    <a
-                      href="#how-it-works"
+                    <Link
+                      href="/#how-it-works"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block px-3 py-2 rounded-lg text-base font-semibold text-[#1A1D2E] hover:bg-[#F8FAFB] transition-all"
                     >
                       How it works
-                    </a>
-                    <a
-                      href="#features"
+                    </Link>
+                    <Link
+                      href="/#features"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block px-3 py-2 rounded-lg text-base font-semibold text-[#1A1D2E] hover:bg-[#F8FAFB] transition-all"
                     >
                       Features
-                    </a>
-                    <a
-                      href="#pricing"
+                    </Link>
+                    <Link
+                      href="/#pricing"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block px-3 py-2 rounded-lg text-base font-semibold text-[#1A1D2E] hover:bg-[#F8FAFB] transition-all"
                     >
                       Pricing
-                    </a>
+                    </Link>
 
                     <div className="pt-3 mt-3 border-t border-[#E2E8F0] space-y-2">
                       <Link
