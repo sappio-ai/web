@@ -16,10 +16,11 @@ export class EmailService {
   static async sendInviteEmail(email: string, inviteCode: string): Promise<{ success: boolean; error?: string }> {
     try {
       const { data, error } = await resend.emails.send({
-        from: 'Sappio <onboarding@sappio.ai>',
+        from: 'Sappio <hello@sappio.ai>',
         to: [email],
-        subject: "You're invited to Sappio! 🎉",
-        react: InviteEmail({ email, inviteCode })
+        subject: 'Your Sappio access code',
+        react: InviteEmail({ email, inviteCode }),
+        replyTo: 'hello@sappio.ai'
       })
 
       if (error) {
