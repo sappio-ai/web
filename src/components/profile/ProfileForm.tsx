@@ -226,8 +226,11 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 animate-spin text-[#5A5FF0]" />
+      <div className="flex flex-col items-center justify-center p-12 space-y-4">
+        <div className="w-12 h-12 rounded-xl bg-[#5A5FF0]/10 flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-[#5A5FF0]" />
+        </div>
+        <p className="text-sm text-[#64748B] font-medium">Loading profile...</p>
       </div>
     )
   }
@@ -235,8 +238,11 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
   if (!profile) {
     return (
       <div className="p-8 text-center">
-        <AlertCircle className="w-12 h-12 text-[#EF4444] mx-auto mb-3" />
-        <p className="text-[#EF4444] font-semibold">Failed to load profile</p>
+        <div className="w-16 h-16 rounded-xl bg-[#FEE2E2] flex items-center justify-center mx-auto mb-4">
+          <AlertCircle className="w-8 h-8 text-[#EF4444]" />
+        </div>
+        <p className="text-[#1A1D2E] font-bold text-lg mb-1">Failed to load profile</p>
+        <p className="text-[#64748B] text-sm">Please refresh the page to try again</p>
       </div>
     )
   }

@@ -104,23 +104,23 @@ export default async function ProfilePage() {
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[20px] h-[3px] bg-[#4A4FD0] rounded-t-sm" />
                 </div>
 
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <p className="text-[#64748B] text-xs font-semibold uppercase tracking-wider mb-2">Current Plan</p>
-                    <h3 className="text-2xl font-bold text-[#1A1D2E]">
+                <div className="mb-6">
+                  <p className="text-[#64748B] text-xs font-semibold uppercase tracking-wider mb-3">Current Plan</p>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      userData?.plan === 'pro_plus' ? 'bg-[#F59E0B]/10' :
+                      userData?.plan === 'student_pro' ? 'bg-[#5A5FF0]/10' :
+                      'bg-[#10B981]/10'
+                    }`}>
+                      <PlanIcon className={`w-5 h-5 ${
+                        userData?.plan === 'pro_plus' ? 'text-[#F59E0B]' :
+                        userData?.plan === 'student_pro' ? 'text-[#5A5FF0]' :
+                        'text-[#10B981]'
+                      }`} />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#1A1D2E]">
                       {userData?.plan === 'pro_plus' ? 'Pro Plus' : userData?.plan === 'student_pro' ? 'Student Pro' : 'Free Plan'}
                     </h3>
-                  </div>
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                    userData?.plan === 'pro_plus' ? 'bg-[#F59E0B]/10 border border-[#F59E0B]/30' :
-                    userData?.plan === 'student_pro' ? 'bg-[#5A5FF0]/10 border border-[#5A5FF0]/30' :
-                    'bg-[#10B981]/10 border border-[#10B981]/30'
-                  }`}>
-                    <PlanIcon className={`w-7 h-7 ${
-                      userData?.plan === 'pro_plus' ? 'text-[#F59E0B]' :
-                      userData?.plan === 'student_pro' ? 'text-[#5A5FF0]' :
-                      'text-[#10B981]'
-                    }`} />
                   </div>
                 </div>
 
