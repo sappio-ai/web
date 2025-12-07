@@ -26,7 +26,7 @@ export default function NavbarClient() {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
       
-      // Get user plan - always fetch before rendering
+      // Get user plan
       if (user) {
         const { data: profile } = await supabase
           .from('users')
@@ -44,23 +44,9 @@ export default function NavbarClient() {
 
     getSession()
 
-    // Listen for auth changes and refetch plan
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const newUser = session?.user ?? null
-      setUser(newUser)
-      
-      // Refetch plan when user changes
-      if (newUser) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('plan')
-          .eq('auth_user_id', newUser.id)
-          .single()
-        
-        if (profile?.plan) {
-          setUserPlan(profile.plan as 'free' | 'student_pro' | 'pro_plus')
-        }
-      }
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
     })
 
     return () => {
@@ -361,7 +347,7 @@ export default function NavbarClient() {
                       How it works
                     </Link>
                     <Link
-                      href="/features"
+                      href="/#features"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="block px-3 py-2 rounded-lg text-base font-semibold text-[#1A1D2E] hover:bg-[#F8FAFB] transition-all"
                     >
