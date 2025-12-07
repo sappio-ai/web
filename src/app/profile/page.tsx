@@ -48,55 +48,45 @@ export default async function ProfilePage() {
     }
   }
 
-  const getPlanColor = (plan: string) => {
-    switch(plan) {
-      case 'pro_plus': return { bg: 'from-[#f5e6d3]/20 to-[#e5d6c3]/10', border: 'border-[#f5e6d3]/40', text: 'text-[#f5e6d3]', glow: 'shadow-[#f5e6d3]/20' }
-      case 'student_pro': return { bg: 'from-[#a8d5d5]/20 to-[#8bc5c5]/10', border: 'border-[#a8d5d5]/40', text: 'text-[#a8d5d5]', glow: 'shadow-[#a8d5d5]/20' }
-      default: return { bg: 'from-gray-500/20 to-gray-600/10', border: 'border-gray-500/40', text: 'text-gray-400', glow: 'shadow-gray-500/20' }
-    }
-  }
-
   const PlanIcon = getPlanIcon(userData?.plan || 'free')
-  const planColors = getPlanColor(userData?.plan || 'free')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0F1A] via-[#0D1420] to-[#0A0F1A]">
-      {/* Animated Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -right-48 w-96 h-96 bg-[#a8d5d5]/10 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 -left-48 w-96 h-96 bg-[#f5e6d3]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
+    <div className="min-h-screen bg-[#F8FAFB] relative">
+      {/* Subtle paper texture */}
+      <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /%3E%3C/filter%3E%3Crect width="100" height="100" filter="url(%23noise)" opacity="0.4"/%3E%3C/svg%3E")'
+      }} />
 
       {/* Header */}
       <div className="relative">
-        <div className="max-w-6xl mx-auto px-6 py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 pt-24">
           <Link 
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-gray-500 hover:text-[#a8d5d5] transition-all group"
+            className="inline-flex items-center gap-2 text-[#64748B] hover:text-[#5A5FF0] transition-all group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-medium">Dashboard</span>
+            <span className="text-sm font-semibold">Back to Dashboard</span>
           </Link>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="relative max-w-6xl mx-auto px-6 pb-12">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pb-12">
         {/* Page Title */}
-        <div className="mb-10">
-          <h1 className="text-5xl font-bold mb-3">
-            <span className="bg-gradient-to-r from-white via-[#a8d5d5] to-white bg-clip-text text-transparent">
-              Profile
-            </span>
+        <div className="mb-8">
+          <h1 className="text-[36px] font-bold text-[#1A1D2E] mb-2 tracking-[-0.02em]" style={{ fontFamily: 'var(--font-geist-sans)' }}>
+            Profile Settings
           </h1>
-          <p className="text-gray-500 text-lg">Manage your account and subscription</p>
+          <p className="text-[#64748B] text-[16px]">Manage your account and subscription</p>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_420px] gap-8">
+        <div className="grid lg:grid-cols-[1fr_400px] gap-6">
           {/* Main Form */}
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-br from-[#a8d5d5]/10 to-[#f5e6d3]/10 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition" />
-            <div className="relative bg-[#0D1420]/60 backdrop-blur-sm border border-white/10 rounded-3xl p-8 lg:p-10">
+          <div className="relative">
+            {/* Paper stack backing */}
+            <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+            
+            <div className="relative bg-white rounded-xl p-6 lg:p-8 shadow-[0_2px_12px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.06)] border border-[#E2E8F0]">
               <ProfileForm initialProfile={profile || undefined} hasUsername={!!userData?.username} />
             </div>
           </div>
@@ -104,28 +94,43 @@ export default async function ProfilePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Plan Card */}
-            <div className="relative group">
-              <div className={`absolute -inset-1 bg-gradient-to-br ${planColors.bg} rounded-3xl blur-2xl opacity-60 group-hover:opacity-100 transition duration-500`} />
-              <div className={`relative bg-gradient-to-br from-[#0D1420] to-[#0A0F1A] border-2 ${planColors.border} rounded-3xl p-8 ${planColors.glow} shadow-2xl`}>
+            <div className="relative">
+              {/* Paper stack backing */}
+              <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+              
+              <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_12px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.06)] border-2 border-[#5A5FF0]/30">
+                {/* Bookmark Tab */}
+                <div className="absolute -top-0 right-8 w-[28px] h-[22px] bg-[#5A5FF0] rounded-b-[5px] shadow-sm">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[20px] h-[3px] bg-[#4A4FD0] rounded-t-sm" />
+                </div>
+
                 <div className="flex items-start justify-between mb-6">
                   <div>
-                    <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2">Current Plan</p>
-                    <h3 className={`text-2xl font-bold ${planColors.text}`}>
+                    <p className="text-[#64748B] text-xs font-semibold uppercase tracking-wider mb-2">Current Plan</p>
+                    <h3 className="text-2xl font-bold text-[#1A1D2E]">
                       {userData?.plan === 'pro_plus' ? 'Pro Plus' : userData?.plan === 'student_pro' ? 'Student Pro' : 'Free Plan'}
                     </h3>
                   </div>
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${planColors.bg} border ${planColors.border} flex items-center justify-center`}>
-                    <PlanIcon className={`w-8 h-8 ${planColors.text}`} />
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
+                    userData?.plan === 'pro_plus' ? 'bg-[#F59E0B]/10 border border-[#F59E0B]/30' :
+                    userData?.plan === 'student_pro' ? 'bg-[#5A5FF0]/10 border border-[#5A5FF0]/30' :
+                    'bg-[#10B981]/10 border border-[#10B981]/30'
+                  }`}>
+                    <PlanIcon className={`w-7 h-7 ${
+                      userData?.plan === 'pro_plus' ? 'text-[#F59E0B]' :
+                      userData?.plan === 'student_pro' ? 'text-[#5A5FF0]' :
+                      'text-[#10B981]'
+                    }`} />
                   </div>
                 </div>
 
                 {userData?.plan_expires_at && userData?.plan !== 'free' && (
-                  <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+                  <div className="mb-6 p-4 bg-[#F8FAFB] rounded-xl border border-[#E2E8F0]">
                     <div className="flex items-center gap-3">
-                      <Calendar className="w-5 h-5 text-gray-400" />
+                      <Calendar className="w-5 h-5 text-[#64748B]" />
                       <div>
-                        <p className="text-xs text-gray-500">Valid Until</p>
-                        <p className="text-sm text-white font-semibold">{formatDate(userData.plan_expires_at)}</p>
+                        <p className="text-xs text-[#64748B] font-medium">Valid Until</p>
+                        <p className="text-sm text-[#1A1D2E] font-bold">{formatDate(userData.plan_expires_at)}</p>
                       </div>
                     </div>
                   </div>
@@ -135,35 +140,35 @@ export default async function ProfilePage() {
                   <>
                     <div className="mb-6 space-y-3">
                       <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-lg bg-[#a8d5d5]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Sparkles className="w-3.5 h-3.5 text-[#a8d5d5]" />
+                        <div className="w-6 h-6 rounded-lg bg-[#5A5FF0]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Sparkles className="w-3.5 h-3.5 text-[#5A5FF0]" />
                         </div>
                         <div>
-                          <p className="text-white font-medium text-sm">Unlimited Study Packs</p>
-                          <p className="text-gray-500 text-xs">Create as many as you need</p>
+                          <p className="text-[#1A1D2E] font-semibold text-sm">60 packs per month</p>
+                          <p className="text-[#64748B] text-xs">Upgrade for more</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-lg bg-[#a8d5d5]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Sparkles className="w-3.5 h-3.5 text-[#a8d5d5]" />
+                        <div className="w-6 h-6 rounded-lg bg-[#5A5FF0]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Sparkles className="w-3.5 h-3.5 text-[#5A5FF0]" />
                         </div>
                         <div>
-                          <p className="text-white font-medium text-sm">Advanced Analytics</p>
-                          <p className="text-gray-500 text-xs">Track your progress</p>
+                          <p className="text-[#1A1D2E] font-semibold text-sm">Advanced Analytics</p>
+                          <p className="text-[#64748B] text-xs">Track your progress</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-lg bg-[#a8d5d5]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Sparkles className="w-3.5 h-3.5 text-[#a8d5d5]" />
+                        <div className="w-6 h-6 rounded-lg bg-[#5A5FF0]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Sparkles className="w-3.5 h-3.5 text-[#5A5FF0]" />
                         </div>
                         <div>
-                          <p className="text-white font-medium text-sm">Priority Support</p>
-                          <p className="text-gray-500 text-xs">Get help when you need it</p>
+                          <p className="text-[#1A1D2E] font-semibold text-sm">Priority Support</p>
+                          <p className="text-[#64748B] text-xs">Get help when you need it</p>
                         </div>
                       </div>
                     </div>
 
-                    <button className="w-full py-4 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] hover:from-[#8bc5c5] hover:to-[#a8d5d5] text-[#0a0e14] font-bold rounded-xl transition-all hover:scale-[1.02] shadow-xl shadow-[#a8d5d5]/40 hover:shadow-2xl hover:shadow-[#a8d5d5]/50 flex items-center justify-center gap-2 group/btn">
+                    <button className="w-full py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group/btn">
                       <Sparkles className="w-5 h-5 group-hover/btn:rotate-12 transition-transform" />
                       Upgrade Now
                     </button>
@@ -173,13 +178,15 @@ export default async function ProfilePage() {
             </div>
 
             {/* Account Info */}
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-white/5 to-white/0 rounded-2xl blur opacity-50 group-hover:opacity-75 transition" />
-              <div className="relative bg-white/[0.02] border border-white/10 rounded-2xl p-6">
-                <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-4">Account Info</p>
+            <div className="relative">
+              {/* Paper stack backing */}
+              <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+              
+              <div className="relative bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+                <p className="text-[#64748B] text-xs font-semibold uppercase tracking-wider mb-4">Account Info</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400 text-sm">Member Since</span>
-                  <span className="text-white font-medium text-sm">{formatDate(userData?.created_at || '')}</span>
+                  <span className="text-[#64748B] text-sm font-medium">Member Since</span>
+                  <span className="text-[#1A1D2E] font-bold text-sm">{formatDate(userData?.created_at || '')}</span>
                 </div>
               </div>
             </div>

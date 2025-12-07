@@ -227,7 +227,7 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 animate-spin text-[#a8d5d5]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#5A5FF0]" />
       </div>
     )
   }
@@ -235,25 +235,25 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
   if (!profile) {
     return (
       <div className="p-8 text-center">
-        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
-        <p className="text-red-400">Failed to load profile</p>
+        <AlertCircle className="w-12 h-12 text-[#EF4444] mx-auto mb-3" />
+        <p className="text-[#EF4444] font-semibold">Failed to load profile</p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Username Alert - Only show if no username */}
       {!hasUsername && (
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/30 to-orange-500/30 rounded-2xl blur opacity-75 group-hover:opacity-100 transition" />
-          <div className="relative bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-5 flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
-              <AlertCircle className="w-6 h-6 text-yellow-400" />
+        <div className="relative">
+          <div className="absolute top-[2px] left-0 right-0 h-full bg-[#FEF3C7]/60 rounded-xl border border-[#FCD34D]/40" />
+          <div className="relative bg-[#FFFBEB] border-2 border-[#FCD34D] rounded-xl p-5 flex items-start gap-4 shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-[#FCD34D]/20 flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-[#F59E0B]" />
             </div>
             <div>
-              <p className="text-yellow-400 font-bold text-base mb-1">Complete Your Profile</p>
-              <p className="text-yellow-400/80 text-sm">Set your username below to unlock all features and personalize your experience</p>
+              <p className="text-[#92400E] font-bold text-sm mb-1">Complete Your Profile</p>
+              <p className="text-[#92400E] text-sm">Set your username below to unlock all features and personalize your experience</p>
             </div>
           </div>
         </div>
@@ -261,41 +261,40 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
 
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Personal Information</h2>
-        <p className="text-gray-500">Update your profile details and photo</p>
+        <h2 className="text-xl font-bold text-[#1A1D2E] mb-1">Personal Information</h2>
+        <p className="text-[#64748B] text-sm">Update your profile details and photo</p>
       </div>
 
       {error && (
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-red-500/20 rounded-xl blur" />
-          <div className="relative flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-red-400 text-sm">{error}</p>
+        <div className="relative">
+          <div className="absolute top-[2px] left-0 right-0 h-full bg-[#FEE2E2]/60 rounded-xl border border-[#FCA5A5]/40" />
+          <div className="relative flex items-start gap-3 p-4 bg-[#FEF2F2] border-2 border-[#FCA5A5] rounded-xl shadow-sm">
+            <AlertCircle className="w-5 h-5 text-[#EF4444] flex-shrink-0 mt-0.5" />
+            <p className="text-[#991B1B] text-sm font-medium">{error}</p>
           </div>
         </div>
       )}
 
       {success && (
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-[#a8d5d5]/20 rounded-xl blur" />
-          <div className="relative flex items-start gap-3 p-4 bg-[#a8d5d5]/10 border border-[#a8d5d5]/30 rounded-xl">
-            <Check className="w-5 h-5 text-[#a8d5d5] flex-shrink-0 mt-0.5" />
-            <p className="text-[#a8d5d5] text-sm font-medium">Profile updated successfully!</p>
+        <div className="relative">
+          <div className="absolute top-[2px] left-0 right-0 h-full bg-[#D1FAE5]/60 rounded-xl border border-[#6EE7B7]/40" />
+          <div className="relative flex items-start gap-3 p-4 bg-[#ECFDF5] border-2 border-[#6EE7B7] rounded-xl shadow-sm">
+            <Check className="w-5 h-5 text-[#10B981] flex-shrink-0 mt-0.5" />
+            <p className="text-[#065F46] text-sm font-bold">Profile updated successfully!</p>
           </div>
         </div>
       )}
 
       {/* Avatar Upload Section */}
-      <div className="relative group">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#a8d5d5]/20 to-[#f5e6d3]/20 rounded-2xl blur opacity-50 group-hover:opacity-75 transition" />
-        <div className="relative flex items-center gap-8 p-6 bg-white/[0.03] rounded-2xl border border-white/10">
-          <div className="relative group/avatar">
-            <div className="absolute -inset-2 bg-gradient-to-r from-[#a8d5d5] to-[#f5e6d3] rounded-3xl blur-lg opacity-40 group-hover/avatar:opacity-60 transition" />
-            <div className="relative w-24 h-24 rounded-3xl overflow-hidden bg-gradient-to-br from-[#a8d5d5]/30 to-[#8bc5c5]/30 border-2 border-[#a8d5d5]/50 flex items-center justify-center">
+      <div className="relative">
+        <div className="absolute top-[2px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+        <div className="relative flex items-center gap-6 p-5 bg-[#F8FAFB] rounded-xl border border-[#E2E8F0] shadow-sm">
+          <div className="relative">
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-[#F1F5F9] border-2 border-[#E2E8F0] flex items-center justify-center">
               {formData.avatar_url ? (
                 <img src={formData.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-12 h-12 text-[#a8d5d5]/60" />
+                <User className="w-10 h-10 text-[#94A3B8]" />
               )}
             </div>
           </div>
@@ -308,23 +307,23 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
               onChange={handleImageUpload}
               className="hidden"
             />
-            <h3 className="text-white font-semibold mb-2">Profile Photo</h3>
-            <p className="text-gray-500 text-sm mb-4">JPG, PNG or GIF. Max 2MB</p>
-            <div className="flex flex-wrap items-center gap-3">
+            <h3 className="text-[#1A1D2E] font-bold text-sm mb-1">Profile Photo</h3>
+            <p className="text-[#64748B] text-xs mb-3">JPG, PNG or GIF. Max 2MB</p>
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/15 border border-white/20 hover:border-[#a8d5d5]/50 rounded-xl text-white text-sm font-medium transition-all disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-[#F8FAFB] border border-[#E2E8F0] hover:border-[#5A5FF0]/40 rounded-lg text-[#1A1D2E] text-xs font-semibold transition-all disabled:opacity-50 shadow-sm"
               >
                 {uploading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     Uploading...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-4 h-4" />
+                    <Upload className="w-3.5 h-3.5" />
                     {formData.avatar_url ? 'Change' : 'Upload'}
                   </>
                 )}
@@ -333,7 +332,7 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
                 <button
                   type="button"
                   onClick={removeAvatar}
-                  className="text-sm text-gray-500 hover:text-red-400 transition-colors font-medium"
+                  className="text-xs text-[#64748B] hover:text-[#EF4444] transition-colors font-semibold"
                 >
                   Remove
                 </button>
@@ -344,86 +343,75 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
       </div>
 
       {/* Form Fields */}
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Email (Read-only) */}
         <div ref={errors.email ? firstErrorRef : null}>
-          <label className="block text-sm font-semibold text-gray-400 mb-3">
+          <label className="block text-sm font-bold text-[#1A1D2E] mb-2">
             Email Address
           </label>
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-white/5 rounded-xl blur opacity-0 group-hover:opacity-100 transition" />
-            <div className="relative flex items-center">
-              <Mail className="absolute left-5 w-5 h-5 text-gray-500" />
-              <input
-                type="email"
-                value={profile.email}
-                disabled
-                className="w-full pl-14 pr-28 py-4 bg-white/[0.03] border border-white/10 rounded-xl text-gray-400 cursor-not-allowed focus:outline-none"
-              />
-              <div className="absolute right-4 flex items-center gap-2 text-xs text-[#a8d5d5] bg-[#a8d5d5]/10 px-3 py-2 rounded-lg border border-[#a8d5d5]/30 font-semibold">
-                <div className="w-2 h-2 rounded-full bg-[#a8d5d5]" />
-                Verified
-              </div>
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#94A3B8]" />
+            <input
+              type="email"
+              value={profile.email}
+              disabled
+              className="w-full pl-12 pr-24 py-3 bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg text-[#64748B] cursor-not-allowed focus:outline-none text-sm"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-[#10B981] bg-[#ECFDF5] px-2.5 py-1.5 rounded-md border border-[#6EE7B7] font-bold">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+              Verified
             </div>
           </div>
         </div>
 
         {/* Full Name */}
         <div>
-          <label htmlFor="full_name" className="block text-sm font-semibold text-gray-400 mb-3">
+          <label htmlFor="full_name" className="block text-sm font-bold text-[#1A1D2E] mb-2">
             Full Name
           </label>
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-[#a8d5d5]/10 rounded-xl blur opacity-0 group-hover:opacity-100 transition" />
-            <div className="relative flex items-center">
-              <User className="absolute left-5 w-5 h-5 text-gray-500" />
-              <input
-                id="full_name"
-                type="text"
-                value={formData.full_name}
-                onChange={(e) => handleChange('full_name', e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full pl-14 pr-5 py-4 bg-white/[0.03] border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-[#a8d5d5]/50 focus:ring-2 focus:ring-[#a8d5d5]/20 focus:bg-white/[0.05] transition-all"
-              />
-            </div>
+          <div className="relative">
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#94A3B8]" />
+            <input
+              id="full_name"
+              type="text"
+              value={formData.full_name}
+              onChange={(e) => handleChange('full_name', e.target.value)}
+              placeholder="Enter your full name"
+              className="w-full pl-12 pr-4 py-3 bg-white border border-[#E2E8F0] rounded-lg text-[#1A1D2E] placeholder-[#94A3B8] focus:outline-none focus:border-[#5A5FF0] focus:ring-2 focus:ring-[#5A5FF0]/20 transition-all text-sm"
+            />
           </div>
         </div>
 
         {/* Username */}
         <div ref={errors.username ? firstErrorRef : null}>
-          <label htmlFor="username" className="block text-sm font-semibold text-gray-400 mb-3">
-            Username {!hasUsername && <span className="text-yellow-400 ml-1">*</span>}
+          <label htmlFor="username" className="block text-sm font-bold text-[#1A1D2E] mb-2">
+            Username {!hasUsername && <span className="text-[#F59E0B] ml-1">*</span>}
           </label>
-          <div className="relative group">
-            <div className={`absolute -inset-0.5 rounded-xl blur opacity-0 group-hover:opacity-100 transition ${
-              !hasUsername && !formData.username ? 'bg-yellow-500/10' : 'bg-[#a8d5d5]/10'
-            }`} />
-            <div className="relative flex items-center">
-              <AtSign className="absolute left-5 w-5 h-5 text-gray-500" />
-              <input
-                id="username"
-                type="text"
-                value={formData.username}
-                onChange={(e) => handleChange('username', e.target.value)}
-                placeholder="Choose a unique username"
-                className={`w-full pl-14 pr-5 py-4 bg-white/[0.03] border rounded-xl text-white placeholder-gray-600 focus:outline-none transition-all focus:bg-white/[0.05] ${
-                  !hasUsername && !formData.username
-                    ? 'border-yellow-500/50 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20'
-                    : errors.username 
-                    ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20' 
-                    : 'border-white/10 focus:border-[#a8d5d5]/50 focus:ring-2 focus:ring-[#a8d5d5]/20'
-                }`}
-              />
-            </div>
+          <div className="relative">
+            <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#94A3B8]" />
+            <input
+              id="username"
+              type="text"
+              value={formData.username}
+              onChange={(e) => handleChange('username', e.target.value)}
+              placeholder="Choose a unique username"
+              className={`w-full pl-12 pr-4 py-3 bg-white border rounded-lg text-[#1A1D2E] placeholder-[#94A3B8] focus:outline-none transition-all text-sm ${
+                !hasUsername && !formData.username
+                  ? 'border-[#FCD34D] focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/20'
+                  : errors.username 
+                  ? 'border-[#FCA5A5] focus:border-[#EF4444] focus:ring-2 focus:ring-[#EF4444]/20' 
+                  : 'border-[#E2E8F0] focus:border-[#5A5FF0] focus:ring-2 focus:ring-[#5A5FF0]/20'
+              }`}
+            />
           </div>
           {errors.username && (
-            <p className="mt-3 text-xs text-red-400 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
+            <p className="mt-2 text-xs text-[#EF4444] flex items-center gap-1.5 font-medium">
+              <AlertCircle className="w-3.5 h-3.5" />
               {errors.username}
             </p>
           )}
           {!hasUsername && !errors.username && (
-            <p className="mt-3 text-xs text-gray-500">
+            <p className="mt-2 text-xs text-[#64748B]">
               Choose a unique username that others will see
             </p>
           )}
@@ -431,7 +419,7 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between pt-8 border-t border-white/10">
+      <div className="flex items-center justify-between pt-6 border-t border-[#E2E8F0]">
         <button
           type="button"
           onClick={() => {
@@ -443,29 +431,26 @@ export function ProfileForm({ initialProfile, hasUsername: initialHasUsername = 
             })
             setErrors({})
           }}
-          className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-gray-400 hover:text-white text-sm font-semibold transition-all"
+          className="px-5 py-2.5 bg-white hover:bg-[#F8FAFB] border border-[#E2E8F0] hover:border-[#CBD5E1] rounded-lg text-[#64748B] hover:text-[#1A1D2E] text-sm font-semibold transition-all shadow-sm"
         >
           Reset Changes
         </button>
         <button
           type="submit"
           disabled={saving || uploading}
-          className="relative group/btn px-8 py-3.5 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] hover:from-[#8bc5c5] hover:to-[#a8d5d5] text-[#0a0e14] font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#a8d5d5]/30 hover:shadow-2xl hover:shadow-[#a8d5d5]/50 hover:scale-[1.02] flex items-center gap-2"
+          className="px-6 py-2.5 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md active:scale-[0.98] flex items-center gap-2 text-sm"
         >
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-[#a8d5d5] to-[#8bc5c5] rounded-xl blur opacity-50 group-hover/btn:opacity-75 transition" />
-          <span className="relative flex items-center gap-2">
-            {saving ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Check className="w-5 h-5" />
-                Save Changes
-              </>
-            )}
-          </span>
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Check className="w-4 h-4" />
+              Save Changes
+            </>
+          )}
         </button>
       </div>
     </form>
