@@ -45,8 +45,25 @@ export default function NavbarClient() {
     getSession()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const newUser = session?.user ?? null
+      setUser(newUser)
+      
+      // Fetch plan when user logs in
+      if (newUser) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('plan')
+          .eq('auth_user_id', newUser.id)
+          .single()
+        
+        if (profile?.plan) {
+          setUserPlan(profile.plan as 'free' | 'student_pro' | 'pro_plus')
+        }
+      } else {
+        // Reset to free when user logs out
+        setUserPlan('free')
+      }
     })
 
     return () => {
