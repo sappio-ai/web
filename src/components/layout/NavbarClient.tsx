@@ -60,9 +60,11 @@ export default function NavbarClient() {
         if (profile?.plan) {
           setUserPlan(profile.plan as 'free' | 'student_pro' | 'pro_plus')
         }
+        setLoading(false)
       } else {
         // Reset to free when user logs out
         setUserPlan('free')
+        setLoading(false)
       }
     })
 
