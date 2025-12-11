@@ -117,6 +117,19 @@ export default function NavbarClient() {
                   )}
                 </Link>
                 <Link
+                  href="/rooms"
+                  className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${
+                    pathname?.startsWith('/rooms') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
+                  }`}
+                >
+                  Rooms
+                  {pathname?.startsWith('/rooms') && (
+                    <div className="absolute -top-1 right-1/2 translate-x-1/2 w-[12px] h-[10px] bg-[#5A5FF0] rounded-b-[2px] shadow-sm">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[8px] h-[1.5px] bg-[#4A4FD0] rounded-t-sm" />
+                    </div>
+                  )}
+                </Link>
+                <Link
                   href="/upload"
                   className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${
                     isActive('/upload') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
@@ -238,6 +251,17 @@ export default function NavbarClient() {
                       }`}
                     >
                       Study Packs
+                    </Link>
+                    <Link
+                      href="/rooms"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${
+                        pathname?.startsWith('/rooms')
+                          ? 'bg-[#EEF2FF] text-[#5A5FF0]'
+                          : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
+                      }`}
+                    >
+                      Rooms
                     </Link>
                     <Link
                       href="/upload"

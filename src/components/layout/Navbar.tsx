@@ -41,6 +41,12 @@ export default async function Navbar() {
                 Study Packs
               </Link>
               <Link
+                href="/rooms"
+                className="relative px-3 py-2 text-sm font-semibold text-[#1A1D2E] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
+              >
+                Rooms
+              </Link>
+              <Link
                 href="/upload"
                 className="relative px-3 py-2 text-sm font-semibold text-[#1A1D2E] hover:text-[#5A5FF0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded"
               >

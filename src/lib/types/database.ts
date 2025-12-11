@@ -577,6 +577,338 @@ export type Database = {
           },
         ]
       }
+      study_rooms: {
+        Row: {
+          id: string
+          creator_id: string
+          name: string
+          background_theme: string
+          privacy: string
+          pomodoro_work_minutes: number
+          pomodoro_break_minutes: number
+          status: string
+          last_activity_at: string
+          created_at: string
+          updated_at: string
+          meta_json: Json | null
+        }
+        Insert: {
+          id?: string
+          creator_id: string
+          name: string
+          background_theme?: string
+          privacy?: string
+          pomodoro_work_minutes?: number
+          pomodoro_break_minutes?: number
+          status?: string
+          last_activity_at?: string
+          created_at?: string
+          updated_at?: string
+          meta_json?: Json | null
+        }
+        Update: {
+          id?: string
+          creator_id?: string
+          name?: string
+          background_theme?: string
+          privacy?: string
+          pomodoro_work_minutes?: number
+          pomodoro_break_minutes?: number
+          status?: string
+          last_activity_at?: string
+          created_at?: string
+          updated_at?: string
+          meta_json?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_rooms_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_members: {
+        Row: {
+          id: string
+          room_id: string
+          user_id: string
+          role: string
+          joined_at: string
+          last_seen_at: string | null
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          user_id: string
+          role?: string
+          joined_at?: string
+          last_seen_at?: string | null
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          user_id?: string
+          role?: string
+          joined_at?: string
+          last_seen_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_messages: {
+        Row: {
+          id: string
+          room_id: string
+          user_id: string
+          message_type: string
+          content: string | null
+          tool_type: string | null
+          tool_id: string | null
+          tool_name: string | null
+          created_at: string
+          meta_json: Json | null
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          user_id: string
+          message_type: string
+          content?: string | null
+          tool_type?: string | null
+          tool_id?: string | null
+          tool_name?: string | null
+          created_at?: string
+          meta_json?: Json | null
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          user_id?: string
+          message_type?: string
+          content?: string | null
+          tool_type?: string | null
+          tool_id?: string | null
+          tool_name?: string | null
+          created_at?: string
+          meta_json?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_invites: {
+        Row: {
+          id: string
+          room_id: string
+          inviter_id: string
+          invitee_email: string
+          invitee_user_id: string | null
+          status: string
+          invite_token: string
+          sent_at: string
+          responded_at: string | null
+          expires_at: string
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          inviter_id: string
+          invitee_email: string
+          invitee_user_id?: string | null
+          status?: string
+          invite_token: string
+          sent_at?: string
+          responded_at?: string | null
+          expires_at?: string
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          inviter_id?: string
+          invitee_email?: string
+          invitee_user_id?: string | null
+          status?: string
+          invite_token?: string
+          sent_at?: string
+          responded_at?: string | null
+          expires_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_invites_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_invites_inviter_id_fkey"
+            columns: ["inviter_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_invites_invitee_user_id_fkey"
+            columns: ["invitee_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_shared_tools: {
+        Row: {
+          id: string
+          room_id: string
+          message_id: string
+          sharer_id: string
+          tool_type: string
+          tool_id: string
+          tool_name: string
+          study_pack_id: string | null
+          completion_count: number
+          shared_at: string
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          message_id: string
+          sharer_id: string
+          tool_type: string
+          tool_id: string
+          tool_name: string
+          study_pack_id?: string | null
+          completion_count?: number
+          shared_at?: string
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          message_id?: string
+          sharer_id?: string
+          tool_type?: string
+          tool_id?: string
+          tool_name?: string
+          study_pack_id?: string | null
+          completion_count?: number
+          shared_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_shared_tools_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_shared_tools_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "room_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_shared_tools_sharer_id_fkey"
+            columns: ["sharer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_shared_tools_study_pack_id_fkey"
+            columns: ["study_pack_id"]
+            isOneToOne: false
+            referencedRelation: "study_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_sessions: {
+        Row: {
+          id: string
+          room_id: string
+          started_by: string
+          started_at: string
+          ended_at: string | null
+          duration_minutes: number | null
+          tools_shared_count: number | null
+          messages_sent_count: number | null
+          unique_participants_count: number | null
+          meta_json: Json | null
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          started_by: string
+          started_at?: string
+          ended_at?: string | null
+          duration_minutes?: number | null
+          tools_shared_count?: number | null
+          messages_sent_count?: number | null
+          unique_participants_count?: number | null
+          meta_json?: Json | null
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          started_by?: string
+          started_at?: string
+          ended_at?: string | null
+          duration_minutes?: number | null
+          tools_shared_count?: number | null
+          messages_sent_count?: number | null
+          unique_participants_count?: number | null
+          meta_json?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_sessions_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "study_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_sessions_started_by_fkey"
+            columns: ["started_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           auth_user_id: string
