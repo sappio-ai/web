@@ -136,7 +136,18 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 })
     }
 
-    await InviteService.declineInvite(token)
+    // Get user's internal ID
+    const { data: userData } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_user_id', user.id)
+      .single()
+
+    if (!userData) {
+      return NextResponse.json({ error: 'User not found', code: 'NOT_FOUND' }, { status: 404 })
+    }
+
+    await InviteService.declineInvite(token, userData.id)
 
     return NextResponse.json({ success: true, message: 'Invite declined successfully' })
   } catch (error) {

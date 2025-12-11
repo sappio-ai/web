@@ -225,7 +225,7 @@ export async function DELETE(
         )
       }
 
-      await RoomService.removeMember(roomId, memberIdToRemove)
+      await RoomService.removeMember(roomId, userData.id, memberIdToRemove)
       return NextResponse.json({ success: true, message: 'Member removed successfully' })
     } else {
       // User leaving the room

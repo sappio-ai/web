@@ -153,7 +153,7 @@ export class InviteService {
   static async acceptInvite(
     inviteToken: string,
     userId: string
-  ): Promise<void> {
+  ): Promise<{ roomId: string }> {
     const supabase = await createClient()
 
     // Get invite
@@ -188,7 +188,7 @@ export class InviteService {
         })
         .eq('invite_token', inviteToken)
 
-      return
+      return { roomId: invite.room_id }
     }
 
     // Add user to room
@@ -221,6 +221,8 @@ export class InviteService {
       .from('study_rooms')
       .update({ last_activity_at: new Date().toISOString() })
       .eq('id', invite.room_id)
+
+    return { roomId: invite.room_id }
   }
 
   /**

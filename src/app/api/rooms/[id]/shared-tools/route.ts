@@ -49,7 +49,7 @@ export async function GET(
 
     // Get query parameters for filtering
     const { searchParams } = new URL(request.url)
-    const toolType = searchParams.get('type') // 'quiz', 'flashcards', 'notes', or null for all
+    const toolType = searchParams.get('type') as 'quiz' | 'flashcards' | 'notes' | null // 'quiz', 'flashcards', 'notes', or null for all
 
     const sharedTools = toolType 
       ? await SharedToolService.getSharedTools(roomId, toolType)
