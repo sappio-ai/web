@@ -152,7 +152,7 @@ export default function ProcessingStatus({
                     {/* You can leave message */}
                     {!status.isComplete && status.status !== 'failed' && (
                       <p className="mt-4 text-sm text-[#94A3B8]">
-                        Feel free to leave this page — your study pack will be ready on your dashboard when it's done.
+                        Feel free to leave this page — your study pack will be ready on your dashboard when it&apos;s done.
                       </p>
                     )}
                   </div>

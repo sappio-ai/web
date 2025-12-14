@@ -99,7 +99,7 @@ export default function GenerateMoreButton({
     return (
       <div className="flex items-center gap-2 text-green-600">
         <CheckCircle className="w-5 h-5" />
-        <span className="text-[14px]">You've generated all {maxLimit} items for this pack</span>
+        <span className="text-[14px]">You&apos;ve generated all {maxLimit} items for this pack</span>
       </div>
     )
   }
