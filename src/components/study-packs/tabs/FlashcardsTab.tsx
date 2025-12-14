@@ -8,6 +8,9 @@ import ProgressChart from '@/components/flashcards/ProgressChart'
 import StreakDisplay from '@/components/flashcards/StreakDisplay'
 import ExportMenu from '@/components/exports/ExportMenu'
 import Orb from '@/components/orb/Orb'
+import GenerateMoreButton from '@/components/study-packs/GenerateMoreButton'
+import UpgradePrompt from '@/components/paywall/UpgradePrompt'
+import type { PlanLimits } from '@/lib/types/usage'
 
 interface FlashcardsTabProps {
     packId: string
@@ -21,29 +24,60 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
     )
     const [dueCount, setDueCount] = useState<number>(0)
     const [isLoading, setIsLoading] = useState(true)
+    const [cardCount, setCardCount] = useState<number>(0)
+    const [limits, setLimits] = useState<PlanLimits | null>(null)
 
-    // Fetch due cards count
+    const [generationStatus, setGenerationStatus] = useState<any>(null)
+
+    // Fetch due cards count, card count, and plan limits
     useEffect(() => {
-        const fetchDueCount = async () => {
+        const fetchData = async () => {
             try {
                 setIsLoading(true)
-                const url = new URL(
+                
+                // Fetch study pack data (includes flashcards array with actual count)
+                const packUrl = new URL(
+                    `/api/study-packs/${packId}`,
+                    window.location.origin
+                )
+                const packResponse = await fetch(packUrl.toString())
+                if (packResponse.ok) {
+                    const packData = await packResponse.json()
+                    // Use actual flashcards array length for accurate count
+                    setCardCount(packData.flashcards?.length || packData.stats?.cardCount || 0)
+                    // Get generation status from stats
+                    setGenerationStatus(packData.stats?.generationStatus?.flashcards)
+                }
+                
+                // Fetch due count
+                const dueUrl = new URL(
                     `/api/study-packs/${packId}/flashcards/due`,
                     window.location.origin
                 )
-                const response = await fetch(url.toString())
-                if (response.ok) {
-                    const data = await response.json()
-                    setDueCount(data.count || 0)
+                const dueResponse = await fetch(dueUrl.toString())
+                if (dueResponse.ok) {
+                    const dueData = await dueResponse.json()
+                    setDueCount(dueData.count || 0)
+                }
+                
+                // Fetch plan limits
+                const limitsUrl = new URL(
+                    `/api/user/usage`,
+                    window.location.origin
+                )
+                const limitsResponse = await fetch(limitsUrl.toString())
+                if (limitsResponse.ok) {
+                    const limitsData = await limitsResponse.json()
+                    setLimits(limitsData.limits)
                 }
             } catch (error) {
-                console.error('Error fetching due count:', error)
+                console.error('Error fetching data:', error)
             } finally {
                 setIsLoading(false)
             }
         }
 
-        fetchDueCount()
+        fetchData()
     }, [packId])
 
     // If reviewing, show the review interface
@@ -59,17 +93,66 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
         )
     }
 
+    const canGenerateMore = 
+        limits?.batchCardsSize !== null && 
+        limits?.batchCardsSize !== undefined &&
+        cardCount < (limits?.cardsPerPack || 0)
+
     // Main flashcards tab view
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Export Button */}
-            <div className="flex justify-end">
+            {/* Progress Indicator and Export Button */}
+            <div className="flex items-center justify-between">
+                <div className="text-[14px] text-[#64748B]">
+                    {isLoading || !limits ? (
+                        <span className="inline-block w-24 h-4 bg-[#F1F5F9] rounded animate-pulse" />
+                    ) : (
+                        `${cardCount} / ${limits.cardsPerPack} flashcards`
+                    )}
+                </div>
                 <ExportMenu
                     studyPackId={packId}
                     exportType="flashcards"
                     userPlan={userPlan}
                 />
             </div>
+            
+            {/* Generate More Button (Paid Users) */}
+            {canGenerateMore && limits && (
+                <GenerateMoreButton
+                    contentType="flashcards"
+                    studyPackId={packId}
+                    currentCount={cardCount}
+                    maxLimit={limits.cardsPerPack}
+                    batchSize={limits.batchCardsSize!}
+                    userPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+                    generationStatus={generationStatus}
+                    onGenerated={(newCount) => {
+                        setCardCount(newCount)
+                        setGenerationStatus({ status: 'completed' })
+                        // Refresh due count after generating new cards (new cards are due immediately)
+                        fetch(`/api/study-packs/${packId}/flashcards/due`)
+                            .then(res => res.ok ? res.json() : null)
+                            .then(data => data && setDueCount(data.count || 0))
+                            .catch(console.error)
+                    }}
+                />
+            )}
+            
+            {/* Upgrade Prompt (Free Users) */}
+            {userPlan === 'free' && (
+                <UpgradePrompt
+                    featureName="Generate More Flashcards"
+                    requiredPlan="student_pro"
+                    benefits={[
+                        'Generate up to 120 flashcards per pack',
+                        'Add +30 cards at a time',
+                        'Customize content depth',
+                        'Priority processing'
+                    ]}
+                    currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+                />
+            )}
 
             {/* Streak Display */}
             <StreakDisplay />

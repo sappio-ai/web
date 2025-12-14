@@ -72,7 +72,7 @@ export default function StudyPackView({ pack, userPlan }: StudyPackViewProps) {
           {activeTab === 'notes' && <NotesTab notes={pack.stats.notes} studyPackId={pack.id} userPlan={userPlan} />}
           {activeTab === 'flashcards' && <FlashcardsTab packId={pack.id} userPlan={userPlan} />}
           {activeTab === 'quiz' && <QuizTab packId={pack.id} userPlan={userPlan} />}
-          {activeTab === 'mindmap' && <MindMapTab packId={pack.id} />}
+          {activeTab === 'mindmap' && <MindMapTab packId={pack.id} userPlan={userPlan} />}
           {activeTab === 'insights' && <InsightsTab packId={pack.id} userPlan={userPlan} />}
         </div>
       </div>

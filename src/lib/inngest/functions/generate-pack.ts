@@ -8,6 +8,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 import { GenerationService } from '@/lib/services/GenerationService'
 import { UsageService } from '@/lib/services/UsageService'
 import { GenerationError, MaterialErrorCode } from '@/lib/utils/errors'
+import { responseCache } from '@/lib/utils/cache'
 
 export const generatePack = inngest.createFunction(
   {
@@ -128,7 +129,7 @@ export const generatePack = inngest.createFunction(
       return await UsageService.getPlanLimits(userPlan)
     })
 
-    // Step 5: Generate all content in parallel
+    // Step 5: Generate INITIAL content only (fast generation)
     const results = await step.run('generate-content', async () => {
       try {
         const [notes, learningData, , , ] = await Promise.all([
@@ -137,17 +138,17 @@ export const generatePack = inngest.createFunction(
           GenerationService.generateFlashcards(
             studyPackId,
             chunks,
-            limits.cardsPerPack
+            limits.initialCardsPerPack // CHANGED: use initial limit for fast generation
           ),
           GenerationService.generateQuiz(
             studyPackId,
             chunks,
-            limits.questionsPerQuiz
+            limits.initialQuestionsPerQuiz // CHANGED: use initial limit for fast generation
           ),
           GenerationService.generateMindMap(
             studyPackId,
             chunks,
-            limits.mindmapNodesLimit
+            limits.initialMindmapNodes // CHANGED: use initial limit for fast generation
           ),
         ])
 
@@ -180,15 +181,37 @@ export const generatePack = inngest.createFunction(
         .select('*', { count: 'exact', head: true })
         .eq('study_pack_id', studyPackId)
 
-      const { count: quizCount } = await supabase
-        .from('quiz_items')
-        .select('*', { count: 'exact', head: true })
-        .eq('quiz_id', studyPackId)
+      // Get quiz ID first, then count items
+      const { data: quiz } = await supabase
+        .from('quizzes')
+        .select('id')
+        .eq('study_pack_id', studyPackId)
+        .single()
 
-      const { count: nodeCount } = await supabase
-        .from('mindmap_nodes')
-        .select('*', { count: 'exact', head: true })
-        .eq('mindmap_id', studyPackId)
+      let quizCount = 0
+      if (quiz) {
+        const { count } = await supabase
+          .from('quiz_items')
+          .select('*', { count: 'exact', head: true })
+          .eq('quiz_id', quiz.id)
+        quizCount = count || 0
+      }
+
+      // Get mindmap ID first, then count nodes
+      const { data: mindmap } = await supabase
+        .from('mindmaps')
+        .select('id')
+        .eq('study_pack_id', studyPackId)
+        .single()
+
+      let nodeCount = 0
+      if (mindmap) {
+        const { count } = await supabase
+          .from('mindmap_nodes')
+          .select('*', { count: 'exact', head: true })
+          .eq('mindmap_id', mindmap.id)
+        nodeCount = count || 0
+      }
 
       console.log('Generated items:', { cardCount, quizCount, nodeCount })
 
@@ -215,6 +238,9 @@ export const generatePack = inngest.createFunction(
       if (updateError) {
         console.error('Failed to update study pack:', updateError)
       }
+
+      // Invalidate any cached responses for this study pack
+      responseCache.invalidatePattern(new RegExp(`^study-pack:${studyPackId}:`))
     })
 
     // Step 7: Consume quota and log completion

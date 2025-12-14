@@ -59,6 +59,12 @@ describe('UsageService Extra Packs Property Tests', () => {
             maxPagesPerMaterial: 50,
             maxTokensPerMaterial: 100000,
             mindmapNodesLimit: 200,
+            initialCardsPerPack: 20,
+            initialQuestionsPerQuiz: 10,
+            initialMindmapNodes: 50,
+            batchCardsSize: plan !== 'free' ? 30 : null,
+            batchQuestionsSize: plan !== 'free' ? 10 : null,
+            batchNodesSize: plan !== 'free' ? 60 : null,
             priorityProcessing: plan !== 'free',
           }
 
@@ -124,6 +130,12 @@ describe('UsageService Extra Packs Property Tests', () => {
             maxPagesPerMaterial: 50,
             maxTokensPerMaterial: 100000,
             mindmapNodesLimit: 200,
+            initialCardsPerPack: 20,
+            initialQuestionsPerQuiz: 10,
+            initialMindmapNodes: 50,
+            batchCardsSize: plan !== 'free' ? 30 : null,
+            batchQuestionsSize: plan !== 'free' ? 10 : null,
+            batchNodesSize: plan !== 'free' ? 60 : null,
             priorityProcessing: plan !== 'free',
           }
 
@@ -183,6 +195,12 @@ describe('UsageService Extra Packs Property Tests', () => {
             maxPagesPerMaterial: 50,
             maxTokensPerMaterial: 100000,
             mindmapNodesLimit: 200,
+            initialCardsPerPack: 20,
+            initialQuestionsPerQuiz: 10,
+            initialMindmapNodes: 50,
+            batchCardsSize: plan !== 'free' ? 30 : null,
+            batchQuestionsSize: plan !== 'free' ? 10 : null,
+            batchNodesSize: plan !== 'free' ? 60 : null,
             priorityProcessing: plan !== 'free',
           }
 
@@ -288,6 +306,12 @@ describe('UsageService Extra Packs Property Tests', () => {
             maxPagesPerMaterial: 50,
             maxTokensPerMaterial: 100000,
             mindmapNodesLimit: 200,
+            initialCardsPerPack: 20,
+            initialQuestionsPerQuiz: 10,
+            initialMindmapNodes: 50,
+            batchCardsSize: plan !== 'free' ? 30 : null,
+            batchQuestionsSize: plan !== 'free' ? 10 : null,
+            batchNodesSize: plan !== 'free' ? 60 : null,
             priorityProcessing: plan !== 'free',
           }
 
@@ -363,6 +387,12 @@ describe('UsageService Extra Packs Property Tests', () => {
             maxPagesPerMaterial: 50,
             maxTokensPerMaterial: 100000,
             mindmapNodesLimit: 200,
+            initialCardsPerPack: 20,
+            initialQuestionsPerQuiz: 10,
+            initialMindmapNodes: 50,
+            batchCardsSize: plan !== 'free' ? 30 : null,
+            batchQuestionsSize: plan !== 'free' ? 10 : null,
+            batchNodesSize: plan !== 'free' ? 60 : null,
             priorityProcessing: plan !== 'free',
           }
 

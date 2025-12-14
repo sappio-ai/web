@@ -1,7 +1,3 @@
-/**
- * GET /api/user/usage - Get current user's usage statistics
- */
-
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { UsageService } from '@/lib/services/UsageService'
@@ -10,53 +6,55 @@ export async function GET() {
   try {
     const supabase = await createClient()
 
-    // Get authenticated user
+    // Get current user
     const {
       data: { user },
-      error: authError,
     } = await supabase.auth.getUser()
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user profile to get internal user ID
+    // Get user profile to get plan and database ID
     const { data: profile, error: profileError } = await supabase
       .from('users')
-      .select('id')
+      .select('id, plan')
       .eq('auth_user_id', user.id)
       .single()
 
     if (profileError || !profile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      )
+      console.error('Failed to fetch user profile:', profileError)
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Get usage stats
+    // Get plan limits
+    const limits = await UsageService.getPlanLimits(profile.plan)
+
+    // Get usage stats using the database user ID
     const stats = await UsageService.getUsageStats(profile.id)
 
+    // Return flattened response for backward compatibility with components
+    // that expect data at the top level
     return NextResponse.json({
-      success: true,
+      limits,
+      stats,
+      // Flatten stats to top level for components that expect it
       currentUsage: stats.currentUsage,
-      limit: stats.limit,
       remaining: stats.remaining,
-      percentUsed: stats.percentUsed,
+      limit: stats.limit,
       periodStart: stats.periodStart,
       periodEnd: stats.periodEnd,
+      percentUsed: stats.percentUsed,
       isAtLimit: stats.isAtLimit,
       isNearLimit: stats.isNearLimit,
+      hasGraceWindow: stats.hasGraceWindow,
       extraPacksAvailable: stats.extraPacksAvailable,
       totalAvailable: stats.totalAvailable,
     })
   } catch (error) {
-    console.error('Error fetching usage stats:', error)
+    console.error('Error in user usage endpoint:', error)
     return NextResponse.json(
-      {
-        error: 'Failed to fetch usage statistics',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

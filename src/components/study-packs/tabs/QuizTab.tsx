@@ -8,6 +8,9 @@ import Orb from '@/components/orb/Orb'
 import { PaywallModal } from '@/components/paywall/PaywallModal'
 import { Crown } from 'lucide-react'
 import type { Quiz } from '@/lib/types/quiz'
+import GenerateMoreButton from '@/components/study-packs/GenerateMoreButton'
+import UpgradePrompt from '@/components/paywall/UpgradePrompt'
+import type { PlanLimits } from '@/lib/types/usage'
 
 interface QuizTabProps {
   packId: string
@@ -25,9 +28,13 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
   const [latestWeakTopics, setLatestWeakTopics] = useState<string[]>([])
   const [activeQuiz, setActiveQuiz] = useState<Quiz | null>(null)
   const [showPaywall, setShowPaywall] = useState(false)
+  const [questionCount, setQuestionCount] = useState<number>(0)
+  const [limits, setLimits] = useState<PlanLimits | null>(null)
+  const [generationStatus, setGenerationStatus] = useState<any>(null)
 
   useEffect(() => {
     fetchQuiz()
+    fetchLimits()
   }, [packId])
 
   useEffect(() => {
@@ -52,6 +59,10 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
 
       if (data.quiz) {
         setQuiz(data.quiz)
+        // Use actual quiz items array length for accurate count
+        setQuestionCount(data.quiz.items?.length || data.stats?.quizQuestionCount || 0)
+        // Get generation status from stats
+        setGenerationStatus(data.stats?.generationStatus?.quiz)
       } else {
         setError('No quiz available for this study pack')
       }
@@ -59,6 +70,19 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchLimits = async () => {
+    try {
+      const limitsUrl = new URL('/api/user/usage', window.location.origin)
+      const limitsResponse = await fetch(limitsUrl.toString())
+      if (limitsResponse.ok) {
+        const limitsData = await limitsResponse.json()
+        setLimits(limitsData.limits)
+      }
+    } catch (error) {
+      console.error('Error fetching limits:', error)
     }
   }
 
@@ -210,9 +234,56 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
     )
   }
 
+  const canGenerateMore = 
+    limits?.batchQuestionsSize !== null && 
+    limits?.batchQuestionsSize !== undefined &&
+    questionCount < (limits?.questionsPerQuiz || 0)
+
   // Show quiz overview and history
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Progress Indicator */}
+      <div className="text-[14px] text-[#64748B]">
+        {!limits ? (
+          <span className="inline-block w-24 h-4 bg-[#F1F5F9] rounded animate-pulse" />
+        ) : (
+          `${questionCount} / ${limits.questionsPerQuiz} questions`
+        )}
+      </div>
+      
+      {/* Generate More Button (Paid Users) */}
+      {canGenerateMore && limits && (
+        <GenerateMoreButton
+          contentType="quiz"
+          studyPackId={packId}
+          currentCount={questionCount}
+          maxLimit={limits.questionsPerQuiz}
+          batchSize={limits.batchQuestionsSize!}
+          userPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+          generationStatus={generationStatus}
+          onGenerated={(newCount) => {
+            setQuestionCount(newCount)
+            setGenerationStatus({ status: 'completed' })
+            fetchQuiz() // Refresh quiz to show new questions
+          }}
+        />
+      )}
+      
+      {/* Upgrade Prompt (Free Users) */}
+      {userPlan === 'free' && (
+        <UpgradePrompt
+          featureName="Generate More Quiz Questions"
+          requiredPlan="student_pro"
+          benefits={[
+            'Generate up to 30 quiz questions per pack',
+            'Add +10 questions at a time',
+            'Comprehensive topic coverage',
+            'Priority processing'
+          ]}
+          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+        />
+      )}
+      
       {/* Quiz Overview Card */}
       <div className="relative">
         <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />

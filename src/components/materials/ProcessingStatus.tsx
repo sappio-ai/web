@@ -149,6 +149,12 @@ export default function ProcessingStatus({
                       {status.stage}
                     </h2>
                     <p className="mt-3 text-lg text-[#64748B]">{status.description}</p>
+                    {/* You can leave message */}
+                    {!status.isComplete && status.status !== 'failed' && (
+                      <p className="mt-4 text-sm text-[#94A3B8]">
+                        Feel free to leave this page — your study pack will be ready on your dashboard when it's done.
+                      </p>
+                    )}
                   </div>
 
                   {/* Progress Bar */}

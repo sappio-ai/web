@@ -6,9 +6,13 @@ import MindMapViewer from '@/components/mindmap/MindMapViewer'
 import NodeEditor from '@/components/mindmap/NodeEditor'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import type { MindMap, MindMapNode } from '@/lib/types/mindmap'
+import GenerateMoreButton from '@/components/study-packs/GenerateMoreButton'
+import UpgradePrompt from '@/components/paywall/UpgradePrompt'
+import type { PlanLimits } from '@/lib/types/usage'
 
 interface MindMapTabProps {
   packId: string
+  userPlan?: string
 }
 
 interface MindMapData {
@@ -19,13 +23,16 @@ interface MindMapData {
   isLimited: boolean
 }
 
-export default function MindMapTab({ packId }: MindMapTabProps) {
+export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProps) {
   const [data, setData] = useState<MindMapData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedNode, setSelectedNode] = useState<MindMapNode | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const hasTrackedView = useRef(false)
+  const [nodeCount, setNodeCount] = useState<number>(0)
+  const [limits, setLimits] = useState<PlanLimits | null>(null)
+  const [generationStatus, setGenerationStatus] = useState<any>(null)
 
   useEffect(() => {
     async function fetchMindMap() {
@@ -34,7 +41,10 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
         setError(null)
 
         // First, get the study pack to find the mindmap ID
-        const packResponse = await fetch(`/api/study-packs/${packId}`)
+        // Add cache-busting to ensure fresh data
+        const packResponse = await fetch(`/api/study-packs/${packId}?t=${Date.now()}`, {
+          cache: 'no-store'
+        })
         if (!packResponse.ok) {
           throw new Error('Failed to fetch study pack')
         }
@@ -56,6 +66,11 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
 
         const mindmapData = await response.json()
         setData(mindmapData)
+        
+        // Use actual nodes array length for accurate count
+        setNodeCount(mindmapData.nodes?.length || packData.stats?.mindMapNodeCount || 0)
+        // Get generation status from stats
+        setGenerationStatus(packData.stats?.generationStatus?.mindmap)
 
         // Track map viewed event (only once per mount)
         if (!hasTrackedView.current) {
@@ -70,7 +85,21 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
       }
     }
 
+    async function fetchLimits() {
+      try {
+        const limitsUrl = new URL('/api/user/usage', window.location.origin)
+        const limitsResponse = await fetch(limitsUrl.toString())
+        if (limitsResponse.ok) {
+          const limitsData = await limitsResponse.json()
+          setLimits(limitsData.limits)
+        }
+      } catch (error) {
+        console.error('Error fetching limits:', error)
+      }
+    }
+
     fetchMindMap()
+    fetchLimits()
   }, [packId])
 
   // Loading state
@@ -125,9 +154,72 @@ export default function MindMapTab({ packId }: MindMapTabProps) {
     )
   }
 
+  const canGenerateMore = 
+    limits?.batchNodesSize !== null && 
+    limits?.batchNodesSize !== undefined &&
+    nodeCount < (limits?.mindmapNodesLimit || 0)
+
   // Main content
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Progress Indicator */}
+      <div className="text-[14px] text-[#64748B]">
+        {!limits ? (
+          <span className="inline-block w-24 h-4 bg-[#F1F5F9] rounded animate-pulse" />
+        ) : (
+          `${nodeCount} / ${limits.mindmapNodesLimit} nodes`
+        )}
+      </div>
+      
+      {/* Generate More Button (Paid Users) */}
+      {canGenerateMore && limits && (
+        <GenerateMoreButton
+          contentType="mindmap"
+          studyPackId={packId}
+          currentCount={nodeCount}
+          maxLimit={limits.mindmapNodesLimit}
+          batchSize={limits.batchNodesSize!}
+          userPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+          generationStatus={generationStatus}
+          onGenerated={async (newCount) => {
+            setNodeCount(newCount)
+            setGenerationStatus({ status: 'completed' })
+            // Refresh mind map data without full page reload
+            try {
+              const packResponse = await fetch(`/api/study-packs/${packId}`)
+              if (packResponse.ok) {
+                const packData = await packResponse.json()
+                const mindmapId = packData.mindMap?.id
+                if (mindmapId) {
+                  const response = await fetch(`/api/mindmaps/${mindmapId}`)
+                  if (response.ok) {
+                    const mindmapData = await response.json()
+                    setData(mindmapData)
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('Error refreshing mind map:', error)
+            }
+          }}
+        />
+      )}
+      
+      {/* Upgrade Prompt (Free Users) */}
+      {userPlan === 'free' && (
+        <UpgradePrompt
+          featureName="Generate More Mind Map Nodes"
+          requiredPlan="student_pro"
+          benefits={[
+            'Generate up to 250 mind map nodes per pack',
+            'Add +60 nodes at a time',
+            'Comprehensive topic coverage',
+            'Priority processing'
+          ]}
+          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+        />
+      )}
+      
       {/* Header with stats */}
       <div className="relative">
         <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />

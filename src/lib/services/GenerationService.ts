@@ -836,6 +836,599 @@ Return ONLY valid JSON, no markdown, no explanations, no code blocks.`
   }
 
   /**
+   * Generates additional flashcards for an existing study pack (incremental generation)
+   * Maintains consistency with existing cards and avoids duplicates
+   */
+  static async generateFlashcardsIncremental(
+    studyPackId: string,
+    chunks: Chunk[],
+    targetCount: number
+  ): Promise<number> {
+    if (chunks.length === 0) {
+      throw new GenerationError(
+        MaterialErrorCode.GENERATION_FAILED,
+        'No chunks available for incremental flashcard generation'
+      )
+    }
+
+    if (targetCount <= 0) {
+      console.log('[FlashcardsIncremental] Target count is 0, skipping generation')
+      return 0
+    }
+
+    const supabase = createServiceRoleClient()
+    const now = new Date().toISOString()
+
+    console.log(
+      `[FlashcardsIncremental] Target: ${targetCount} additional cards for pack ${studyPackId}`
+    )
+
+    // 1. Fetch existing flashcards to understand context
+    const { data: existingCards, error: fetchError } = await supabase
+      .from('flashcards')
+      .select('front, back, topic')
+      .eq('study_pack_id', studyPackId)
+
+    if (fetchError) {
+      throw new GenerationError(
+        MaterialErrorCode.DATABASE_ERROR,
+        `Failed to fetch existing flashcards: ${fetchError.message}`
+      )
+    }
+
+    console.log(
+      `[FlashcardsIncremental] Found ${existingCards?.length || 0} existing cards`
+    )
+
+    // 2. Extract existing topics for consistency
+    const existingTopics = [
+      ...new Set((existingCards || []).map((c) => c.topic)),
+    ]
+    const existingFronts = (existingCards || []).map((c) => c.front)
+
+    console.log(
+      `[FlashcardsIncremental] Existing topics: ${existingTopics.join(', ')}`
+    )
+
+    // 3. Select distributed chunks for generation
+    const selectedChunks = this.selectDistributedChunks(chunks, 20)
+    const context = selectedChunks.map((c) => c.content).join('\n\n')
+
+    // 4. Generate new cards with context about existing ones
+    const prompt = `You are an expert at creating effective flashcards for studying. You are generating ADDITIONAL flashcards for an existing study pack.
+
+EXISTING CONTEXT:
+- Current card count: ${existingCards?.length || 0}
+- Existing topics: ${existingTopics.length > 0 ? existingTopics.join(', ') : 'None yet'}
+- Sample existing questions: ${existingFronts.slice(0, 5).join('; ')}
+
+Content:
+${context}
+
+Generate ${targetCount} NEW flashcards that:
+1. COMPLEMENT existing cards (don't duplicate questions or concepts already covered)
+2. Use existing topics where appropriate, or create new topics if covering new areas
+3. Cover different aspects of the material not yet addressed
+4. Maintain consistent difficulty level with existing cards
+5. Follow the same format and style as existing cards
+
+Generate flashcards in the following JSON format:
+{
+  "flashcards": [
+    {
+      "front": "Question or prompt (10-150 characters)",
+      "back": "Answer or explanation (20-500 characters)",
+      "kind": "qa",
+      "topic": "Topic category"
+    }
+  ]
+}
+
+Requirements:
+- Create exactly ${targetCount} flashcards
+- Mix of Q&A and cloze deletion types
+- Front: 10-150 characters
+- Back: 20-500 characters
+- Reuse existing topics when relevant: ${existingTopics.join(', ')}
+- Create new topics only if covering genuinely new areas
+- Avoid duplicating questions from the sample existing questions shown above
+- Focus on concepts, definitions, and facts NOT covered by existing cards
+
+Return ONLY valid JSON, no markdown or explanations.`
+
+    try {
+      const response = await generateChatCompletion(
+        [
+          {
+            role: 'system',
+            content:
+              'You are an expert educator. Always respond with valid JSON only.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        {
+          model: 'gpt-4o-mini',
+          temperature: 0.8,
+          responseFormat: 'json_object',
+        }
+      )
+
+      const data = JSON.parse(response)
+      const flashcards = data.flashcards || []
+
+      console.log(
+        `[FlashcardsIncremental] Generated ${flashcards.length} new cards`
+      )
+
+      if (flashcards.length === 0) {
+        console.warn('[FlashcardsIncremental] No cards generated')
+        return 0
+      }
+
+      // 5. Insert new cards with proper SRS initialization
+      const records = flashcards.slice(0, targetCount).map((card: any) => ({
+        study_pack_id: studyPackId,
+        front: card.front,
+        back: card.back,
+        kind: card.kind || 'qa',
+        topic: card.topic || 'General',
+        ease: 2.5,
+        interval_days: 0,
+        due_at: now,
+        reps: 0,
+        lapses: 0,
+      }))
+
+      console.log(`[FlashcardsIncremental] Inserting ${records.length} cards`)
+
+      const { error: insertError } = await supabase
+        .from('flashcards')
+        .insert(records)
+
+      if (insertError) {
+        throw new GenerationError(
+          MaterialErrorCode.DATABASE_ERROR,
+          `Failed to insert flashcards: ${insertError.message}`
+        )
+      }
+
+      console.log(
+        `[FlashcardsIncremental] Successfully inserted ${records.length} cards`
+      )
+
+      return records.length
+    } catch (error: any) {
+      if (error instanceof GenerationError) {
+        throw error
+      }
+      throw new GenerationError(
+        MaterialErrorCode.AI_API_ERROR,
+        `Failed to generate incremental flashcards: ${error.message}`
+      )
+    }
+  }
+
+  /**
+   * Generates additional quiz questions for an existing study pack (incremental generation)
+   * Maintains consistency with existing questions and avoids duplicates
+   */
+  static async generateQuizIncremental(
+    studyPackId: string,
+    chunks: Chunk[],
+    targetCount: number
+  ): Promise<number> {
+    if (chunks.length === 0) {
+      throw new GenerationError(
+        MaterialErrorCode.GENERATION_FAILED,
+        'No chunks available for incremental quiz generation'
+      )
+    }
+
+    if (targetCount <= 0) {
+      console.log('[QuizIncremental] Target count is 0, skipping generation')
+      return 0
+    }
+
+    const supabase = createServiceRoleClient()
+
+    console.log(
+      `[QuizIncremental] Target: ${targetCount} additional questions for pack ${studyPackId}`
+    )
+
+    // 1. Get the quiz ID for this study pack
+    const { data: quiz, error: quizError } = await supabase
+      .from('quizzes')
+      .select('id')
+      .eq('study_pack_id', studyPackId)
+      .single()
+
+    if (quizError || !quiz) {
+      throw new GenerationError(
+        MaterialErrorCode.DATABASE_ERROR,
+        `Failed to fetch quiz: ${quizError?.message || 'Quiz not found'}`
+      )
+    }
+
+    console.log(`[QuizIncremental] Found quiz: ${quiz.id}`)
+
+    // 2. Fetch existing quiz questions to understand context
+    const { data: existingQuestions, error: fetchError } = await supabase
+      .from('quiz_items')
+      .select('question, answer, topic')
+      .eq('quiz_id', quiz.id)
+
+    if (fetchError) {
+      throw new GenerationError(
+        MaterialErrorCode.DATABASE_ERROR,
+        `Failed to fetch existing quiz questions: ${fetchError.message}`
+      )
+    }
+
+    console.log(
+      `[QuizIncremental] Found ${existingQuestions?.length || 0} existing questions`
+    )
+
+    // 3. Extract existing topics and questions for consistency
+    const existingTopics = [
+      ...new Set((existingQuestions || []).map((q) => q.topic)),
+    ]
+    const existingQuestionTexts = (existingQuestions || []).map((q) => q.question)
+
+    console.log(
+      `[QuizIncremental] Existing topics: ${existingTopics.join(', ')}`
+    )
+
+    // 4. Select distributed chunks for generation
+    const selectedChunks = this.selectDistributedChunks(chunks, 20)
+    const context = selectedChunks.map((c) => c.content).join('\n\n')
+
+    // 5. Generate new questions with context about existing ones
+    const prompt = `You are an expert at creating educational quizzes. You are generating ADDITIONAL multiple-choice questions for an existing quiz.
+
+EXISTING CONTEXT:
+- Current question count: ${existingQuestions?.length || 0}
+- Existing topics: ${existingTopics.length > 0 ? existingTopics.join(', ') : 'None yet'}
+- Sample existing questions: ${existingQuestionTexts.slice(0, 5).join('; ')}
+
+Content:
+${context}
+
+Generate ${targetCount} NEW multiple-choice questions that:
+1. COMPLEMENT existing questions (don't duplicate topics or concepts already covered)
+2. Use existing topics where appropriate, or create new topics if covering new areas
+3. Cover different aspects of the material not yet addressed
+4. Maintain consistent difficulty distribution with existing questions
+5. Follow the same format and style as existing questions
+
+Generate quiz in the following JSON format:
+{
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "Question text",
+      "answer": "Correct answer (must match one of the options exactly)",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "explanation": "Why this is the correct answer (100-300 chars)",
+      "topic": "Topic category"
+    }
+  ]
+}
+
+Requirements:
+- Generate exactly ${targetCount} multiple-choice questions
+- Each question must have exactly 4 options
+- Only 1 option should be correct
+- The "answer" field must match one of the options exactly
+- Explanations should be 100-300 characters
+- Reuse existing topics when relevant: ${existingTopics.join(', ')}
+- Create new topics only if covering genuinely new areas
+- Avoid duplicating questions from the sample existing questions shown above
+- Focus on understanding and application, not just memorization
+- Vary difficulty levels (easy, medium, hard)
+
+Return ONLY valid JSON, no markdown or explanations.`
+
+    try {
+      const response = await generateChatCompletion(
+        [
+          {
+            role: 'system',
+            content:
+              'You are an expert educator. Always respond with valid JSON only.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        {
+          model: 'gpt-4o-mini',
+          temperature: 0.7,
+          responseFormat: 'json_object',
+        }
+      )
+
+      const data = JSON.parse(response)
+      const questions = data.questions || []
+
+      console.log(
+        `[QuizIncremental] Generated ${questions.length} new questions`
+      )
+
+      if (questions.length === 0) {
+        console.warn('[QuizIncremental] No questions generated')
+        return 0
+      }
+
+      // 6. Insert new questions into quiz_items table
+      const items = questions.slice(0, targetCount).map((q: any) => ({
+        quiz_id: quiz.id,
+        type: q.type || 'mcq',
+        question: q.question,
+        answer: q.answer,
+        options_json: q.options || null,
+        explanation: q.explanation || '',
+        topic: q.topic || 'General',
+      }))
+
+      console.log(`[QuizIncremental] Inserting ${items.length} questions`)
+
+      const { error: insertError } = await supabase
+        .from('quiz_items')
+        .insert(items)
+
+      if (insertError) {
+        throw new GenerationError(
+          MaterialErrorCode.DATABASE_ERROR,
+          `Failed to insert quiz questions: ${insertError.message}`
+        )
+      }
+
+      console.log(
+        `[QuizIncremental] Successfully inserted ${items.length} questions`
+      )
+
+      return items.length
+    } catch (error: any) {
+      if (error instanceof GenerationError) {
+        throw error
+      }
+      throw new GenerationError(
+        MaterialErrorCode.AI_API_ERROR,
+        `Failed to generate incremental quiz questions: ${error.message}`
+      )
+    }
+  }
+
+  /**
+   * Generates additional mind map nodes for an existing study pack (incremental generation)
+   * Integrates new nodes with existing hierarchy and maintains structure
+   * NEW: Ensures all new nodes are attached to existing nodes as children
+   */
+  static async generateMindMapIncremental(
+    studyPackId: string,
+    chunks: Chunk[],
+    targetCount: number
+  ): Promise<number> {
+    if (chunks.length === 0) {
+      throw new GenerationError(
+        MaterialErrorCode.GENERATION_FAILED,
+        'No chunks available for incremental mind map generation'
+      )
+    }
+
+    if (targetCount <= 0) {
+      console.log('[MindMapIncremental] Target count is 0, skipping generation')
+      return 0
+    }
+
+    const supabase = createServiceRoleClient()
+
+    console.log(
+      `[MindMapIncremental] Target: ${targetCount} additional nodes for pack ${studyPackId}`
+    )
+
+    // 1. Get the mindmap ID for this study pack
+    const { data: mindmap, error: mindmapError } = await supabase
+      .from('mindmaps')
+      .select('id, title')
+      .eq('study_pack_id', studyPackId)
+      .single()
+
+    if (mindmapError || !mindmap) {
+      throw new GenerationError(
+        MaterialErrorCode.DATABASE_ERROR,
+        `Failed to fetch mindmap: ${mindmapError?.message || 'Mindmap not found'}`
+      )
+    }
+
+    console.log(`[MindMapIncremental] Found mindmap: ${mindmap.id}`)
+
+    // 2. Fetch existing mind map nodes to understand structure
+    const { data: existingNodes, error: fetchError } = await supabase
+      .from('mindmap_nodes')
+      .select('id, parent_id, title, content, order_index')
+      .eq('mindmap_id', mindmap.id)
+      .order('order_index', { ascending: true })
+
+    if (fetchError) {
+      throw new GenerationError(
+        MaterialErrorCode.DATABASE_ERROR,
+        `Failed to fetch existing mind map nodes: ${fetchError.message}`
+      )
+    }
+
+    console.log(
+      `[MindMapIncremental] Found ${existingNodes?.length || 0} existing nodes`
+    )
+
+    // 3. Analyze existing structure - find nodes that can be expanded
+    const rootNode = (existingNodes || []).find((n) => n.parent_id === null)
+    const mainBranches = (existingNodes || []).filter((n) => n.parent_id === rootNode?.id)
+    
+    // Find ALL non-root nodes that could be parents (for deeper hierarchies)
+    const allNonRootNodes = (existingNodes || []).filter((n) => n.parent_id !== null)
+    
+    // Identify leaf nodes (nodes with no children)
+    const leafNodeIds = new Set(
+      allNonRootNodes
+        .filter((n) => !(existingNodes || []).some((other) => other.parent_id === n.id))
+        .map((n) => n.id)
+    )
+
+    // Build expandable nodes list with priority:
+    // 1. Main branches (always include)
+    // 2. Leaf nodes (prioritize for deeper hierarchies)
+    // 3. Intermediate nodes (can also be expanded)
+    const expandableNodes: Array<{ id: string; title: string; type: string; depth: number }> = []
+    
+    // Calculate depth for each node
+    const getDepth = (nodeId: string | null, nodes: typeof existingNodes): number => {
+      if (!nodeId) return 0
+      const node = nodes?.find((n) => n.id === nodeId)
+      if (!node || !node.parent_id) return 1
+      return 1 + getDepth(node.parent_id, nodes)
+    }
+
+    // Add main branches first (depth 1)
+    mainBranches.forEach((n) => {
+      expandableNodes.push({ id: n.id, title: n.title, type: 'branch', depth: 1 })
+    })
+
+    // Add leaf nodes sorted by depth (deeper = more priority for expansion)
+    const leafNodesWithDepth = allNonRootNodes
+      .filter((n) => leafNodeIds.has(n.id) && n.parent_id !== rootNode?.id)
+      .map((n) => ({
+        id: n.id,
+        title: n.title,
+        type: 'leaf',
+        depth: getDepth(n.id, existingNodes),
+      }))
+      .sort((a, b) => b.depth - a.depth) // Deeper nodes first
+
+    expandableNodes.push(...leafNodesWithDepth)
+
+    // Limit to 20 nodes max for cost efficiency
+    const limitedExpandableNodes = expandableNodes.slice(0, 20)
+
+    console.log(
+      `[MindMapIncremental] Structure: 1 root, ${mainBranches.length} branches, ${leafNodeIds.size} leaves, ${limitedExpandableNodes.length} expandable`
+    )
+
+    // 4. Select distributed chunks for generation (reduced for cost efficiency)
+    const selectedChunks = this.selectDistributedChunks(chunks, 10)
+    const context = selectedChunks.map((c) => c.content).join('\n\n')
+
+    // 5. Generate new nodes with compact prompt for cost efficiency
+    const prompt = `Expand this mind map with ${targetCount} new child nodes.
+
+TOPIC: ${mindmap.title}
+
+PARENT NODES (attach new nodes to these by index):
+${limitedExpandableNodes.map((n, i) => `${i}: "${n.title}" [${n.type}]`).join('\n')}
+
+CONTENT:
+${context.substring(0, 3000)}
+
+OUTPUT JSON:
+{"nodes":[{"title":"3-8 words","content":"20-40 words explanation","parentIndex":0}]}
+
+RULES:
+- parentIndex: 0-${limitedExpandableNodes.length - 1}
+- Prefer adding to leaf nodes for depth
+- No duplicates of existing topics
+- Exactly ${targetCount} nodes`
+
+    try {
+      const response = await generateChatCompletion(
+        [
+          {
+            role: 'system',
+            content:
+              'You are an expert educator creating hierarchical mind maps. Always respond with valid JSON only. Create deep, meaningful hierarchies, not flat lists.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        {
+          model: 'gpt-4o-mini',
+          temperature: 0.7,
+          responseFormat: 'json_object',
+        }
+      )
+
+      const data = JSON.parse(response)
+      const nodes = data.nodes || []
+
+      console.log(
+        `[MindMapIncremental] Generated ${nodes.length} new nodes`
+      )
+
+      if (nodes.length === 0) {
+        console.warn('[MindMapIncremental] No nodes generated')
+        return 0
+      }
+
+      // 7. Map parentIndex to actual existing node IDs
+      const nodesToInsert = nodes.slice(0, targetCount)
+      
+      // Insert nodes with proper parent relationships to existing nodes
+      const nodeRecords = nodesToInsert.map((node: any, index: number) => {
+        // Get the parent from expandable nodes using parentIndex
+        let parentId: string | null = null
+        if (
+          typeof node.parentIndex === 'number' &&
+          node.parentIndex >= 0 &&
+          node.parentIndex < limitedExpandableNodes.length
+        ) {
+          parentId = limitedExpandableNodes[node.parentIndex].id
+        } else {
+          // Fallback: prefer leaf nodes for deeper hierarchies, then main branches
+          const fallbackNode = limitedExpandableNodes.find((n) => n.type === 'leaf') ||
+            limitedExpandableNodes.find((n) => n.type === 'branch') ||
+            mainBranches[0]
+          parentId = fallbackNode?.id || rootNode?.id || null
+        }
+
+        return {
+          mindmap_id: mindmap.id,
+          parent_id: parentId,
+          title: node.title,
+          content: node.content || '',
+          order_index: (existingNodes?.length || 0) + index,
+          source_chunk_ids: [],
+        }
+      })
+
+      console.log(
+        `[MindMapIncremental] Inserting ${nodeRecords.length} nodes with parent relationships`
+      )
+
+      const { data: insertedNodes, error: insertError } = await supabase
+        .from('mindmap_nodes')
+        .insert(nodeRecords)
+        .select()
+
+      if (insertError || !insertedNodes) {
+        throw new GenerationError(
+          MaterialErrorCode.DATABASE_ERROR,
+          `Failed to insert mind map nodes: ${insertError?.message}`
+        )
+      }
+
+      console.log(
+        `[MindMapIncremental] Successfully inserted ${insertedNodes.length} nodes with proper parent relationships`
+      )
+
+      return insertedNodes.length
+    } catch (error: any) {
+      if (error instanceof GenerationError) {
+        throw error
+      }
+      throw new GenerationError(
+        MaterialErrorCode.AI_API_ERROR,
+        `Failed to generate incremental mind map nodes: ${error.message}`
+      )
+    }
+  }
+
+  /**
    * Calculates coverage percentage based on chunk utilization
    */
   static calculateCoverage(

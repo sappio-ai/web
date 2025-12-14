@@ -7,11 +7,24 @@ export type PlanTier = 'free' | 'student_pro' | 'pro_plus'
 export interface PlanLimits {
   plan: PlanTier
   packsPerMonth: number
+  
+  // Maximum limits
   cardsPerPack: number
   questionsPerQuiz: number
+  mindmapNodesLimit: number
+  
+  // Initial generation amounts
+  initialCardsPerPack: number
+  initialQuestionsPerQuiz: number
+  initialMindmapNodes: number
+  
+  // Batch sizes for on-demand generation (null for free plan)
+  batchCardsSize: number | null
+  batchQuestionsSize: number | null
+  batchNodesSize: number | null
+  
   maxPagesPerMaterial: number
   maxTokensPerMaterial: number
-  mindmapNodesLimit: number
   priorityProcessing: boolean
 }
 
@@ -59,32 +72,50 @@ export interface UserProfile {
 export const DEFAULT_PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   free: {
     plan: 'free',
-    packsPerMonth: 5,
-    cardsPerPack: 40,
-    questionsPerQuiz: 15,
+    packsPerMonth: 3,
+    cardsPerPack: 20,
+    questionsPerQuiz: 8,
+    mindmapNodesLimit: 40,
+    initialCardsPerPack: 20,
+    initialQuestionsPerQuiz: 8,
+    initialMindmapNodes: 40,
+    batchCardsSize: null,
+    batchQuestionsSize: null,
+    batchNodesSize: null,
     maxPagesPerMaterial: 50,
     maxTokensPerMaterial: 50000,
-    mindmapNodesLimit: 80,
     priorityProcessing: false,
   },
   student_pro: {
     plan: 'student_pro',
-    packsPerMonth: 60,
+    packsPerMonth: 50,
     cardsPerPack: 120,
     questionsPerQuiz: 30,
+    mindmapNodesLimit: 250,
+    initialCardsPerPack: 20,
+    initialQuestionsPerQuiz: 10,
+    initialMindmapNodes: 50,
+    batchCardsSize: 30,
+    batchQuestionsSize: 10,
+    batchNodesSize: 60,
     maxPagesPerMaterial: 200,
     maxTokensPerMaterial: 200000,
-    mindmapNodesLimit: 250,
     priorityProcessing: true,
   },
   pro_plus: {
     plan: 'pro_plus',
-    packsPerMonth: 300,
-    cardsPerPack: 300,
+    packsPerMonth: 150,
+    cardsPerPack: 200,
     questionsPerQuiz: 60,
+    mindmapNodesLimit: 800,
+    initialCardsPerPack: 25,
+    initialQuestionsPerQuiz: 15,
+    initialMindmapNodes: 60,
+    batchCardsSize: 50,
+    batchQuestionsSize: 15,
+    batchNodesSize: 100,
     maxPagesPerMaterial: 500,
     maxTokensPerMaterial: 500000,
-    mindmapNodesLimit: 800,
     priorityProcessing: true,
   },
 }

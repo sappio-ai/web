@@ -52,9 +52,15 @@ export class UsageService {
       packsPerMonth: data.packs_per_month,
       cardsPerPack: data.cards_per_pack,
       questionsPerQuiz: data.questions_per_quiz,
+      mindmapNodesLimit: data.mindmap_nodes_limit,
+      initialCardsPerPack: data.initial_cards_per_pack,
+      initialQuestionsPerQuiz: data.initial_questions_per_quiz,
+      initialMindmapNodes: data.initial_mindmap_nodes,
+      batchCardsSize: data.batch_cards_size,
+      batchQuestionsSize: data.batch_questions_size,
+      batchNodesSize: data.batch_nodes_size,
       maxPagesPerMaterial: data.max_pages_per_material,
       maxTokensPerMaterial: data.max_tokens_per_material,
-      mindmapNodesLimit: data.mindmap_nodes_limit,
       priorityProcessing: data.priority_processing,
     }
 
@@ -498,9 +504,15 @@ export class UsageService {
       packsPerMonth: row.packs_per_month,
       cardsPerPack: row.cards_per_pack,
       questionsPerQuiz: row.questions_per_quiz,
+      mindmapNodesLimit: row.mindmap_nodes_limit,
+      initialCardsPerPack: row.initial_cards_per_pack,
+      initialQuestionsPerQuiz: row.initial_questions_per_quiz,
+      initialMindmapNodes: row.initial_mindmap_nodes,
+      batchCardsSize: row.batch_cards_size,
+      batchQuestionsSize: row.batch_questions_size,
+      batchNodesSize: row.batch_nodes_size,
       maxPagesPerMaterial: row.max_pages_per_material,
       maxTokensPerMaterial: row.max_tokens_per_material,
-      mindmapNodesLimit: row.mindmap_nodes_limit,
       priorityProcessing: row.priority_processing,
     }))
   }

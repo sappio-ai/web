@@ -24,11 +24,16 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check cache first
+    // Check cache first (skip if request has cache-busting param)
+    const url = new URL(request.url)
+    const skipCache = url.searchParams.has('t')
     const cacheKey = `study-pack:${studyPackId}:${user.id}`
-    const cached = responseCache.get(cacheKey, CACHE_TTL.STUDY_PACK)
-    if (cached) {
-      return NextResponse.json(cached)
+    
+    if (!skipCache) {
+      const cached = responseCache.get(cacheKey, CACHE_TTL.STUDY_PACK)
+      if (cached) {
+        return NextResponse.json(cached)
+      }
     }
 
     // Get study pack with ownership verification
