@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/providers/PostHogProvider";
 import PageViewTracker from "@/components/analytics/PageViewTracker";
+import CookieConsent from "@/components/CookieConsent";
 import { Suspense } from "react";
 
 const inter = Inter({
@@ -80,6 +81,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <CookieConsent />
           <Analytics />
         </PostHogProvider>
       </body>

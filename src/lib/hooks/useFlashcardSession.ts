@@ -143,13 +143,13 @@ export function useFlashcardSession(
       averageTime: 0,
       totalTime: 0,
     })
-    
+
     await fetchDueCards()
     setCurrentIndex(0)
     setIsFlipped(false)
     setIsComplete(false)
     setCardStartTime(Date.now())
-    
+
     // Always create a new session when explicitly restarting
     const sessionId = await createSessionRecord()
     setCurrentSessionId(sessionId)
@@ -158,16 +158,16 @@ export function useFlashcardSession(
   // Initialize session on mount
   useEffect(() => {
     let mounted = true
-    
+
     const initSession = async () => {
       if (!mounted) return
-      
+
       await fetchDueCards()
-      
+
       if (!mounted) return
-      
+
       setCardStartTime(Date.now())
-      
+
       // Create initial session record only once
       if (!currentSessionId) {
         const sessionId = await createSessionRecord()
@@ -176,9 +176,9 @@ export function useFlashcardSession(
         }
       }
     }
-    
+
     initSession()
-    
+
     return () => {
       mounted = false
     }
@@ -230,7 +230,7 @@ export function useFlashcardSession(
   const grade = useCallback(
     async (gradeValue: Grade) => {
       if (!cards[currentIndex]) return
-      
+
       // Prevent multiple rapid inputs
       if (isProcessing) return
       setIsProcessing(true)
@@ -314,7 +314,7 @@ export function useFlashcardSession(
         } else {
           // Session complete
           setIsComplete(true)
-          
+
           // Update session record with final stats
           if (currentSessionId) {
             const finalStats = {
@@ -326,8 +326,26 @@ export function useFlashcardSession(
             finalStats.accuracy = finalStats.cardsReviewed > 0
               ? (goodAndEasy / finalStats.cardsReviewed) * 100
               : 0
-            
+
             updateSessionRecord(currentSessionId, finalStats)
+
+            // Track study session completed event
+            fetch('/api/events', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                event: 'study_session_completed',
+                props: {
+                  study_pack_id: packId,
+                  session_id: currentSessionId,
+                  duration_ms: finalStats.totalTime,
+                  cards_reviewed: finalStats.cardsReviewed,
+                  correct_count: finalStats.good + finalStats.easy,
+                  accuracy: Math.round(finalStats.accuracy),
+                  topic_filter: topicFilter || null,
+                }
+              })
+            }).catch(console.error) // Non-blocking
           }
         }
       } catch (err) {

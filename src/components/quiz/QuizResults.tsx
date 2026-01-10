@@ -83,20 +83,18 @@ export default function QuizResults({
                           {topic.topic}
                         </span>
                         <span
-                          className={`font-bold text-[16px] ${
-                            topic.isWeak ? 'text-[#EF4444]' : 'text-[#10B981]'
-                          }`}
+                          className={`font-bold text-[16px] ${topic.isWeak ? 'text-[#EF4444]' : 'text-[#10B981]'
+                            }`}
                         >
                           {Math.round(topic.accuracy)}%
                         </span>
                       </div>
                       <div className="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
                         <div
-                          className={`h-full transition-all ${
-                            topic.isWeak
+                          className={`h-full transition-all ${topic.isWeak
                               ? 'bg-[#EF4444]'
                               : 'bg-[#5A5FF0]'
-                          }`}
+                            }`}
                           style={{ width: `${topic.accuracy}%` }}
                         />
                       </div>
@@ -117,36 +115,36 @@ export default function QuizResults({
       {Object.values(results.detail_json.topicPerformance).some(
         (t) => t.isWeak
       ) && (
-        <div className="relative mb-6">
-          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#F59E0B]/40" />
-          <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#F59E0B]/50">
-            <div className="flex items-start gap-3">
-              <svg
-                className="w-6 h-6 text-[#F59E0B] flex-shrink-0 mt-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-              <div>
-                <h4 className="text-[#F59E0B] font-bold mb-1 text-[16px]">
-                  Weak Topics Identified
-                </h4>
-                <p className="text-[#64748B] text-[14px]">
-                  You scored below 70% on some topics. Consider reviewing
-                  flashcards for these areas to improve your understanding.
-                </p>
+          <div className="relative mb-6">
+            <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#F59E0B]/40" />
+            <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#F59E0B]/50">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="w-6 h-6 text-[#F59E0B] flex-shrink-0 mt-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                <div>
+                  <h4 className="text-[#F59E0B] font-bold mb-1 text-[16px]">
+                    Weak Topics Identified
+                  </h4>
+                  <p className="text-[#64748B] text-[14px]">
+                    You scored below 70% on some topics. Consider reviewing
+                    flashcards for these areas to improve your understanding.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-3">
