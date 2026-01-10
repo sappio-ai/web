@@ -25,7 +25,7 @@ export default function NavbarClient() {
     const getSession = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
-      
+
       // Get user plan
       if (user) {
         const { data: profile } = await supabase
@@ -33,12 +33,12 @@ export default function NavbarClient() {
           .select('plan')
           .eq('auth_user_id', user.id)
           .single()
-        
+
         if (profile?.plan) {
           setUserPlan(profile.plan as 'free' | 'student_pro' | 'pro_plus')
         }
       }
-      
+
       setLoading(false)
     }
 
@@ -80,7 +80,7 @@ export default function NavbarClient() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
       />
-      
+
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-[var(--border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -105,9 +105,8 @@ export default function NavbarClient() {
               <div className="hidden md:flex items-center gap-1 ml-8">
                 <Link
                   href="/dashboard"
-                  className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${
-                    isActive('/dashboard') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
-                  }`}
+                  className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${isActive('/dashboard') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
+                    }`}
                 >
                   Study Packs
                   {isActive('/dashboard') && (
@@ -118,38 +117,11 @@ export default function NavbarClient() {
                 </Link>
                 <Link
                   href="/rooms"
-                  className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${
-                    pathname?.startsWith('/rooms') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
-                  }`}
+                  className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${pathname?.startsWith('/rooms') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
+                    }`}
                 >
                   Rooms
                   {pathname?.startsWith('/rooms') && (
-                    <div className="absolute -top-1 right-1/2 translate-x-1/2 w-[12px] h-[10px] bg-[#5A5FF0] rounded-b-[2px] shadow-sm">
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[8px] h-[1.5px] bg-[#4A4FD0] rounded-t-sm" />
-                    </div>
-                  )}
-                </Link>
-                <Link
-                  href="/upload"
-                  className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${
-                    isActive('/upload') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
-                  }`}
-                >
-                  Upload
-                  {isActive('/upload') && (
-                    <div className="absolute -top-1 right-1/2 translate-x-1/2 w-[12px] h-[10px] bg-[#5A5FF0] rounded-b-[2px] shadow-sm">
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[8px] h-[1.5px] bg-[#4A4FD0] rounded-t-sm" />
-                    </div>
-                  )}
-                </Link>
-                <Link
-                  href="/practice"
-                  className={`relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 rounded ${
-                    isActive('/practice') ? 'text-[#5A5FF0]' : 'text-[#1A1D2E] hover:text-[#5A5FF0]'
-                  }`}
-                >
-                  Practice
-                  {isActive('/practice') && (
                     <div className="absolute -top-1 right-1/2 translate-x-1/2 w-[12px] h-[10px] bg-[#5A5FF0] rounded-b-[2px] shadow-sm">
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[8px] h-[1.5px] bg-[#4A4FD0] rounded-t-sm" />
                     </div>
@@ -165,7 +137,7 @@ export default function NavbarClient() {
               ) : user ? (
                 <>
                   <PlanBadge plan={userPlan} />
-                  
+
                   <button
                     onClick={() => setIsCreateModalOpen(true)}
                     className="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-sm font-semibold rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 focus:ring-offset-2 flex items-center gap-2 active:scale-[0.98] shadow-sm whitespace-nowrap"
@@ -200,14 +172,14 @@ export default function NavbarClient() {
                       Pricing
                     </Link>
                   </div>
-                  
+
                   <Link
                     href="/login"
                     className="text-sm font-bold text-[var(--ink)] hover:text-[var(--primary)] hover:underline decoration-2 underline-offset-4 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 rounded px-2 py-1 whitespace-nowrap"
                   >
                     Log in
                   </Link>
-                  <Link 
+                  <Link
                     href="/signup"
                     className="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-sm font-semibold rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 focus:ring-offset-2 active:scale-[0.98] shadow-sm relative overflow-hidden group whitespace-nowrap"
                   >
@@ -244,47 +216,24 @@ export default function NavbarClient() {
                     <Link
                       href="/dashboard"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${
-                        isActive('/dashboard')
+                      className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${isActive('/dashboard')
                           ? 'bg-[#EEF2FF] text-[#5A5FF0]'
                           : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
-                      }`}
+                        }`}
                     >
                       Study Packs
                     </Link>
                     <Link
                       href="/rooms"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${
-                        pathname?.startsWith('/rooms')
+                      className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${pathname?.startsWith('/rooms')
                           ? 'bg-[#EEF2FF] text-[#5A5FF0]'
                           : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
-                      }`}
+                        }`}
                     >
                       Rooms
                     </Link>
-                    <Link
-                      href="/upload"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${
-                        isActive('/upload')
-                          ? 'bg-[#EEF2FF] text-[#5A5FF0]'
-                          : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
-                      }`}
-                    >
-                      Upload
-                    </Link>
-                    <Link
-                      href="/practice"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${
-                        isActive('/practice')
-                          ? 'bg-[#EEF2FF] text-[#5A5FF0]'
-                          : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
-                      }`}
-                    >
-                      Practice
-                    </Link>
+
 
                     <div className="pt-3 mt-3 border-t border-[#E2E8F0]">
                       <button

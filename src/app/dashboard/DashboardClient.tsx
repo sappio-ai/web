@@ -15,7 +15,7 @@ import { Package, BookOpen, Target, TrendingUp, Clock, Plus } from 'lucide-react
 import Link from 'next/link'
 import Image from 'next/image'
 import { useDebounce } from '@/lib/hooks/useDebounce'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import WelcomeModal from '@/components/onboarding/WelcomeModal'
 import DashboardTour from '@/components/onboarding/DashboardTour'
 import OnboardingChecklist from '@/components/onboarding/OnboardingChecklist'
@@ -42,7 +42,6 @@ export default function DashboardClient({
     dashboardData,
 }: DashboardClientProps) {
     const router = useRouter()
-    const searchParams = useSearchParams()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [runTour, setRunTour] = useState(false)
 
@@ -66,16 +65,6 @@ export default function DashboardClient({
     // Determine if we should show welcome modal
     // Show if: not seen in DB, not dismissed this session, and no packs
     const showWelcomeModal = !hasSeenWelcomeInDB && !welcomeDismissed && !hasPacks
-
-    // Handle initial actions from URL (e.g. "New Pack" from navbar)
-    useEffect(() => {
-        if (searchParams.get('action') === 'new') {
-            setIsModalOpen(true)
-            // Remove the param from URL cleanly
-            const newUrl = window.location.pathname
-            window.history.replaceState({}, '', newUrl)
-        }
-    }, [searchParams])
 
     // Start tour after welcome is dismissed (either this session or from DB)
     useEffect(() => {
