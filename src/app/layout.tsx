@@ -4,6 +4,9 @@ import "./globals.css";
 import NavbarClient from "@/components/layout/NavbarClient";
 import Footer from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/next";
+import { PostHogProvider } from "@/providers/PostHogProvider";
+import PageViewTracker from "@/components/analytics/PageViewTracker";
+import { Suspense } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -68,12 +71,17 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen bg-[#F8FAFB] text-[#1A1D2E]`}
       >
-        <NavbarClient />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-        <Analytics />
+        <PostHogProvider>
+          <Suspense fallback={null}>
+            <PageViewTracker />
+          </Suspense>
+          <NavbarClient />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <Analytics />
+        </PostHogProvider>
       </body>
     </html>
   );

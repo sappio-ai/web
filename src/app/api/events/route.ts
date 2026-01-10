@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import PostHogClient from '@/lib/posthog'
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Insert event
+    // Insert event into DB
     const { error: insertError } = await supabase.from('events').insert({
       user_id: dbUser.id,
       event,
@@ -50,6 +51,25 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to track event' },
         { status: 500 }
       )
+    }
+
+    // Send to PostHog
+    try {
+      const posthog = PostHogClient()
+      if (posthog) {
+        posthog.capture({
+          distinctId: dbUser.id, // Use internal DB ID for consistent tracking
+          event: event,
+          properties: {
+            ...props,
+            $set: { email: user.email } // Ensure user properties are updated
+          }
+        })
+        await posthog.shutdown() // Ensure flush
+      }
+    } catch (phError) {
+      console.error('PostHog tracking failed:', phError)
+      // Non-blocking - don't fail the request
     }
 
     return NextResponse.json({ success: true })
