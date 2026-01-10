@@ -76,7 +76,7 @@ export default function WelcomeModal({
                         </h1>
 
                         <p className="text-[16px] text-[#64748B] mb-8 leading-relaxed max-w-sm mx-auto">
-                            You're all set to transform your study materials into exam-ready flashcards, quizzes, and more.
+                            You&apos;re all set to transform your study materials into exam-ready flashcards, quizzes, and more.
                         </p>
 
                         {/* Actions */}
@@ -99,7 +99,7 @@ export default function WelcomeModal({
                                 onClick={handleClose}
                                 className="w-full px-6 py-4 rounded-xl font-semibold text-[#64748B] hover:text-[#1A1D2E] hover:bg-[#F1F5F9] transition-all focus:outline-none focus:ring-2 focus:ring-[#CBD5E1] active:scale-[0.98]"
                             >
-                                I'll Explore First
+                                I&apos;ll Explore First
                             </button>
                         </div>
 
