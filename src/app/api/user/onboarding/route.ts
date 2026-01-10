@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
         }
 
-        let meta = userData.meta_json as Record<string, any> || {}
+        const meta = userData.meta_json as Record<string, any> || {}
         if (!meta.onboarding) {
             meta.onboarding = {
                 completed: false,
