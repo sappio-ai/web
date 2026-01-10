@@ -11,11 +11,15 @@ import ContinuePanel from '@/components/dashboard/ContinuePanel'
 import Orb from '@/components/orb/Orb'
 import { useOrb } from '@/lib/contexts/OrbContext'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
-import { Package, BookOpen, Target, TrendingUp, Clock, Flame, Plus } from 'lucide-react'
+import { Package, BookOpen, Target, TrendingUp, Clock, Plus } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useDebounce } from '@/lib/hooks/useDebounce'
 import { useRouter } from 'next/navigation'
+import WelcomeModal from '@/components/onboarding/WelcomeModal'
+import DashboardTour from '@/components/onboarding/DashboardTour'
+import OnboardingChecklist from '@/components/onboarding/OnboardingChecklist'
+// Removed sonner import as not needed for sample pack anymore
 
 interface DashboardClientProps {
     userData: any
@@ -37,112 +41,165 @@ export default function DashboardClient({
     studyPacks,
     dashboardData,
 }: DashboardClientProps) {
+    const router = useRouter()
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [runTour, setRunTour] = useState(false)
+
+    // Track if welcome has been dismissed THIS session (prevents re-showing after close)
+    const [welcomeDismissed, setWelcomeDismissed] = useState(false)
+
+    // Search & Filter State
     const [searchQuery, setSearchQuery] = useState('')
     const [activeFilter, setActiveFilter] = useState<'all' | 'has_due' | 'recent' | 'needs_review'>('all')
     const [activeSort, setActiveSort] = useState<'updated' | 'alphabetical' | 'due_cards' | 'progress'>('updated')
-    const { getWelcomeOrb } = useOrb()
-    
-    const { dueCount, packsWithDueCards, masteredCount, avgAccuracy, hasQuizResults } = dashboardData
-    
-    // Get time-based welcome Orb
-    const welcomeOrb = getWelcomeOrb()
-    const welcomeGreeting = welcomeOrb === 'welcome-back-morning' ? 'Good morning' : 
-                           welcomeOrb === 'welcome-back-afternoon' ? 'Good afternoon' : 
-                           'Good evening'
 
-    // Debounce search query
+    const { getWelcomeOrb } = useOrb()
+    const { dueCount, packsWithDueCards, masteredCount, avgAccuracy, hasQuizResults } = dashboardData
+
+    // Onboarding State
+    const onboardingMeta = userData?.meta_json?.onboarding || {}
+    const hasSeenWelcomeInDB = onboardingMeta.seen_welcome
+    const hasPacks = studyPacks.length > 0
+    const hasDueCards = dueCount > 0
+
+    // Determine if we should show welcome modal
+    // Show if: not seen in DB, not dismissed this session, and no packs
+    const showWelcomeModal = !hasSeenWelcomeInDB && !welcomeDismissed && !hasPacks
+
+    // Start tour after welcome is dismissed (either this session or from DB)
+    useEffect(() => {
+        // If user is new (based on DB), ensure we clear any stale local storage state
+        if (!hasSeenWelcomeInDB) {
+            localStorage.removeItem('sappio_tour_completed')
+        }
+
+        const tourCompletedLocal = localStorage.getItem('sappio_tour_completed') === 'true'
+        const shouldStartTour = (hasSeenWelcomeInDB || welcomeDismissed) && !tourCompletedLocal && !showWelcomeModal
+
+        if (shouldStartTour) {
+            // Small delay to let modal animation finish
+            const timer = setTimeout(() => setRunTour(true), 500)
+            return () => clearTimeout(timer)
+        }
+    }, [hasSeenWelcomeInDB, welcomeDismissed, showWelcomeModal])
+
+    const handleCloseWelcome = async () => {
+        // Immediately dismiss the modal via local state
+        setWelcomeDismissed(true)
+
+        // Then update the database in the background
+        try {
+            await fetch('/api/user/onboarding', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'seen_welcome' })
+            })
+        } catch (error) {
+            console.error('Failed to update onboarding status', error)
+        }
+    }
+
+    const handleCreateFirstPack = () => {
+        handleCloseWelcome()
+        setIsModalOpen(true)
+    }
+
+    const handleTourFinish = () => {
+        setRunTour(false)
+        localStorage.setItem('sappio_tour_completed', 'true')
+    }
+
+    // Determine Greeting
+    const welcomeOrb = getWelcomeOrb()
+    const welcomeGreeting = welcomeOrb === 'welcome-back-morning' ? 'Good morning' :
+        welcomeOrb === 'welcome-back-afternoon' ? 'Good afternoon' :
+            'Good evening'
+
     const debouncedSearch = useDebounce(searchQuery, 300)
 
-    // Track search events
+    // Analytics
     useEffect(() => {
-        if (debouncedSearch) {
-            AnalyticsService.trackPackSearched(debouncedSearch)
-        }
+        if (debouncedSearch) AnalyticsService.trackPackSearched(debouncedSearch)
     }, [debouncedSearch])
 
-    // Track filter events
     useEffect(() => {
-        if (activeFilter !== 'all') {
-            AnalyticsService.trackPackFiltered(activeFilter)
-        }
+        if (activeFilter !== 'all') AnalyticsService.trackPackFiltered(activeFilter)
     }, [activeFilter])
 
-    // Track sort events
     useEffect(() => {
         AnalyticsService.trackPackSorted(activeSort)
     }, [activeSort])
 
-    // Filter and sort packs
+    // Filter Logic
     const filteredAndSortedPacks = useMemo(() => {
         let filtered = [...studyPacks]
 
-        // Apply search filter
         if (debouncedSearch) {
             const query = debouncedSearch.toLowerCase()
-            filtered = filtered.filter(
-                (pack) =>
-                    pack.title.toLowerCase().includes(query) ||
-                    pack.summary?.toLowerCase().includes(query)
+            filtered = filtered.filter(p =>
+                p.title.toLowerCase().includes(query) ||
+                p.summary?.toLowerCase().includes(query)
             )
         }
 
-        // Apply category filter
         if (activeFilter === 'has_due') {
-            filtered = filtered.filter((pack) => pack.dueCount > 0)
+            filtered = filtered.filter(p => p.dueCount > 0)
         } else if (activeFilter === 'recent') {
-            const sevenDaysAgo = new Date()
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-            filtered = filtered.filter(
-                (pack) => new Date(pack.updated_at) >= sevenDaysAgo
-            )
+            const date = new Date()
+            date.setDate(date.getDate() - 7)
+            filtered = filtered.filter(p => new Date(p.updated_at) >= date)
         } else if (activeFilter === 'needs_review') {
-            filtered = filtered.filter(
-                (pack) => (pack.stats_json?.progress || 0) < 50
-            )
+            filtered = filtered.filter(p => (p.stats_json?.progress || 0) < 50)
         }
 
-        // Apply sorting
         filtered.sort((a, b) => {
             switch (activeSort) {
-                case 'alphabetical':
-                    return a.title.localeCompare(b.title)
-                case 'due_cards':
-                    return b.dueCount - a.dueCount
-                case 'progress':
-                    return (b.stats_json?.progress || 0) - (a.stats_json?.progress || 0)
-                case 'updated':
-                default:
-                    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+                case 'alphabetical': return a.title.localeCompare(b.title)
+                case 'due_cards': return b.dueCount - a.dueCount
+                case 'progress': return (b.stats_json?.progress || 0) - (a.stats_json?.progress || 0)
+                case 'updated': default: return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
             }
         })
 
         return filtered
     }, [studyPacks, debouncedSearch, activeFilter, activeSort])
 
-    // Calculate filter counts
     const filterCounts = useMemo(() => {
-        const sevenDaysAgo = new Date()
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-
+        const date = new Date()
+        date.setDate(date.getDate() - 7)
         return {
             all: studyPacks.length,
-            has_due: studyPacks.filter((pack) => pack.dueCount > 0).length,
-            recent: studyPacks.filter(
-                (pack) => new Date(pack.updated_at) >= sevenDaysAgo
-            ).length,
-            needs_review: studyPacks.filter(
-                (pack) => (pack.stats_json?.progress || 0) < 50
-            ).length,
+            has_due: studyPacks.filter(p => p.dueCount > 0).length,
+            recent: studyPacks.filter(p => new Date(p.updated_at) >= date).length,
+            needs_review: studyPacks.filter(p => (p.stats_json?.progress || 0) < 50).length,
         }
     }, [studyPacks])
 
-    const hasPacks = studyPacks.length > 0
-    const hasDueCards = dueCount > 0
-    const hasFilteredPacks = filteredAndSortedPacks.length > 0
+    // Check local progress + DB meta
+    const progress = {
+        has_created_pack: hasPacks || !!onboardingMeta.has_created_pack,
+        has_reviewed_flashcards: !!onboardingMeta.has_reviewed_flashcards || masteredCount > 0,
+        has_taken_quiz: !!onboardingMeta.has_taken_quiz || hasQuizResults
+    }
+
+    // If fully onboarding complete, no need to show checklist
+    const showChecklist = !progress.has_created_pack || !progress.has_reviewed_flashcards || !progress.has_taken_quiz
 
     return (
         <>
+            <WelcomeModal
+                isOpen={showWelcomeModal}
+                userName={userData?.full_name?.split(' ')[0]}
+                onClose={handleCloseWelcome}
+                onCreatePack={handleCreateFirstPack}
+            />
+
+            <DashboardTour
+                run={runTour}
+                onFinish={handleTourFinish}
+                hasPacks={hasPacks}
+            />
+
             <CreatePackModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -172,13 +229,19 @@ export default function DashboardClient({
                         </div>
                     </div>
 
+
+                    {/* Onboarding Checklist - Show for all users who haven't completed onboarding */}
+                    {showChecklist && (hasSeenWelcomeInDB || welcomeDismissed) && (
+                        <OnboardingChecklist progress={progress} />
+                    )}
+
                     {/* Dynamic Hero CTA - Paper Stack Style */}
                     {!hasPacks ? (
                         // First Pack Hero
-                        <div className="mb-8 relative">
+                        <div className="mb-8 relative" data-tour="create-pack">
                             {/* Paper stack layers */}
                             <div className="absolute top-[6px] left-[6px] right-[-6px] h-full bg-white/40 rounded-xl border border-[#94A3B8]/25" />
-                            
+
                             <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_12px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.06)] border border-[#5A5FF0]/40">
                                 {/* Bookmark Tab */}
                                 <div className="absolute -top-0 right-12 w-[28px] h-[22px] bg-[#5A5FF0] rounded-b-[5px] shadow-sm">
@@ -193,17 +256,32 @@ export default function DashboardClient({
                                         <p className="text-[15px] text-[#64748B] mb-1">
                                             Upload PDFs, documents, or paste URLs to generate AI-powered study materials
                                         </p>
-                                        <p className="text-[13px] text-[#5A5FF0] font-medium">
-                                            ✨ Get flashcards, quizzes, notes, and mind maps in seconds
-                                        </p>
+                                        <div className="flex items-center gap-4 mt-4 text-[13px] font-medium text-[#64748B]">
+                                            <span className="flex items-center gap-1.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#5A5FF0]" />
+                                                Flashcards
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#5A5FF0]" />
+                                                Quizzes
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#5A5FF0]" />
+                                                Mind Maps
+                                            </span>
+                                        </div>
                                     </div>
-                                    <button
-                                        onClick={() => setIsModalOpen(true)}
-                                        className="px-6 py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[15px] font-semibold rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2 flex items-center gap-2"
-                                    >
-                                        <Plus className="w-5 h-5" />
-                                        Create Pack
-                                    </button>
+                                    <div className="flex flex-col gap-3 min-w-[200px]">
+                                        <button
+                                            onClick={() => setIsModalOpen(true)}
+                                            className="w-full px-6 py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[15px] font-semibold rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2 flex items-center justify-center gap-2 shadow-lg shadow-[#5A5FF0]/20"
+                                        >
+                                            <Plus className="w-5 h-5" />
+                                            Create Pack
+                                        </button>
+
+                                        {/* Sample pack button removed */}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -213,24 +291,23 @@ export default function DashboardClient({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         {/* Create New Pack CTA - Less prominent when cards are due */}
                         {hasPacks && (
-                            <div className="md:col-span-1">
+                            <div className="md:col-span-1" data-tour="create-pack">
                                 <div className="relative h-full">
                                     {/* Paper stack effect */}
                                     <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
-                                    
+
                                     <button
                                         onClick={() => setIsModalOpen(true)}
-                                        className={`relative w-full h-full rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border transition-all duration-200 group active:scale-[0.99] flex flex-col items-center justify-center text-center overflow-hidden ${
-                                            hasDueCards
-                                                ? 'bg-white hover:bg-[#F8FAFB] border-[#94A3B8]/30 hover:border-[#5A5FF0]/40'
-                                                : 'bg-gradient-to-br from-[#1A1D2E] to-[#2A2D3E] hover:from-[#2A2D3E] hover:to-[#1A1D2E] border-[#5A5FF0]/30 hover:border-[#5A5FF0]/50 shadow-[0_2px_12px_rgba(90,95,240,0.15)]'
-                                        }`}
+                                        className={`relative w-full h-full rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border transition-all duration-200 group active:scale-[0.99] flex flex-col items-center justify-center text-center overflow-hidden ${hasDueCards
+                                            ? 'bg-white hover:bg-[#F8FAFB] border-[#94A3B8]/30 hover:border-[#5A5FF0]/40'
+                                            : 'bg-gradient-to-br from-[#1A1D2E] to-[#2A2D3E] hover:from-[#2A2D3E] hover:to-[#1A1D2E] border-[#5A5FF0]/30 hover:border-[#5A5FF0]/50 shadow-[0_2px_12px_rgba(90,95,240,0.15)]'
+                                            }`}
                                     >
                                         {/* Highlight accent line - only when no due cards */}
                                         {!hasDueCards && (
                                             <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#5A5FF0] to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
                                         )}
-                                        
+
                                         {/* Decorative Orb Image - Bottom Right */}
                                         <div className="absolute -bottom-8 -right-8 w-48 h-48 opacity-25 group-hover:opacity-35 transition-opacity">
                                             <Image
@@ -241,27 +318,23 @@ export default function DashboardClient({
                                                 className="object-contain"
                                             />
                                         </div>
-                                        
-                                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform mb-3 relative z-10 ${
-                                            hasDueCards
-                                                ? 'bg-[#5A5FF0]/10 border border-[#5A5FF0]/30'
-                                                : 'bg-[#5A5FF0]/20 border border-[#5A5FF0]/40'
-                                        }`}>
+
+                                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform mb-3 relative z-10 ${hasDueCards
+                                            ? 'bg-[#5A5FF0]/10 border border-[#5A5FF0]/30'
+                                            : 'bg-[#5A5FF0]/20 border border-[#5A5FF0]/40'
+                                            }`}>
                                             <Plus className={`w-7 h-7 ${hasDueCards ? 'text-[#5A5FF0]' : 'text-[#5A5FF0]'}`} strokeWidth={2.5} />
                                         </div>
-                                        <h3 className={`text-[18px] font-bold mb-2 relative z-10 ${
-                                            hasDueCards ? 'text-[#1A1D2E]' : 'text-white'
-                                        }`}>
+                                        <h3 className={`text-[18px] font-bold mb-2 relative z-10 ${hasDueCards ? 'text-[#1A1D2E]' : 'text-white'
+                                            }`}>
                                             Create New Pack
                                         </h3>
-                                        <p className={`text-[13px] mb-3 relative z-10 ${
-                                            hasDueCards ? 'text-[#64748B]' : 'text-[#94A3B8]'
-                                        }`}>
+                                        <p className={`text-[13px] mb-3 relative z-10 ${hasDueCards ? 'text-[#64748B]' : 'text-[#94A3B8]'
+                                            }`}>
                                             Upload materials or paste URLs
                                         </p>
-                                        <div className={`flex items-center gap-2 font-semibold text-[13px] group-hover:gap-3 transition-all relative z-10 ${
-                                            hasDueCards ? 'text-[#5A5FF0]' : 'text-[#5A5FF0]'
-                                        }`}>
+                                        <div className={`flex items-center gap-2 font-semibold text-[13px] group-hover:gap-3 transition-all relative z-10 ${hasDueCards ? 'text-[#5A5FF0]' : 'text-[#5A5FF0]'
+                                            }`}>
                                             <span>Get Started</span>
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -271,20 +344,22 @@ export default function DashboardClient({
                                 </div>
                             </div>
                         )}
-                        
+
                         <div className={hasPacks ? "md:col-span-2 space-y-6" : "md:col-span-3 space-y-6"}>
-                            <ContinuePanel 
-                                lastPackId={studyPacks[0]?.id}
-                                lastPackTitle={studyPacks[0]?.title}
-                                dueCountInPack={studyPacks[0]?.dueCount || 0}
-                            />
+                            {hasPacks && (
+                                <ContinuePanel
+                                    lastPackId={studyPacks[0]?.id}
+                                    lastPackTitle={studyPacks[0]?.title}
+                                    dueCountInPack={studyPacks[0]?.dueCount || 0}
+                                />
+                            )}
                             <ExtraPacksBalance userId={userData?.id} userPlan={userData?.plan as 'free' | 'student_pro' | 'pro_plus'} />
                         </div>
                     </div>
 
-                    {/* Stats Grid - Paper Cards with Consistent Styling */}
+                    {/* Stats Grid - Hide for new users */}
                     {hasPacks && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" data-tour="stats-grid">
                             {/* Cards Mastered */}
                             <div className="relative bg-white rounded-xl p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-[#E2E8F0]">
                                 <div className="flex items-center gap-2.5 mb-3">
@@ -341,7 +416,7 @@ export default function DashboardClient({
 
                     {/* Study Packs Section */}
                     {hasPacks && (
-                        <div>
+                        <div data-tour="recent-packs">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-[24px] font-bold text-[#1A1D2E]">Your Study Packs</h2>
                                 <p className="text-[14px] text-[#64748B]">{studyPacks.length} pack{studyPacks.length !== 1 ? 's' : ''}</p>
@@ -372,7 +447,7 @@ export default function DashboardClient({
                             )}
 
                             {/* Empty State for No Results */}
-                            {!hasFilteredPacks ? (
+                            {!filteredAndSortedPacks.length ? (
                                 <div className="relative bg-white rounded-xl p-12 shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-[#E2E8F0]">
                                     <div className="flex flex-col items-center justify-center text-center">
                                         <Orb pose="empty-state-inviting" size="lg" />
@@ -412,7 +487,7 @@ export default function DashboardClient({
                                                 <div className="relative">
                                                     {/* Backing sheet */}
                                                     <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
-                                                    
+
                                                     {/* Main card */}
                                                     <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#94A3B8]/30 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(15,23,42,0.12),0_2px_4px_rgba(15,23,42,0.08)] overflow-hidden">
                                                         {/* Bookmark Tab - Amber for "needs attention" */}
@@ -474,7 +549,7 @@ export default function DashboardClient({
                                                                     <span className="font-semibold">{progress}%</span>
                                                                 </div>
                                                                 <div className="h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-                                                                    <div 
+                                                                    <div
                                                                         className="h-full bg-[#5A5FF0] rounded-full transition-all duration-300"
                                                                         style={{ width: `${progress}%` }}
                                                                     />
