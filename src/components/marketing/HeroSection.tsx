@@ -107,7 +107,7 @@ export default function HeroSection() {
                   <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
                     <Check className="w-4 h-4 text-green-600" />
                   </div>
-                  <span className="font-bold text-[#1A1D2E]">You're on the list!</span>
+                  <span className="font-bold text-[#1A1D2E]">You&apos;re on the list!</span>
                 </div>
                 <p className="text-sm text-[#64748B]">Check your email for confirmation.</p>
               </div>
