@@ -7,10 +7,7 @@ interface WaitlistConfirmationEmailProps {
 
 export const WaitlistConfirmationEmail = ({ email, referralCode }: WaitlistConfirmationEmailProps) => (
     <html>
-        <head>
-            <meta charSet="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        </head>
+
         <body style={{
             margin: 0,
             padding: 0,
@@ -52,7 +49,7 @@ export const WaitlistConfirmationEmail = ({ email, referralCode }: WaitlistConfi
                                                     lineHeight: '1.5',
                                                     color: '#111827'
                                                 }}>
-                                                    You're on the list!
+                                                    You&apos;re on the list!
                                                 </p>
                                                 <p style={{
                                                     margin: '0 0 24px 0',
@@ -60,7 +57,7 @@ export const WaitlistConfirmationEmail = ({ email, referralCode }: WaitlistConfi
                                                     lineHeight: '1.6',
                                                     color: '#374151'
                                                 }}>
-                                                    We've reserved your spot. We're rolling out access gradually to ensure the best experience for everyone.
+                                                    We&apos;ve reserved your spot. We&apos;re rolling out access gradually to ensure the best experience for everyone.
                                                 </p>
 
                                                 <p style={{
@@ -117,7 +114,7 @@ export const WaitlistConfirmationEmail = ({ email, referralCode }: WaitlistConfi
                                                     color: '#6b7280',
                                                     textAlign: 'center'
                                                 }}>
-                                                    We'll email you at {email} when your account is ready.
+                                                    We&apos;ll email you at {email} when your account is ready.
                                                 </p>
                                             </td>
                                         </tr>
