@@ -9,12 +9,35 @@ import Highlight from '@/components/ui/InkHighlight'
 export default function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
   const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email) {
-      router.push(`/waitlist?email=${encodeURIComponent(email)}`)
+    if (!email) return
+
+    setStatus('loading')
+    setErrorMessage('')
+
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to join waitlist')
+      }
+
+      setStatus('success')
+      setEmail('')
+    } catch (error: any) {
+      setStatus('error')
+      setErrorMessage(error.message || 'Something went wrong. Please try again.')
     }
   }
 
@@ -74,22 +97,46 @@ export default function HeroSection() {
           </p>
 
           {/* Input Form wrapped in 'Paper' aesthetic */}
+          {/* Input Form wrapped in 'Paper' aesthetic */}
           <div className="w-full max-w-md relative group">
             <div className="absolute inset-0 bg-[#1A1D2E] rounded-2xl translate-y-2 translate-x-2 transition-transform group-hover:translate-y-3 group-hover:translate-x-3" />
-            <form onSubmit={handleSubmit} className="relative flex flex-col sm:flex-row gap-2 bg-white p-2 rounded-2xl border-2 border-[#1A1D2E]">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 bg-transparent text-lg text-[#1A1D2E] placeholder:text-[#94A3B8] outline-none"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <button type="submit" className="px-6 py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold text-lg rounded-xl transition-colors shadow-sm whitespace-nowrap">
-                Join waitlist
-              </button>
-            </form>
+
+            {status === 'success' ? (
+              <div className="relative flex flex-col items-center justify-center bg-white p-6 rounded-2xl border-2 border-[#1A1D2E] min-h-[80px]">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="font-bold text-[#1A1D2E]">You're on the list!</span>
+                </div>
+                <p className="text-sm text-[#64748B]">Check your email for confirmation.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="relative flex flex-col sm:flex-row gap-2 bg-white p-2 rounded-2xl border-2 border-[#1A1D2E]">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-3 bg-transparent text-lg text-[#1A1D2E] placeholder:text-[#94A3B8] outline-none disabled:opacity-50"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === 'loading'}
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="px-6 py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] disabled:bg-[#4A4FD0]/70 disabled:cursor-wait text-white font-bold text-lg rounded-xl transition-colors shadow-sm whitespace-nowrap"
+                >
+                  {status === 'loading' ? 'Joining...' : 'Join waitlist'}
+                </button>
+              </form>
+            )}
           </div>
+          {status === 'error' && (
+            <p className="mt-4 text-sm text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
+              {errorMessage}
+            </p>
+          )}
           <p className="mt-4 text-sm text-[#64748B] font-medium">
             No spam. One email when you&apos;re in.
           </p>

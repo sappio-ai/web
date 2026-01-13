@@ -11,7 +11,11 @@ import PlanBadge from './PlanBadge'
 import type { User } from '@supabase/supabase-js'
 import { Menu, X } from 'lucide-react'
 
-export default function NavbarClient() {
+interface NavbarClientProps {
+  waitlistMode: boolean
+}
+
+export default function NavbarClient({ waitlistMode }: NavbarClientProps) {
   const [user, setUser] = useState<User | null>(null)
   const [userPlan, setUserPlan] = useState<'free' | 'student_pro' | 'pro_plus'>('free')
   const [loading, setLoading] = useState(true)
@@ -180,10 +184,10 @@ export default function NavbarClient() {
                     Log in
                   </Link>
                   <Link
-                    href="/signup"
+                    href={waitlistMode ? '/waitlist' : '/signup'}
                     className="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-sm font-semibold rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40 focus:ring-offset-2 active:scale-[0.98] shadow-sm relative overflow-hidden group whitespace-nowrap"
                   >
-                    <span className="relative z-10">Get started</span>
+                    <span className="relative z-10">{waitlistMode ? 'Join waitlist' : 'Get started'}</span>
                     <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
                 </>
@@ -217,8 +221,8 @@ export default function NavbarClient() {
                       href="/dashboard"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${isActive('/dashboard')
-                          ? 'bg-[#EEF2FF] text-[#5A5FF0]'
-                          : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
+                        ? 'bg-[#EEF2FF] text-[#5A5FF0]'
+                        : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
                         }`}
                     >
                       Study Packs
@@ -227,8 +231,8 @@ export default function NavbarClient() {
                       href="/rooms"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`block px-3 py-2 rounded-lg text-base font-semibold transition-all ${pathname?.startsWith('/rooms')
-                          ? 'bg-[#EEF2FF] text-[#5A5FF0]'
-                          : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
+                        ? 'bg-[#EEF2FF] text-[#5A5FF0]'
+                        : 'text-[#1A1D2E] hover:bg-[#F8FAFB]'
                         }`}
                     >
                       Rooms
@@ -342,10 +346,10 @@ export default function NavbarClient() {
                         Log in
                       </Link>
                       <Link
-                        href="/signup"
+                        href={waitlistMode ? '/waitlist' : '/signup'}
                         className="block px-3 py-2 text-center bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-base font-semibold rounded-lg transition-all duration-150 shadow-sm"
                       >
-                        Get started
+                        {waitlistMode ? 'Join waitlist' : 'Get started'}
                       </Link>
                     </div>
                   </>

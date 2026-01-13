@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServerClient } from '@supabase/supabase-js'
+import { EmailService } from '@/lib/email/EmailService'
 
 // Generate a simple referral code
 function generateReferralCode(): string {
@@ -31,9 +32,9 @@ export async function POST(request: NextRequest) {
           persistSession: false
         }
       })
-      
+
       const referralCode = generateReferralCode()
-      
+
       const { data, error } = await supabase
         .from('waitlist')
         .insert({
@@ -56,13 +57,16 @@ export async function POST(request: NextRequest) {
             { status: 409 }
           )
         }
-        
+
         console.error('Supabase error:', error)
         return NextResponse.json(
           { error: 'Failed to join waitlist', details: error.message },
           { status: 500 }
         )
       }
+
+      // Send confirmation email
+      await EmailService.sendWaitlistConfirmationEmail(email, data.referral_code)
 
       return NextResponse.json({
         success: true,
@@ -71,9 +75,9 @@ export async function POST(request: NextRequest) {
     } else {
       // Fallback: In-memory store (for development)
       console.log('Waitlist signup (in-memory):', { email, studying, currentTool, wantsEarlyAccess, referredBy })
-      
+
       const referralCode = generateReferralCode()
-      
+
       return NextResponse.json({
         success: true,
         referralCode,

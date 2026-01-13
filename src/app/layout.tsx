@@ -8,6 +8,7 @@ import { PostHogProvider } from "@/providers/PostHogProvider";
 import PageViewTracker from "@/components/analytics/PageViewTracker";
 import CookieConsent from "@/components/CookieConsent";
 import { Suspense } from "react";
+import { AppSettingsService } from "@/lib/services/AppSettingsService";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -62,11 +63,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const waitlistMode = await AppSettingsService.isWaitlistModeEnabled();
+
   return (
     <html lang="en">
       <body
@@ -76,7 +79,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <PageViewTracker />
           </Suspense>
-          <NavbarClient />
+          <NavbarClient waitlistMode={waitlistMode} />
           <main className="flex-1">
             {children}
           </main>

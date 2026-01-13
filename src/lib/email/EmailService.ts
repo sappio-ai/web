@@ -6,6 +6,7 @@
 
 import { Resend } from 'resend'
 import { InviteEmail } from './templates/invite'
+import { WaitlistConfirmationEmail } from './templates/waitlist-confirmation'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -32,9 +33,38 @@ export class EmailService {
       return { success: true }
     } catch (error) {
       console.error('[EmailService] Failed to send invite:', error)
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }
+  }
+
+  /**
+   * Send confirmation email to user who joined waitlist
+   */
+  static async sendWaitlistConfirmationEmail(email: string, referralCode: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: 'Sappio <hello@sappio.ai>',
+        to: [email],
+        subject: "You're on the list!",
+        react: WaitlistConfirmationEmail({ email, referralCode }),
+        replyTo: 'hello@sappio.ai'
+      })
+
+      if (error) {
+        console.error('[EmailService] Error sending waitlist confirmation:', error)
+        return { success: false, error: error.message }
+      }
+
+      console.log(`[EmailService] Waitlist confirmation sent to ${email}:`, data?.id)
+      return { success: true }
+    } catch (error) {
+      console.error('[EmailService] Failed to send waitlist confirmation:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
       }
     }
   }
@@ -52,7 +82,7 @@ export class EmailService {
     // Send emails sequentially to avoid rate limits
     for (const { email, inviteCode } of emailsWithCodes) {
       const result = await this.sendInviteEmail(email, inviteCode)
-      
+
       if (result.success) {
         successful.push(email)
       } else {

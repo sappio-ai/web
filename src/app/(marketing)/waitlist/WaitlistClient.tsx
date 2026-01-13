@@ -119,7 +119,7 @@ export default function WaitlistClient() {
         <div className="relative w-full max-w-lg">
           {/* Paper Shadow Effect */}
           <div className="absolute inset-0 bg-[#1A1D2E] rounded-3xl translate-y-3 translate-x-3" />
-          
+
           <div className="relative bg-white rounded-3xl overflow-hidden border-2 border-[#1A1D2E]">
             {/* Header with gradient accent */}
             <div className="bg-gradient-to-br from-[#5A5FF0] to-[#4A4FD0] p-10 text-center relative overflow-hidden">
@@ -275,7 +275,7 @@ export default function WaitlistClient() {
 
               {/* Decorative Corner Accent */}
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFDE59] rounded-bl-[60px] opacity-20" />
-              
+
               {/* Bookmark Tab */}
               <div className="absolute -top-0 right-12 w-[32px] h-[26px] bg-[#5A5FF0] rounded-b-[6px] shadow-sm z-20">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[22px] h-[3px] bg-[#4A4FD0] rounded-t-sm" />
