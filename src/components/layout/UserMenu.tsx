@@ -59,8 +59,7 @@ export default function UserMenu({ user, plan = 'free' }: UserMenuProps) {
     try {
       const supabase = createBrowserClient()
       await supabase.auth.signOut()
-      router.push('/login')
-      router.refresh()
+      window.location.href = '/'
     } catch (error) {
       console.error('Logout error:', error)
       setLoading(false)

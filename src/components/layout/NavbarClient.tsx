@@ -320,7 +320,7 @@ export default function NavbarClient(props: NavbarClientProps) {
                             setIsMobileMenuOpen(false)
                             const supabase = createBrowserClient()
                             await supabase.auth.signOut()
-                            window.location.href = '/login'
+                            window.location.href = '/'
                           }}
                           className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#DC2626] hover:bg-[#FEE2E2] transition-colors w-full"
                         >
