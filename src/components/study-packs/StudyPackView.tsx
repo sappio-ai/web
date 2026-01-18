@@ -36,9 +36,10 @@ interface StudyPackViewProps {
     }
   }
   userPlan: string
+  isDemo?: boolean
 }
 
-export default function StudyPackView({ pack, userPlan }: StudyPackViewProps) {
+export default function StudyPackView({ pack, userPlan, isDemo = false }: StudyPackViewProps) {
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab') as TabType | null
 
@@ -65,15 +66,15 @@ export default function StudyPackView({ pack, userPlan }: StudyPackViewProps) {
       }} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-        <PackHeader pack={pack} />
+        <PackHeader pack={pack} isDemo={isDemo} />
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
         <div className="mt-8">
           {activeTab === 'notes' && <NotesTab notes={pack.stats.notes} studyPackId={pack.id} userPlan={userPlan} />}
-          {activeTab === 'flashcards' && <FlashcardsTab packId={pack.id} userPlan={userPlan} />}
-          {activeTab === 'quiz' && <QuizTab packId={pack.id} userPlan={userPlan} />}
-          {activeTab === 'mindmap' && <MindMapTab packId={pack.id} userPlan={userPlan} />}
-          {activeTab === 'insights' && <InsightsTab packId={pack.id} userPlan={userPlan} />}
+          {activeTab === 'flashcards' && <FlashcardsTab packId={pack.id} userPlan={userPlan} isDemo={isDemo} />}
+          {activeTab === 'quiz' && <QuizTab packId={pack.id} userPlan={userPlan} isDemo={isDemo} />}
+          {activeTab === 'mindmap' && <MindMapTab packId={pack.id} userPlan={userPlan} isDemo={isDemo} />}
+          {activeTab === 'insights' && <InsightsTab packId={pack.id} userPlan={userPlan} isDemo={isDemo} />}
         </div>
       </div>
     </div>

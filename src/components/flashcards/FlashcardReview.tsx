@@ -13,12 +13,14 @@ interface FlashcardReviewProps {
   packId: string
   topicFilter?: string
   onComplete?: () => void
+  isDemo?: boolean
 }
 
 export default function FlashcardReview({
   packId,
   topicFilter,
   onComplete,
+  isDemo = false,
 }: FlashcardReviewProps) {
   const {
     currentCard,
@@ -38,7 +40,7 @@ export default function FlashcardReview({
     takeBreak,
     continueStudying,
     disableBreakSuggestions,
-  } = useFlashcardSession(packId, topicFilter)
+  } = useFlashcardSession(packId, topicFilter, isDemo)
 
   // Keyboard shortcut for flipping
   useKeyboardShortcuts({
@@ -52,7 +54,7 @@ export default function FlashcardReview({
           <Orb pose="processing-thinking" size="lg" />
         </div>
         <p className="text-[#64748B] mb-8">Loading flashcards...</p>
-        
+
         {/* Loading Skeleton */}
         <div className="w-full max-w-2xl h-64 sm:h-80 md:h-96 bg-[#F1F5F9] rounded-2xl animate-pulse mb-6" />
         <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
@@ -151,21 +153,21 @@ export default function FlashcardReview({
           </p>
         </div>
 
-      {/* Flashcard */}
-      <FlashcardCard card={currentCard} isFlipped={isFlipped} onFlip={flip} />
+        {/* Flashcard */}
+        <FlashcardCard card={currentCard} isFlipped={isFlipped} onFlip={flip} />
 
-      {/* Action Buttons */}
-      {!isFlipped ? (
-        <button
-          onClick={flip}
-          disabled={isProcessing}
-          className="mt-8 px-8 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[16px] font-semibold rounded-xl shadow-sm transition-colors hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-        >
-          Show Answer (Space)
-        </button>
-      ) : (
-        <GradingButtons onGrade={grade} disabled={isProcessing} />
-      )}
+        {/* Action Buttons */}
+        {!isFlipped ? (
+          <button
+            onClick={flip}
+            disabled={isProcessing}
+            className="mt-8 px-8 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[16px] font-semibold rounded-xl shadow-sm transition-colors hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            Show Answer (Space)
+          </button>
+        ) : (
+          <GradingButtons onGrade={grade} disabled={isProcessing} />
+        )}
       </div>
     </>
   )

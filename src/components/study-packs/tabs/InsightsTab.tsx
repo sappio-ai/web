@@ -10,14 +10,16 @@ import DueLoadForecast from '@/components/insights/DueLoadForecast'
 import PerformanceTrends from '@/components/insights/PerformanceTrends'
 import SessionDepthAnalytics from '@/components/insights/SessionDepthAnalytics'
 import UpgradePrompt from '@/components/paywall/UpgradePrompt'
+import DemoPrompt from '@/components/demo/DemoPrompt'
 import type { QuizResult, TopicPerformance } from '@/lib/types/quiz'
 
 interface InsightsTabProps {
   packId: string
   userPlan?: string
+  isDemo?: boolean
 }
 
-export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
+export default function InsightsTab({ packId, userPlan, isDemo = false }: InsightsTabProps) {
   const [quizResults, setQuizResults] = useState<QuizResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -38,8 +40,8 @@ export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
         const packData = await packResponse.json()
         setPackStats(packData.stats)
 
-        // Fetch quiz results if quiz exists
-        if (packData.quiz) {
+        // Fetch quiz results if quiz exists AND not demo
+        if (packData.quiz && !isDemo) {
           const quizResponse = await fetch(
             `/api/quiz-results/history?quiz_id=${packData.quiz.id}&limit=10`
           )
@@ -187,59 +189,73 @@ export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Pack Overview Stats */}
-      <div className="relative">
-        <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
-        <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
-          <div className="flex items-center gap-3 mb-6">
-            <Orb pose="analytics-dashboard" size="sm" />
-            <h3 className="text-[20px] font-bold text-[#1A1D2E]">Study Pack Stats</h3>
+      {/* Pack Overview Stats - Hide for Demo */}
+      {
+        !isDemo && (
+          <div className="relative">
+            <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+            <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
+              <div className="flex items-center gap-3 mb-6">
+                <Orb pose="analytics-dashboard" size="sm" />
+                <h3 className="text-[20px] font-bold text-[#1A1D2E]">Study Pack Stats</h3>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+                  <p className="text-[#64748B] text-[12px] mb-1">Coverage</p>
+                  <p className="text-[#1A1D2E] text-[20px] font-bold capitalize">
+                    {packStats?.coverage || 'N/A'}
+                  </p>
+                </div>
+                <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+                  <p className="text-[#64748B] text-[12px] mb-1">Flashcards</p>
+                  <p className="text-[#1A1D2E] text-[20px] font-bold">
+                    {packStats?.cardCount || 0}
+                  </p>
+                </div>
+                <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+                  <p className="text-[#64748B] text-[12px] mb-1">Quiz Attempts</p>
+                  <p className="text-[#1A1D2E] text-[20px] font-bold">
+                    {quizResults.length}
+                  </p>
+                </div>
+                <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
+                  <p className="text-[#64748B] text-[12px] mb-1">Avg Quiz Score</p>
+                  <p
+                    className={`text-[20px] font-bold ${overallQuizScore >= 70
+                      ? 'text-[#10B981]'
+                      : overallQuizScore > 0
+                        ? 'text-[#F59E0B]'
+                        : 'text-[#64748B]'
+                      }`}
+                  >
+                    {quizResults.length > 0
+                      ? `${Math.round(overallQuizScore)}%`
+                      : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
+        )
+      }
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
-              <p className="text-[#64748B] text-[12px] mb-1">Coverage</p>
-              <p className="text-[#1A1D2E] text-[20px] font-bold capitalize">
-                {packStats?.coverage || 'N/A'}
-              </p>
-            </div>
-            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
-              <p className="text-[#64748B] text-[12px] mb-1">Flashcards</p>
-              <p className="text-[#1A1D2E] text-[20px] font-bold">
-                {packStats?.cardCount || 0}
-              </p>
-            </div>
-            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
-              <p className="text-[#64748B] text-[12px] mb-1">Quiz Attempts</p>
-              <p className="text-[#1A1D2E] text-[20px] font-bold">
-                {quizResults.length}
-              </p>
-            </div>
-            <div className="bg-[#F8FAFB] rounded-lg p-4 border border-[#E2E8F0]">
-              <p className="text-[#64748B] text-[12px] mb-1">Avg Quiz Score</p>
-              <p
-                className={`text-[20px] font-bold ${
-                  overallQuizScore >= 70
-                    ? 'text-[#10B981]'
-                    : overallQuizScore > 0
-                      ? 'text-[#F59E0B]'
-                      : 'text-[#64748B]'
-                }`}
-              >
-                {quizResults.length > 0
-                  ? `${Math.round(overallQuizScore)}%`
-                  : 'N/A'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Pack Completeness Score - Hide for Demo */}
+      {!isDemo && <PackCompletenessScore packId={packId} />}
 
-      {/* Pack Completeness Score */}
-      <PackCompletenessScore packId={packId} />
-
-      {/* Advanced Analytics - Pro Plus Only */}
-      {userPlan === 'pro_plus' ? (
+      {/* Advanced Analytics or Demo Prompt */}
+      {isDemo ? (
+        <DemoPrompt
+          featureName="Deep Learning Insights"
+          description="Sign up to get advanced analytics on your study habits, retention rates, and knowledge gaps."
+          icon="chart"
+          bulletPoints={[
+            "Analyze your retention over time",
+            "Forecast due cards for efficient studying",
+            "Track session depth and focus"
+          ]}
+        />
+      ) : userPlan === 'pro_plus' ? (
         <>
           {/* Due Load Forecast */}
           <DueLoadForecast packId={packId} />
@@ -268,11 +284,11 @@ export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
         />
       )}
 
-      {/* Flashcard Progress */}
-      <ProgressChart packId={packId} />
+      {/* Flashcard Progress - Hide for Demo */}
+      {!isDemo && <ProgressChart packId={packId} />}
 
-      {/* Streak */}
-      <StreakDisplay />
+      {/* Streak - Hide for Demo */}
+      {!isDemo && <StreakDisplay />}
 
       {/* Quiz Performance by Topic */}
       {quizResults.length > 0 && sortedTopics.length > 0 && (
@@ -291,11 +307,10 @@ export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
               {sortedTopics.map((topic) => (
                 <div
                   key={topic.topic}
-                  className={`rounded-lg p-4 border transition-all ${
-                    topic.isWeak
-                      ? 'bg-[#FEF2F2] border-[#FCA5A5] hover:bg-[#FEE2E2]'
-                      : 'bg-[#F8FAFB] border-[#E2E8F0] hover:bg-[#F1F5F9]'
-                  }`}
+                  className={`rounded-lg p-4 border transition-all ${topic.isWeak
+                    ? 'bg-[#FEF2F2] border-[#FCA5A5] hover:bg-[#FEE2E2]'
+                    : 'bg-[#F8FAFB] border-[#E2E8F0] hover:bg-[#F1F5F9]'
+                    }`}
                 >
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
@@ -309,20 +324,18 @@ export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
                       )}
                     </div>
                     <span
-                      className={`font-bold text-[14px] ${
-                        topic.isWeak ? 'text-[#DC2626]' : 'text-[#10B981]'
-                      }`}
+                      className={`font-bold text-[14px] ${topic.isWeak ? 'text-[#DC2626]' : 'text-[#10B981]'
+                        }`}
                     >
                       {Math.round(topic.accuracy)}%
                     </span>
                   </div>
                   <div className="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden mb-2">
                     <div
-                      className={`h-full transition-all ${
-                        topic.isWeak
-                          ? 'bg-[#DC2626]'
-                          : 'bg-gradient-to-r from-[#10B981] to-[#059669]'
-                      }`}
+                      className={`h-full transition-all ${topic.isWeak
+                        ? 'bg-[#DC2626]'
+                        : 'bg-gradient-to-r from-[#10B981] to-[#059669]'
+                        }`}
                       style={{ width: `${topic.accuracy}%` }}
                     />
                   </div>
@@ -349,8 +362,8 @@ export default function InsightsTab({ packId, userPlan }: InsightsTabProps) {
         </div>
       )}
 
-      {/* No Quiz Data */}
-      {quizResults.length === 0 && (
+      {/* No Quiz Data - Hide for Demo */}
+      {!isDemo && quizResults.length === 0 && (
         <div className="relative">
           <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
           <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">

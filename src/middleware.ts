@@ -7,27 +7,30 @@ export async function middleware(request: NextRequest) {
 
   // Define protected routes that require authentication
   const protectedRoutes = ['/dashboard', '/profile', '/settings', '/study-packs', '/review', '/practice', '/upload']
-  
+
   // Define admin routes that require admin role
   const adminRoutes = ['/admin']
-  
+
   // Define auth routes that should redirect to dashboard if already logged in
   const authRoutes = ['/login', '/signup']
-  
+
   // Define marketing routes that should redirect to dashboard if already logged in
   const marketingRoutes = ['/waitlist']
-  
+
   const { pathname, searchParams } = request.nextUrl
 
   // Check if the current path is an admin route
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
-  
+
   // Check if the current path is a protected route
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-  
+  // Note: We include the ID directly as a fallback to ensure it works immediately even if env vars haven't reloaded
+  const demoId = process.env.NEXT_PUBLIC_DEMO_PACK_ID || '3747df11-0426-4749-8597-af89639e8d38'
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route)) &&
+    !(demoId && pathname.includes(demoId))
+
   // Check if the current path is an auth route
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
-  
+
   // Check if the current path is a marketing route
   const isMarketingRoute = pathname === '/' || marketingRoutes.some(route => pathname.startsWith(route))
 

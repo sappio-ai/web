@@ -23,9 +23,10 @@ interface PackHeaderProps {
       tags?: string[]
     }
   }
+  isDemo?: boolean
 }
 
-export default function PackHeader({ pack }: PackHeaderProps) {
+export default function PackHeader({ pack, isDemo = false }: PackHeaderProps) {
   const router = useRouter()
 
   const formatDate = (dateString: string) => {
@@ -57,14 +58,19 @@ export default function PackHeader({ pack }: PackHeaderProps) {
       {/* Back Button and Streak */}
       <div className="flex items-center justify-between mb-6">
         <Link
-          href="/dashboard"
+          href={isDemo ? "/signup" : "/dashboard"}
           className="inline-flex items-center gap-2 text-[#64748B] hover:text-[#1A1D2E] transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          <span className="text-[15px] font-medium">Back to Dashboard</span>
+          <span className="text-[15px] font-medium">{isDemo ? "Sign up to create yours" : "Back to Dashboard"}</span>
         </Link>
 
-        <StreakDisplay variant="compact" />
+        {!isDemo && <StreakDisplay variant="compact" />}
+        {isDemo && (
+          <div className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wider rounded-full border border-amber-200">
+            Demo Preview
+          </div>
+        )}
       </div>
 
       {/* Header Card - Paper Stack Style */}

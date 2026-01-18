@@ -25,7 +25,8 @@ interface UseFlashcardSessionReturn {
 
 export function useFlashcardSession(
   packId: string,
-  topicFilter?: string
+  topicFilter?: string,
+  isDemo: boolean = false
 ): UseFlashcardSessionReturn {
   const [cards, setCards] = useState<Flashcard[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -89,6 +90,7 @@ export function useFlashcardSession(
 
   // Create session record in database
   const createSessionRecord = useCallback(async () => {
+    if (isDemo) return 'demo-session-id'
     try {
       const response = await fetch('/api/review-sessions', {
         method: 'POST',
@@ -114,6 +116,7 @@ export function useFlashcardSession(
 
   // Update session record in database
   const updateSessionRecord = useCallback(async (sessionId: string, stats: SessionStats) => {
+    if (isDemo) return
     try {
       await fetch(`/api/review-sessions/${sessionId}`, {
         method: 'PATCH',
@@ -264,41 +267,46 @@ export function useFlashcardSession(
         })
 
         // Submit review to API with retry logic
-        let retries = 3
-        let lastError: Error | null = null
+        if (isDemo) {
+          // In demo mode, just simulate success delay
+          await new Promise(resolve => setTimeout(resolve, 300))
+        } else {
+          let retries = 3
+          let lastError: Error | null = null
 
-        while (retries > 0) {
-          try {
-            const response = await fetch(
-              `/api/flashcards/${cards[currentIndex].id}/review`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ grade: gradeValue }),
-              }
-            )
-
-            if (!response.ok) {
-              throw new Error('Failed to submit review')
-            }
-
-            // Success - break out of retry loop
-            break
-          } catch (err) {
-            lastError = err instanceof Error ? err : new Error('Unknown error')
-            retries--
-
-            if (retries === 0) {
-              // All retries failed - but don't block user, just log
-              console.error('Failed to submit review after retries:', lastError)
-              // Continue anyway - optimistic update already happened
-            } else {
-              // Wait before retry (exponential backoff)
-              await new Promise((resolve) =>
-                setTimeout(resolve, (4 - retries) * 1000)
+          while (retries > 0) {
+            try {
+              const response = await fetch(
+                `/api/flashcards/${cards[currentIndex].id}/review`,
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ grade: gradeValue }),
+                }
               )
+
+              if (!response.ok) {
+                throw new Error('Failed to submit review')
+              }
+
+              // Success - break out of retry loop
+              break
+            } catch (err) {
+              lastError = err instanceof Error ? err : new Error('Unknown error')
+              retries--
+
+              if (retries === 0) {
+                // All retries failed - but don't block user, just log
+                console.error('Failed to submit review after retries:', lastError)
+                // Continue anyway - optimistic update already happened
+              } else {
+                // Wait before retry (exponential backoff)
+                await new Promise((resolve) =>
+                  setTimeout(resolve, (4 - retries) * 1000)
+                )
+              }
             }
           }
         }
@@ -330,22 +338,24 @@ export function useFlashcardSession(
             updateSessionRecord(currentSessionId, finalStats)
 
             // Track study session completed event
-            fetch('/api/events', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                event: 'study_session_completed',
-                props: {
-                  study_pack_id: packId,
-                  session_id: currentSessionId,
-                  duration_ms: finalStats.totalTime,
-                  cards_reviewed: finalStats.cardsReviewed,
-                  correct_count: finalStats.good + finalStats.easy,
-                  accuracy: Math.round(finalStats.accuracy),
-                  topic_filter: topicFilter || null,
-                }
-              })
-            }).catch(console.error) // Non-blocking
+            if (!isDemo) {
+              fetch('/api/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  event: 'study_session_completed',
+                  props: {
+                    study_pack_id: packId,
+                    session_id: currentSessionId,
+                    duration_ms: finalStats.totalTime,
+                    cards_reviewed: finalStats.cardsReviewed,
+                    correct_count: finalStats.good + finalStats.easy,
+                    accuracy: Math.round(finalStats.accuracy),
+                    topic_filter: topicFilter || null,
+                  }
+                })
+              }).catch(console.error) // Non-blocking
+            }
           }
         }
       } catch (err) {
@@ -357,7 +367,7 @@ export function useFlashcardSession(
         }, 300)
       }
     },
-    [cards, currentIndex, cardStartTime, isProcessing, currentSessionId, sessionStats, updateSessionRecord]
+    [cards, currentIndex, cardStartTime, isProcessing, currentSessionId, sessionStats, updateSessionRecord, isDemo]
   )
 
   // Prefetch next 3 cards

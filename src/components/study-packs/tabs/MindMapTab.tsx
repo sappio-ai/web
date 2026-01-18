@@ -8,11 +8,13 @@ import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import type { MindMap, MindMapNode } from '@/lib/types/mindmap'
 import GenerateMoreButton from '@/components/study-packs/GenerateMoreButton'
 import UpgradePrompt from '@/components/paywall/UpgradePrompt'
+import DemoPrompt from '@/components/demo/DemoPrompt'
 import type { PlanLimits } from '@/lib/types/usage'
 
 interface MindMapTabProps {
   packId: string
   userPlan?: string
+  isDemo?: boolean
 }
 
 interface MindMapData {
@@ -23,7 +25,7 @@ interface MindMapData {
   isLimited: boolean
 }
 
-export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProps) {
+export default function MindMapTab({ packId, userPlan = 'free', isDemo = false }: MindMapTabProps) {
   const [data, setData] = useState<MindMapData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -36,6 +38,11 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
 
   useEffect(() => {
     async function fetchMindMap() {
+      if (isDemo) {
+        setIsLoading(false)
+        return
+      }
+
       try {
         setIsLoading(true)
         setError(null)
@@ -66,7 +73,7 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
 
         const mindmapData = await response.json()
         setData(mindmapData)
-        
+
         // Use actual nodes array length for accurate count
         setNodeCount(mindmapData.nodes?.length || packData.stats?.mindMapNodeCount || 0)
         // Get generation status from stats
@@ -99,8 +106,10 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
     }
 
     fetchMindMap()
-    fetchLimits()
-  }, [packId])
+    if (!isDemo) {
+      fetchLimits()
+    }
+  }, [packId, isDemo])
 
   // Loading state
   if (isLoading) {
@@ -133,6 +142,25 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
     )
   }
 
+  // Demo state - Show prompt immediately
+  if (isDemo) {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <DemoPrompt
+          featureName="Interactive AI Mind Maps"
+          description="Sign up to explore the full interactive mind map, edit nodes, and visualize connections."
+          icon="mindmap"
+          ctaText="Unlock Mind Maps"
+          bulletPoints={[
+            "Visualize complex topics effortlessly",
+            "Edit and customize nodes",
+            "Understand relationships between concepts"
+          ]}
+        />
+      </div>
+    )
+  }
+
   // Empty state
   if (!data || !data.nodes || data.nodes.length === 0) {
     return (
@@ -154,8 +182,8 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
     )
   }
 
-  const canGenerateMore = 
-    limits?.batchNodesSize !== null && 
+  const canGenerateMore =
+    limits?.batchNodesSize !== null &&
     limits?.batchNodesSize !== undefined &&
     nodeCount < (limits?.mindmapNodesLimit || 0)
 
@@ -170,7 +198,7 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
           `${nodeCount} / ${limits.mindmapNodesLimit} nodes`
         )}
       </div>
-      
+
       {/* Generate More Button (Paid Users) */}
       {canGenerateMore && limits && (
         <GenerateMoreButton
@@ -204,7 +232,7 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
           }}
         />
       )}
-      
+
       {/* Upgrade Prompt (Free Users) */}
       {userPlan === 'free' && (
         <UpgradePrompt
@@ -219,7 +247,7 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
           currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
         />
       )}
-      
+
       {/* Header with stats */}
       <div className="relative">
         <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
@@ -306,10 +334,10 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
                 nodes: prev.nodes.map((n) =>
                   n.id === nodeId
                     ? {
-                        ...n,
-                        title: updatedNode.title,
-                        content: updatedNode.content,
-                      }
+                      ...n,
+                      title: updatedNode.title,
+                      content: updatedNode.content,
+                    }
                     : n
                 ),
               }
@@ -319,10 +347,10 @@ export default function MindMapTab({ packId, userPlan = 'free' }: MindMapTabProp
             setSelectedNode((prev) =>
               prev?.id === nodeId
                 ? {
-                    ...prev,
-                    title: updatedNode.title,
-                    content: updatedNode.content,
-                  }
+                  ...prev,
+                  title: updatedNode.title,
+                  content: updatedNode.content,
+                }
                 : prev
             )
 

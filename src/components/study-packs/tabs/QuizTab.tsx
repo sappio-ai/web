@@ -10,14 +10,16 @@ import { Crown } from 'lucide-react'
 import type { Quiz } from '@/lib/types/quiz'
 import GenerateMoreButton from '@/components/study-packs/GenerateMoreButton'
 import UpgradePrompt from '@/components/paywall/UpgradePrompt'
+import DemoPrompt from '@/components/demo/DemoPrompt'
 import type { PlanLimits } from '@/lib/types/usage'
 
 interface QuizTabProps {
   packId: string
   userPlan: string
+  isDemo?: boolean
 }
 
-export default function QuizTab({ packId, userPlan }: QuizTabProps) {
+export default function QuizTab({ packId, userPlan, isDemo = false }: QuizTabProps) {
   const [quiz, setQuiz] = useState<Quiz | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -34,11 +36,13 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
 
   useEffect(() => {
     fetchQuiz()
-    fetchLimits()
+    if (!isDemo) {
+      fetchLimits()
+    }
   }, [packId])
 
   useEffect(() => {
-    if (quiz) {
+    if (quiz && !isDemo) {
       fetchLatestWeakTopics()
     }
   }, [quiz])
@@ -234,8 +238,8 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
     )
   }
 
-  const canGenerateMore = 
-    limits?.batchQuestionsSize !== null && 
+  const canGenerateMore =
+    limits?.batchQuestionsSize !== null &&
     limits?.batchQuestionsSize !== undefined &&
     questionCount < (limits?.questionsPerQuiz || 0)
 
@@ -250,7 +254,7 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
           `${questionCount} / ${limits.questionsPerQuiz} questions`
         )}
       </div>
-      
+
       {/* Generate More Button (Paid Users) */}
       {canGenerateMore && limits && (
         <GenerateMoreButton
@@ -268,7 +272,7 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
           }}
         />
       )}
-      
+
       {/* Upgrade Prompt (Free Users) */}
       {userPlan === 'free' && (
         <UpgradePrompt
@@ -283,7 +287,7 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
           currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
         />
       )}
-      
+
       {/* Quiz Overview Card */}
       <div className="relative">
         <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
@@ -319,8 +323,8 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
                 <p className="text-[#1A1D2E] text-[24px] font-bold">
                   {quiz.items
                     ? new Set(
-                        quiz.items.map((item) => item.topic || 'General')
-                      ).size
+                      quiz.items.map((item) => item.topic || 'General')
+                    ).size
                     : 0}
                 </p>
                 <button
@@ -379,11 +383,10 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
               <button
                 onClick={handleStartWeakTopicQuiz}
                 disabled={isLoadingWeakQuiz}
-                className={`w-full px-8 py-4 text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
-                  userPlan === 'free' 
-                    ? 'bg-[#94A3B8] hover:bg-[#64748B]' 
+                className={`w-full px-8 py-4 text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${userPlan === 'free'
+                    ? 'bg-[#94A3B8] hover:bg-[#64748B]'
                     : 'bg-[#F59E0B] hover:bg-[#D97706]'
-                }`}
+                  }`}
               >
                 {isLoadingWeakQuiz ? (
                   <>
@@ -429,8 +432,8 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
                       </svg>
                     )}
                     <span>
-                      {userPlan === 'free' 
-                        ? 'Upgrade to Retest Weak Topics' 
+                      {userPlan === 'free'
+                        ? 'Upgrade to Retest Weak Topics'
                         : `Retest Weak Topics (${latestWeakTopics.length})`}
                     </span>
                   </>
@@ -441,8 +444,21 @@ export default function QuizTab({ packId, userPlan }: QuizTabProps) {
         </div>
       </div>
 
-      {/* Quiz History */}
-      <QuizHistory quizId={quiz.id} />
+      {/* Quiz History or Demo Prompt */}
+      {isDemo ? (
+        <DemoPrompt
+          featureName="Track Your Quiz Performance"
+          description="Sign up to save your quiz history, track your improvement over time, and identify weak topics."
+          icon="chart"
+          bulletPoints={[
+            "Save detailed quiz results",
+            "Track your score improvement",
+            "Identify knowledge gaps"
+          ]}
+        />
+      ) : (
+        <QuizHistory quizId={quiz.id} />
+      )}
 
       {/* Paywall Modal */}
       <PaywallModal

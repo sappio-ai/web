@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import StudyPackView from '@/components/study-packs/StudyPackView'
 
 export default async function StudyPackPage({
@@ -8,54 +8,87 @@ export default async function StudyPackPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const supabase = await createClient()
+  const demoId = process.env.NEXT_PUBLIC_DEMO_PACK_ID || '3747df11-0426-4749-8597-af89639e8d38'
+  const isDemo = id === demoId
 
-  // Authenticate user
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
+  let user = null
+  let userPlan = 'free'
+  let pack = null
 
-  if (authError || !user) {
-    redirect('/login')
+  if (isDemo) {
+    // ---------------------------------------------------------
+    // DEMO MODE: Bypass Auth & RLS
+    // ---------------------------------------------------------
+    const adminSupabase = createServiceRoleClient()
+
+    // Fetch pack directly without checking user ownership
+    const { data: demoPack, error: demoError } = await adminSupabase
+      .from('study_packs')
+      .select(`
+        *,
+        materials(id, kind, source_url, page_count, status)
+      `)
+      .eq('id', id)
+      .single()
+
+    if (demoError || !demoPack) {
+      notFound()
+    }
+    pack = demoPack
+    // For demo purposes, we can simulate a plan or keep it free
+    userPlan = 'student_pro'
+  } else {
+    // ---------------------------------------------------------
+    // STANDARD MODE: Strict Auth & RLS
+    // ---------------------------------------------------------
+    const supabase = await createClient()
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !authUser) {
+      redirect('/login')
+    }
+    user = authUser
+
+    // Fetch study pack with user ownership check
+    const { data: userPack, error: packError } = await supabase
+      .from('study_packs')
+      .select(`
+        *,
+        users!inner(id, auth_user_id, plan),
+        materials(id, kind, source_url, page_count, status)
+      `)
+      .eq('id', id)
+      .eq('users.auth_user_id', user.id) // Strict ownership check
+      .single()
+
+    if (packError || !userPack) {
+      notFound()
+    }
+    pack = userPack
+    userPlan = pack.users?.plan || 'free'
   }
 
-  // Fetch study pack with all related data
-  const { data: pack, error: packError } = await supabase
-    .from('study_packs')
-    .select(
-      `
-      *,
-      users!inner(id, auth_user_id, plan),
-      materials(id, kind, source_url, page_count, status)
-    `
-    )
-    .eq('id', id)
-    .eq('users.auth_user_id', user.id)
-    .single()
-
-  if (packError || !pack) {
-    notFound()
-  }
-
-  // Get user plan
-  const userPlan = pack.users?.plan || 'free'
+  // ---------------------------------------------------------
+  // COMMON DATA PREPARATION
+  // ---------------------------------------------------------
 
   // Get counts for stats
-  const { count: flashcardCount } = await supabase
+  const dataClient = isDemo ? createServiceRoleClient() : await createClient()
+
+  const { count: flashcardCount } = await dataClient
     .from('flashcards')
     .select('*', { count: 'exact', head: true })
     .eq('study_pack_id', id)
 
   // Check if pack is still being generated (no content yet)
   const isGenerating = !pack.stats_json?.notes && (!flashcardCount || flashcardCount === 0)
-  
+
   // If still generating, redirect to status page
   if (isGenerating && pack.material_id) {
     redirect(`/materials/${pack.material_id}/status`)
   }
 
-  const { data: quizzes } = await supabase
+  const { data: quizzes } = await dataClient
     .from('quizzes')
     .select('id, quiz_items(count)')
     .eq('study_pack_id', id)
@@ -97,6 +130,6 @@ export default async function StudyPackPage({
     },
   }
 
-  return <StudyPackView pack={packData} userPlan={userPlan} />
+  return <StudyPackView pack={packData} userPlan={userPlan} isDemo={isDemo} />
 }
 

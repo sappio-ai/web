@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { responseCache, CACHE_TTL } from '@/lib/utils/cache'
 
 /**
@@ -14,58 +14,85 @@ export async function GET(
     const supabase = await createClient()
     const { id: studyPackId } = await params
 
-    // Authenticate user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
+    const demoId = process.env.NEXT_PUBLIC_DEMO_PACK_ID || '3747df11-0426-4749-8597-af89639e8d38'
+    const isDemo = studyPackId === demoId
+    let user = null
+    let pack = null
+    let supabaseClient = supabase
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    if (isDemo) {
+      // DEMO MODE: Bypass Auth
+      supabaseClient = createServiceRoleClient()
 
-    // Check cache first (skip if request has cache-busting param)
-    const url = new URL(request.url)
-    const skipCache = url.searchParams.has('t')
-    const cacheKey = `study-pack:${studyPackId}:${user.id}`
-    
-    if (!skipCache) {
-      const cached = responseCache.get(cacheKey, CACHE_TTL.STUDY_PACK)
-      if (cached) {
-        return NextResponse.json(cached)
+      const { data: demoPack, error: demoError } = await supabaseClient
+        .from('study_packs')
+        .select(`
+                *,
+                materials(id, kind, source_url, page_count)
+            `)
+        .eq('id', studyPackId)
+        .single()
+
+      if (demoError || !demoPack) {
+        return NextResponse.json({ error: 'Study pack not found' }, { status: 404 })
       }
-    }
+      pack = demoPack
+    } else {
+      // STANDARD MODE: Strict Auth
+      const {
+        data: { user: authUser },
+        error: authError,
+      } = await supabase.auth.getUser()
 
-    // Get study pack with ownership verification
-    const { data: pack, error: packError } = await supabase
-      .from('study_packs')
-      .select(
+      if (authError || !authUser) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      user = authUser
+
+      // Check cache first (skip if request has cache-busting param)
+      const url = new URL(request.url)
+      const skipCache = url.searchParams.has('t')
+      const cacheKey = `study-pack:${studyPackId}:${user.id}`
+
+      if (!skipCache) {
+        const cached = responseCache.get(cacheKey, CACHE_TTL.STUDY_PACK)
+        if (cached) {
+          return NextResponse.json(cached)
+        }
+      }
+
+      // Get study pack with ownership verification
+      const { data: userPack, error: packError } = await supabase
+        .from('study_packs')
+        .select(
+          `
+            *,
+            users!inner(id),
+            materials(id, kind, source_url, page_count)
         `
-        *,
-        users!inner(id),
-        materials(id, kind, source_url, page_count)
-      `
-      )
-      .eq('id', studyPackId)
-      .eq('users.auth_user_id', user.id)
-      .single()
+        )
+        .eq('id', studyPackId)
+        .eq('users.auth_user_id', user.id)
+        .single()
 
-    if (packError || !pack) {
-      return NextResponse.json(
-        { error: 'Study pack not found' },
-        { status: 404 }
-      )
+      if (packError || !userPack) {
+        return NextResponse.json(
+          { error: 'Study pack not found' },
+          { status: 404 }
+        )
+      }
+      pack = userPack
     }
 
     // Get flashcards
-    const { data: flashcards } = await supabase
+    const { data: flashcards } = await supabaseClient
       .from('flashcards')
       .select('*')
       .eq('study_pack_id', studyPackId)
       .order('created_at', { ascending: true })
 
     // Get quiz with items
-    const { data: quizzes } = await supabase
+    const { data: quizzes } = await supabaseClient
       .from('quizzes')
       .select(
         `
@@ -78,7 +105,7 @@ export async function GET(
     const quiz = quizzes?.[0] || null
 
     // Get mind map with nodes
-    const { data: mindmaps } = await supabase
+    const { data: mindmaps } = await supabaseClient
       .from('mindmaps')
       .select(
         `
@@ -102,11 +129,11 @@ export async function GET(
       updatedAt: pack.updated_at,
       material: pack.materials
         ? {
-            id: pack.materials.id,
-            kind: pack.materials.kind,
-            sourceUrl: pack.materials.source_url,
-            pageCount: pack.materials.page_count,
-          }
+          id: pack.materials.id,
+          kind: pack.materials.kind,
+          sourceUrl: pack.materials.source_url,
+          pageCount: pack.materials.page_count,
+        }
         : null,
       stats: {
         coverage: pack.stats_json?.coverage || 'med',
@@ -120,26 +147,29 @@ export async function GET(
       flashcards: flashcards || [],
       quiz: quiz
         ? {
-            id: quiz.id,
-            configJson: quiz.config_json,
-            createdAt: quiz.created_at,
-            items: quiz.quiz_items || [],
-          }
+          id: quiz.id,
+          configJson: quiz.config_json,
+          createdAt: quiz.created_at,
+          items: quiz.quiz_items || [],
+        }
         : null,
       mindMap: mindmap
         ? {
-            id: mindmap.id,
-            title: mindmap.title,
-            layoutJson: mindmap.layout_json,
-            createdAt: mindmap.created_at,
-            updatedAt: mindmap.updated_at,
-            nodes: mindmap.mindmap_nodes || [],
-          }
+          id: mindmap.id,
+          title: mindmap.title,
+          layoutJson: mindmap.layout_json,
+          createdAt: mindmap.created_at,
+          updatedAt: mindmap.updated_at,
+          nodes: mindmap.mindmap_nodes || [],
+        }
         : null,
     }
 
     // Cache the response
-    responseCache.set(cacheKey, response)
+    if (user) {
+      const cacheKey = `study-pack:${studyPackId}:${user.id}`
+      responseCache.set(cacheKey, response)
+    }
 
     return NextResponse.json(response)
   } catch (error) {

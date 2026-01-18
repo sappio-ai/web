@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createBrowserClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -14,18 +14,29 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createBrowserClient()
 
+  // Robustly determine if we are in demo mode
+  const demoId = '3747df11-0426-4749-8597-af89639e8d38'
+  const isDemo = pathname?.includes(demoId) || pathname?.includes(process.env.NEXT_PUBLIC_DEMO_PACK_ID || demoId)
+
   useEffect(() => {
+    // If it's demo mode, we don't need to check auth or redirect
+    if (isDemo) {
+      setLoading(false)
+      return
+    }
+
     const checkAuth = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        
+
         if (!user) {
           router.push('/login')
           return
         }
-        
+
         setUser(user)
       } catch (error) {
         console.error('Auth check error:', error)
@@ -37,13 +48,12 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
 
     checkAuth()
 
-    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_OUT' || !session) {
+        if (!isDemo && (event === 'SIGNED_OUT' || !session)) {
           router.push('/login')
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          setUser(session.user)
+          setUser(session?.user || null)
         }
       }
     )
@@ -51,7 +61,12 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [router, supabase])
+  }, [router, supabase, isDemo])
+
+  // CRITICAL: Always handle demo mode first to prevent brief "not authorized" states
+  if (isDemo) {
+    return <>{children}</>
+  }
 
   if (loading) {
     return (

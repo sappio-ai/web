@@ -10,14 +10,16 @@ import ExportMenu from '@/components/exports/ExportMenu'
 import Orb from '@/components/orb/Orb'
 import GenerateMoreButton from '@/components/study-packs/GenerateMoreButton'
 import UpgradePrompt from '@/components/paywall/UpgradePrompt'
+import DemoPrompt from '@/components/demo/DemoPrompt'
 import type { PlanLimits } from '@/lib/types/usage'
 
 interface FlashcardsTabProps {
     packId: string
     userPlan?: string
+    isDemo?: boolean
 }
 
-export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsTabProps) {
+export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = false }: FlashcardsTabProps) {
     const [isReviewing, setIsReviewing] = useState(false)
     const [selectedTopic, setSelectedTopic] = useState<string | undefined>(
         undefined
@@ -34,7 +36,7 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
         const fetchData = async () => {
             try {
                 setIsLoading(true)
-                
+
                 // Fetch study pack data (includes flashcards array with actual count)
                 const packUrl = new URL(
                     `/api/study-packs/${packId}`,
@@ -48,7 +50,7 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
                     // Get generation status from stats
                     setGenerationStatus(packData.stats?.generationStatus?.flashcards)
                 }
-                
+
                 // Fetch due count
                 const dueUrl = new URL(
                     `/api/study-packs/${packId}/flashcards/due`,
@@ -59,16 +61,27 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
                     const dueData = await dueResponse.json()
                     setDueCount(dueData.count || 0)
                 }
-                
-                // Fetch plan limits
-                const limitsUrl = new URL(
-                    `/api/user/usage`,
-                    window.location.origin
-                )
-                const limitsResponse = await fetch(limitsUrl.toString())
-                if (limitsResponse.ok) {
-                    const limitsData = await limitsResponse.json()
-                    setLimits(limitsData.limits)
+
+                if (isDemo) {
+                    // Mock limits for demo
+                    setLimits({
+                        cardsPerPack: 100,
+                        batchCardsSize: 10,
+                        totalPacks: 10,
+                        storageUsed: 0,
+                        storageLimit: 1000
+                    } as any)
+                } else {
+                    // Fetch plan limits
+                    const limitsUrl = new URL(
+                        `/api/user/usage`,
+                        window.location.origin
+                    )
+                    const limitsResponse = await fetch(limitsUrl.toString())
+                    if (limitsResponse.ok) {
+                        const limitsData = await limitsResponse.json()
+                        setLimits(limitsData.limits)
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching data:', error)
@@ -88,13 +101,14 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
                     packId={packId}
                     topicFilter={selectedTopic}
                     onComplete={() => setIsReviewing(false)}
+                    isDemo={isDemo}
                 />
             </div>
         )
     }
 
-    const canGenerateMore = 
-        limits?.batchCardsSize !== null && 
+    const canGenerateMore = !isDemo &&
+        limits?.batchCardsSize !== null &&
         limits?.batchCardsSize !== undefined &&
         cardCount < (limits?.cardsPerPack || 0)
 
@@ -110,13 +124,17 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
                         `${cardCount} / ${limits.cardsPerPack} flashcards`
                     )}
                 </div>
-                <ExportMenu
-                    studyPackId={packId}
-                    exportType="flashcards"
-                    userPlan={userPlan}
-                />
+                {isDemo ? (
+                    <div className="text-xs font-medium text-gray-400">Read Only</div>
+                ) : (
+                    <ExportMenu
+                        studyPackId={packId}
+                        exportType="flashcards"
+                        userPlan={userPlan}
+                    />
+                )}
             </div>
-            
+
             {/* Generate More Button (Paid Users) */}
             {canGenerateMore && limits && (
                 <GenerateMoreButton
@@ -138,9 +156,9 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
                     }}
                 />
             )}
-            
-            {/* Upgrade Prompt (Free Users) */}
-            {userPlan === 'free' && (
+
+            {/* Upgrade Prompt (Free Users) - Don't show in Demo */}
+            {!isDemo && userPlan === 'free' && (
                 <UpgradePrompt
                     featureName="Generate More Flashcards"
                     requiredPlan="student_pro"
@@ -154,8 +172,8 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
                 />
             )}
 
-            {/* Streak Display */}
-            <StreakDisplay />
+            {/* Streak Display - Hide in Demo */}
+            {!isDemo && <StreakDisplay />}
 
             {/* Due Cards Section - Paper Card Style */}
             <div className="relative">
@@ -222,8 +240,21 @@ export default function FlashcardsTab({ packId, userPlan = 'free' }: FlashcardsT
                 </div>
             </div>
 
-            {/* Progress Chart */}
-            <ProgressChart packId={packId} />
+            {/* Progress Chart or Demo Prompt */}
+            {isDemo ? (
+                <DemoPrompt
+                    featureName="Track Your Progress"
+                    description="Create an account to save your learning history, track streaks, and get personalized insights."
+                    icon="chart"
+                    bulletPoints={[
+                        "Visualize your learning retention over time",
+                        "Track daily study streaks",
+                        "Identify strong and weak topics"
+                    ]}
+                />
+            ) : (
+                <ProgressChart packId={packId} />
+            )}
         </div>
     )
 }

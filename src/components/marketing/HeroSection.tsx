@@ -124,13 +124,25 @@ export default function HeroSection() {
 
             {!checkingMode && !waitlistModeEnabled ? (
               /* Open Registration Mode: Get Started Button */
-              <div className="relative bg-white p-2 rounded-2xl border-2 border-[#1A1D2E]">
+              <div className="relative bg-white p-2 rounded-2xl border-2 border-[#1A1D2E] flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={() => router.push('/signup')}
-                  className="w-full px-6 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold text-lg rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold text-lg rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
                 >
                   Start Learning for Free
                   <ArrowRight className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => router.push(`/study-packs/${process.env.NEXT_PUBLIC_DEMO_PACK_ID}`)}
+                  className="px-6 py-4 bg-indigo-50 hover:bg-indigo-100 text-[#5A5FF0] font-bold text-lg rounded-xl transition-all flex items-center justify-center gap-2 group relative overflow-hidden"
+                >
+                  <span className="md:hidden">Sample</span>
+                  <span className="hidden md:inline">View Sample</span>
+                  <div className="w-5 h-5 rounded-full bg-[#5A5FF0]/20 flex items-center justify-center group-hover:bg-[#5A5FF0] transition-colors">
+                    <svg className="w-3 h-3 text-[#5A5FF0] group-hover:text-white transition-colors ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
                 </button>
               </div>
             ) : status === 'success' ? (
