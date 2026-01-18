@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import ReviewClient from '@/app/review/ReviewClient'
+import ReviewClient from './ReviewClient'
 
 export default async function ReviewPage() {
   const supabase = await createClient()
-  
+
   const { data: { user }, error } = await supabase.auth.getUser()
 
   if (error || !user) {
@@ -103,7 +103,7 @@ export default async function ReviewPage() {
   }
 
   return (
-    <ReviewClient 
+    <ReviewClient
       userData={userData}
       studyPacks={sortedPacks}
       reviewData={reviewData}
