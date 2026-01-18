@@ -1,8 +1,22 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 
 export default function Footer() {
+  const pathname = usePathname()
   const currentYear = new Date().getFullYear()
+
+  // Hide footer on app and admin routes
+  if (pathname?.startsWith('/dashboard') ||
+    pathname?.startsWith('/settings') ||
+    pathname?.startsWith('/profile') ||
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/rooms') ||
+    pathname?.startsWith('/study-packs')) {
+    return null
+  }
 
   return (
     <footer className="relative bg-white border-t border-[#E2E8F0] mt-auto">

@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import DashboardClient from '@/app/dashboard/DashboardClient'
+import DashboardClient from './DashboardClient'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  
+
   const { data: { user }, error } = await supabase.auth.getUser()
 
   if (error || !user) {
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
 
   // Get all flashcards for the user's study packs
   const packIds = studyPacks?.map(p => p.id) || []
-  
+
   let dueCount = 0
   let masteredCount = 0
   let packsWithDueCards = new Set<string>()
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
 
     dueCount = dueCards?.length || 0
     packsWithDueCards = new Set(dueCards?.map(c => c.study_pack_id) || [])
-    
+
     // Count due cards per pack
     dueCards?.forEach(card => {
       dueCountByPack[card.study_pack_id] = (dueCountByPack[card.study_pack_id] || 0) + 1
@@ -110,8 +110,8 @@ export default async function DashboardPage() {
   }
 
   return (
-    <DashboardClient 
-      userData={userData} 
+    <DashboardClient
+      userData={userData}
       studyPacks={studyPacksWithDue || []}
       dashboardData={dashboardData}
     />

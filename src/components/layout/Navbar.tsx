@@ -74,7 +74,7 @@ export default async function Navbar() {
                 )}
 
                 {/* Mobile Menu & Client logic will handle user state */}
-                <NavbarClient waitlistMode={waitlistMode} />
+                <NavbarClient waitlistMode={waitlistMode} isAppNav={true} />
               </>
             ) : (
               <>
@@ -115,7 +115,7 @@ export default async function Navbar() {
               </>
             )}
             {/* Pass waitlist mode to client for mobile menu */}
-            {!user && <NavbarClient waitlistMode={waitlistMode} />}
+            {!user && <NavbarClient waitlistMode={waitlistMode} isAppNav={true} />}
           </div>
         </div>
       </div>

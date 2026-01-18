@@ -12,10 +12,12 @@ import type { User } from '@supabase/supabase-js'
 import { Menu, X } from 'lucide-react'
 
 interface NavbarClientProps {
-  waitlistMode: boolean
+  waitlistMode?: boolean
+  isAppNav?: boolean
 }
 
-export default function NavbarClient({ waitlistMode }: NavbarClientProps) {
+export default function NavbarClient(props: NavbarClientProps) {
+  const { waitlistMode } = props
   const [user, setUser] = useState<User | null>(null)
   const [userPlan, setUserPlan] = useState<'free' | 'student_pro' | 'pro_plus'>('free')
   const [loading, setLoading] = useState(true)
@@ -74,6 +76,23 @@ export default function NavbarClient({ waitlistMode }: NavbarClientProps) {
       document.body.style.overflow = 'unset'
     }
   }, [isMobileMenuOpen])
+
+  // Logic to hide the global root navbar on app/admin routes
+  // But allow it if explicitly invoked by the App Layout (via isAppNav prop)
+  const isAppRoute = pathname?.startsWith('/dashboard') ||
+    pathname?.startsWith('/settings') ||
+    pathname?.startsWith('/profile') ||
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/rooms') ||
+    pathname?.startsWith('/study-packs') ||
+    pathname?.startsWith('/flashcards') ||
+    pathname?.startsWith('/materials') ||
+    pathname?.startsWith('/review') ||
+    pathname?.startsWith('/test-timer')
+
+  if (isAppRoute && !props.isAppNav) {
+    return null
+  }
 
   // Check if link is active
   const isActive = (path: string) => pathname === path
