@@ -2,8 +2,28 @@
 
 import { Check, X, Sparkles, Zap, GraduationCap, Crown } from 'lucide-react'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 
 export default function PricingSection() {
+  const [waitlistModeEnabled, setWaitlistModeEnabled] = useState(true)
+  const [checkingMode, setCheckingMode] = useState(true)
+
+  useEffect(() => {
+    const checkWaitlistMode = async () => {
+      try {
+        const response = await fetch('/api/waitlist/validate-code')
+        const data = await response.json()
+        setWaitlistModeEnabled(data.waitlistModeEnabled)
+      } catch (error) {
+        console.error('Error checking waitlist mode:', error)
+      } finally {
+        setCheckingMode(false)
+      }
+    }
+
+    checkWaitlistMode()
+  }, [])
+
   const tiers = [
     {
       name: 'Free',
@@ -16,8 +36,8 @@ export default function PricingSection() {
         'Basic quizzes',
         'No exports'
       ],
-      cta: 'Start for free',
-      href: '/waitlist',
+      cta: checkingMode ? 'Loading...' : waitlistModeEnabled ? 'Start for free' : 'Start Learning',
+      href: checkingMode || waitlistModeEnabled ? '/waitlist' : '/signup',
       popular: false,
       color: 'bg-white',
       border: 'border-slate-200',
@@ -37,8 +57,8 @@ export default function PricingSection() {
         'All export formats',
         'Priority support'
       ],
-      cta: 'Join Waitlist',
-      href: '/waitlist',
+      cta: checkingMode ? 'Loading...' : waitlistModeEnabled ? 'Join Waitlist' : 'Get Started',
+      href: checkingMode || waitlistModeEnabled ? '/waitlist' : '/signup',
       popular: true,
       color: 'bg-[#1A1D2E]',  // Dark Mode
       border: 'border-[#1A1D2E]',
@@ -57,8 +77,8 @@ export default function PricingSection() {
         'Deep research mode',
         'Team attributes'
       ],
-      cta: 'Join Waitlist',
-      href: '/waitlist',
+      cta: checkingMode ? 'Loading...' : waitlistModeEnabled ? 'Join Waitlist' : 'Get Started',
+      href: checkingMode || waitlistModeEnabled ? '/waitlist' : '/signup',
       popular: false,
       color: 'bg-white',
       border: 'border-slate-200',
@@ -146,7 +166,7 @@ export default function PricingSection() {
       <div className="mt-16 text-center">
         <p className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-slate-600 font-semibold text-sm shadow-sm">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          Early access pricing is discounted for waitlist members
+          {checkingMode ? "Loading..." : waitlistModeEnabled ? "Early access pricing is discounted for waitlist members" : "Introductory pricing available for a limited time"}
         </p>
       </div>
     </div>
