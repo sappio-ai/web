@@ -233,20 +233,6 @@ export default function MindMapTab({ packId, userPlan = 'free', isDemo = false }
         />
       )}
 
-      {/* Upgrade Prompt (Free Users) */}
-      {userPlan === 'free' && (
-        <UpgradePrompt
-          featureName="Generate More Mind Map Nodes"
-          requiredPlan="student_pro"
-          benefits={[
-            'Generate up to 250 mind map nodes per pack',
-            'Add +60 nodes at a time',
-            'Comprehensive topic coverage',
-            'Priority processing'
-          ]}
-          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
-        />
-      )}
 
       {/* Header with stats */}
       <div className="relative">
@@ -366,6 +352,21 @@ export default function MindMapTab({ packId, userPlan = 'free', isDemo = false }
             setSelectedNode(null)
           }}
           mode="modal"
+        />
+      )}
+
+      {/* Upgrade Prompt (Free Users) - Show at bottom */}
+      {userPlan === 'free' && (
+        <UpgradePrompt
+          featureName="More Mind Map Nodes"
+          requiredPlan="student_pro"
+          benefits={[
+            'Generate up to 250 mind map nodes per pack',
+            'Add +60 nodes at a time',
+            'Comprehensive topic coverage',
+            'Priority processing'
+          ]}
+          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
         />
       )}
     </div>

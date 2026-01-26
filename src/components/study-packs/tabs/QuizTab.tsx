@@ -273,20 +273,6 @@ export default function QuizTab({ packId, userPlan, isDemo = false }: QuizTabPro
         />
       )}
 
-      {/* Upgrade Prompt (Free Users) */}
-      {userPlan === 'free' && (
-        <UpgradePrompt
-          featureName="Generate More Quiz Questions"
-          requiredPlan="student_pro"
-          benefits={[
-            'Generate up to 30 quiz questions per pack',
-            'Add +10 questions at a time',
-            'Comprehensive topic coverage',
-            'Priority processing'
-          ]}
-          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
-        />
-      )}
 
       {/* Quiz Overview Card */}
       <div className="relative">
@@ -384,8 +370,8 @@ export default function QuizTab({ packId, userPlan, isDemo = false }: QuizTabPro
                 onClick={handleStartWeakTopicQuiz}
                 disabled={isLoadingWeakQuiz}
                 className={`w-full px-8 py-4 text-white text-[16px] font-semibold rounded-lg transition-colors duration-150 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${userPlan === 'free'
-                    ? 'bg-[#94A3B8] hover:bg-[#64748B]'
-                    : 'bg-[#F59E0B] hover:bg-[#D97706]'
+                  ? 'bg-[#94A3B8] hover:bg-[#64748B]'
+                  : 'bg-[#F59E0B] hover:bg-[#D97706]'
                   }`}
               >
                 {isLoadingWeakQuiz ? (
@@ -458,6 +444,21 @@ export default function QuizTab({ packId, userPlan, isDemo = false }: QuizTabPro
         />
       ) : (
         <QuizHistory quizId={quiz.id} />
+      )}
+
+      {/* Upgrade Prompt (Free Users) - Show at bottom */}
+      {!isDemo && userPlan === 'free' && (
+        <UpgradePrompt
+          featureName="More Quiz Questions"
+          requiredPlan="student_pro"
+          benefits={[
+            'Generate up to 30 quiz questions per pack',
+            'Add +10 questions at a time',
+            'Comprehensive topic coverage',
+            'Priority processing'
+          ]}
+          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+        />
       )}
 
       {/* Paywall Modal */}

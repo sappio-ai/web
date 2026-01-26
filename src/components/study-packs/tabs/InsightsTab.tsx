@@ -255,7 +255,7 @@ export default function InsightsTab({ packId, userPlan, isDemo = false }: Insigh
             "Track session depth and focus"
           ]}
         />
-      ) : userPlan === 'pro_plus' ? (
+      ) : userPlan === 'pro_plus' && (
         <>
           {/* Due Load Forecast */}
           <DueLoadForecast packId={packId} />
@@ -269,19 +269,6 @@ export default function InsightsTab({ packId, userPlan, isDemo = false }: Insigh
           {/* Session Depth Analytics */}
           <SessionDepthAnalytics packId={packId} />
         </>
-      ) : (
-        <UpgradePrompt
-          featureName="Advanced Analytics"
-          requiredPlan="pro_plus"
-          benefits={[
-            'Due load forecasting for better planning',
-            'Lapse tracking to identify problem areas',
-            'Performance trends over time',
-            'Session depth analytics',
-            'Detailed retention insights',
-          ]}
-          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
-        />
       )}
 
       {/* Flashcard Progress - Hide for Demo */}
@@ -379,6 +366,22 @@ export default function InsightsTab({ packId, userPlan, isDemo = false }: Insigh
             </div>
           </div>
         </div>
+      )}
+
+      {/* Upgrade Prompt (Non-Pro+ Users) - Show at bottom */}
+      {!isDemo && userPlan !== 'pro_plus' && (
+        <UpgradePrompt
+          featureName="Advanced Analytics"
+          requiredPlan="pro_plus"
+          benefits={[
+            'Due load forecasting for better planning',
+            'Lapse tracking to identify problem areas',
+            'Performance trends over time',
+            'Session depth analytics',
+            'Detailed retention insights',
+          ]}
+          currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+        />
       )}
     </div>
   )

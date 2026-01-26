@@ -157,21 +157,6 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
                 />
             )}
 
-            {/* Upgrade Prompt (Free Users) - Don't show in Demo */}
-            {!isDemo && userPlan === 'free' && (
-                <UpgradePrompt
-                    featureName="Generate More Flashcards"
-                    requiredPlan="student_pro"
-                    benefits={[
-                        'Generate up to 120 flashcards per pack',
-                        'Add +30 cards at a time',
-                        'Customize content depth',
-                        'Priority processing'
-                    ]}
-                    currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
-                />
-            )}
-
             {/* Streak Display - Hide in Demo */}
             {!isDemo && <StreakDisplay />}
 
@@ -254,6 +239,21 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
                 />
             ) : (
                 <ProgressChart packId={packId} />
+            )}
+
+            {/* Upgrade Prompt (Free Users) - Show at bottom */}
+            {!isDemo && userPlan === 'free' && (
+                <UpgradePrompt
+                    featureName="More Flashcards"
+                    requiredPlan="student_pro"
+                    benefits={[
+                        'Generate up to 120 flashcards per pack',
+                        'Add +30 cards at a time',
+                        'Customize content depth',
+                        'Priority processing'
+                    ]}
+                    currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
+                />
             )}
         </div>
     )
