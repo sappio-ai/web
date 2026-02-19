@@ -87,7 +87,7 @@ export const sendDueReminders = inngest.createFunction(
         if (sessions && sessions.length > 0) {
           const today = new Date()
           today.setUTCHours(0, 0, 0, 0)
-          let checkDate = new Date(today)
+          const checkDate = new Date(today)
           // Check yesterday first (since they haven't reviewed today yet)
           checkDate.setDate(checkDate.getDate() - 1)
 
