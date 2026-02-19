@@ -118,10 +118,11 @@ export const sendDueReminders = inngest.createFunction(
       return results
     })
 
-    // Step 2: Send emails
+    // Step 2: Send emails (rate-limited to stay under Resend's 2 req/sec)
     const emailResults = await step.run('send-emails', async () => {
       let sent = 0
       let failed = 0
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
       for (const user of usersWithDueCards) {
         try {
@@ -133,9 +134,13 @@ export const sendDueReminders = inngest.createFunction(
             unsubscribeUrl: getUnsubscribeUrl(user.userId),
           })
           sent++
+          // Wait 600ms between emails to stay under 2 req/sec limit
+          await delay(600)
         } catch (error) {
           console.error(`[due-reminders] Failed for ${user.email}:`, error)
           failed++
+          // Wait extra on rate limit errors before retrying next
+          await delay(1000)
         }
       }
 

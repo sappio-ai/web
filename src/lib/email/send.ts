@@ -115,6 +115,7 @@ export async function sendCardsDueEmail(
     return result
   } catch (error) {
     console.error(`❌ Failed to send cards due email to ${to}:`, error)
+    throw error
   }
 }
 
