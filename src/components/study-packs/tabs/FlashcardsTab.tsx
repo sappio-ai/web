@@ -11,15 +11,18 @@ import Orb from '@/components/orb/Orb'
 import GenerateMoreButton from '@/components/study-packs/GenerateMoreButton'
 import UpgradePrompt from '@/components/paywall/UpgradePrompt'
 import DemoPrompt from '@/components/demo/DemoPrompt'
+import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import type { PlanLimits } from '@/lib/types/usage'
 
 interface FlashcardsTabProps {
     packId: string
     userPlan?: string
     isDemo?: boolean
+    onNavigateToTab?: (tab: string) => void
+    packData?: any
 }
 
-export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = false }: FlashcardsTabProps) {
+export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = false, onNavigateToTab, packData }: FlashcardsTabProps) {
     const [isReviewing, setIsReviewing] = useState(false)
     const [selectedTopic, setSelectedTopic] = useState<string | undefined>(
         undefined
@@ -31,39 +34,38 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
 
     const [generationStatus, setGenerationStatus] = useState<any>(null)
 
-    // Fetch due cards count, card count, and plan limits
+    // Use shared packData from parent when available
+    useEffect(() => {
+        if (packData) {
+            setCardCount(packData.flashcards?.length || packData.stats?.cardCount || 0)
+            setGenerationStatus(packData.stats?.generationStatus?.flashcards)
+        }
+    }, [packData])
+
+    // Fetch due count and plan limits (these are tab-specific, not shared)
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setIsLoading(true)
 
-                // Fetch study pack data (includes flashcards array with actual count)
-                const packUrl = new URL(
-                    `/api/study-packs/${packId}`,
-                    window.location.origin
-                )
-                const packResponse = await fetch(packUrl.toString())
-                if (packResponse.ok) {
-                    const packData = await packResponse.json()
-                    // Use actual flashcards array length for accurate count
-                    setCardCount(packData.flashcards?.length || packData.stats?.cardCount || 0)
-                    // Get generation status from stats
-                    setGenerationStatus(packData.stats?.generationStatus?.flashcards)
+                // If no shared packData, fetch pack data independently
+                if (!packData) {
+                    const packResponse = await fetch(`/api/study-packs/${packId}`)
+                    if (packResponse.ok) {
+                        const data = await packResponse.json()
+                        setCardCount(data.flashcards?.length || data.stats?.cardCount || 0)
+                        setGenerationStatus(data.stats?.generationStatus?.flashcards)
+                    }
                 }
 
                 // Fetch due count
-                const dueUrl = new URL(
-                    `/api/study-packs/${packId}/flashcards/due`,
-                    window.location.origin
-                )
-                const dueResponse = await fetch(dueUrl.toString())
+                const dueResponse = await fetch(`/api/study-packs/${packId}/flashcards/due`)
                 if (dueResponse.ok) {
                     const dueData = await dueResponse.json()
                     setDueCount(dueData.count || 0)
                 }
 
                 if (isDemo) {
-                    // Mock limits for demo
                     setLimits({
                         cardsPerPack: 100,
                         batchCardsSize: 10,
@@ -72,12 +74,7 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
                         storageLimit: 1000
                     } as any)
                 } else {
-                    // Fetch plan limits
-                    const limitsUrl = new URL(
-                        `/api/user/usage`,
-                        window.location.origin
-                    )
-                    const limitsResponse = await fetch(limitsUrl.toString())
+                    const limitsResponse = await fetch(`/api/user/usage`)
                     if (limitsResponse.ok) {
                         const limitsData = await limitsResponse.json()
                         setLimits(limitsData.limits)
@@ -91,7 +88,7 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
         }
 
         fetchData()
-    }, [packId])
+    }, [packId, packData])
 
     // If reviewing, show the review interface
     if (isReviewing) {
@@ -184,9 +181,25 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
                             <h3 className="text-[24px] font-bold text-[#1A1D2E] mt-4">
                                 No cards due today!
                             </h3>
-                            <p className="text-[15px] text-[#64748B] mt-2">
+                            <p className="text-[15px] text-[#64748B] mt-2 mb-6">
                                 Come back tomorrow to continue your learning journey.
                             </p>
+                            {onNavigateToTab && (
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => onNavigateToTab('quiz')}
+                                        className="px-5 py-2.5 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[14px] font-semibold rounded-lg transition-colors"
+                                    >
+                                        Take a Quiz Instead
+                                    </button>
+                                    <button
+                                        onClick={() => onNavigateToTab('mindmap')}
+                                        className="px-5 py-2.5 bg-white hover:bg-[#F8FAFB] text-[#1A1D2E] text-[14px] font-semibold rounded-lg transition-colors border border-[#E2E8F0]"
+                                    >
+                                        Explore Mind Map
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="space-y-6">
@@ -204,7 +217,10 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
                                     </p>
                                 </div>
                                 <button
-                                    onClick={() => setIsReviewing(true)}
+                                    onClick={() => {
+                                        AnalyticsService.trackReviewStarted(packId, dueCount)
+                                        setIsReviewing(true)
+                                    }}
                                     className="px-6 py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[15px] font-semibold rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[#5A5FF0]/40 focus:ring-offset-2 shadow-sm"
                                 >
                                     Start Review

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import CreatePackModal from '@/components/materials/CreatePackModal'
 import StreakDisplay from '@/components/flashcards/StreakDisplay'
 import PackSearchBar from '@/components/dashboard/PackSearchBar'
@@ -126,8 +126,12 @@ export default function DashboardClient({
         if (activeFilter !== 'all') AnalyticsService.trackPackFiltered(activeFilter)
     }, [activeFilter])
 
+    const hasSortInteracted = useRef(false)
     useEffect(() => {
-        AnalyticsService.trackPackSorted(activeSort)
+        if (hasSortInteracted.current) {
+            AnalyticsService.trackPackSorted(activeSort)
+        }
+        hasSortInteracted.current = true
     }, [activeSort])
 
     // Filter Logic

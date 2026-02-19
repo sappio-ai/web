@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Orb from '@/components/orb/Orb'
 import ExportMenu from '@/components/exports/ExportMenu'
-import { BookOpen, Lightbulb, AlertTriangle, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react'
+import { BookOpen, Lightbulb, AlertTriangle, HelpCircle, ChevronDown, ChevronUp, CreditCard, Zap } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface NotesData {
@@ -24,9 +24,10 @@ interface NotesTabProps {
   notes: NotesData
   studyPackId: string
   userPlan?: string
+  onNavigateToTab?: (tab: string) => void
 }
 
-export default function NotesTab({ notes, studyPackId, userPlan = 'free' }: NotesTabProps) {
+export default function NotesTab({ notes, studyPackId, userPlan = 'free', onNavigateToTab }: NotesTabProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     overview: true,
     concepts: false,
@@ -273,6 +274,42 @@ export default function NotesTab({ notes, studyPackId, userPlan = 'free' }: Note
                 </motion.div>
               )}
             </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {/* Next Step CTA */}
+      {onNavigateToTab && (
+        <div className="relative">
+          <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+          <div className="relative bg-gradient-to-br from-[#EEF2FF] to-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06)] border border-[#5A5FF0]/20">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#5A5FF0]/10 flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-[#5A5FF0]" />
+                </div>
+                <div>
+                  <h3 className="text-[18px] font-bold text-[#1A1D2E]">Ready to test yourself?</h3>
+                  <p className="text-[14px] text-[#64748B]">Review flashcards or take a quiz to reinforce what you just read</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => onNavigateToTab('flashcards')}
+                  className="px-5 py-2.5 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[14px] font-semibold rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  Flashcards
+                </button>
+                <button
+                  onClick={() => onNavigateToTab('quiz')}
+                  className="px-5 py-2.5 bg-white hover:bg-[#F8FAFB] text-[#1A1D2E] text-[14px] font-semibold rounded-lg transition-colors border border-[#E2E8F0] flex items-center gap-2"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  Quiz
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

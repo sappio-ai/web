@@ -9,6 +9,7 @@ import { GenerationService } from '@/lib/services/GenerationService'
 import { UsageService } from '@/lib/services/UsageService'
 import { GenerationError, MaterialErrorCode } from '@/lib/utils/errors'
 import { responseCache } from '@/lib/utils/cache'
+import { sendPackReadyEmail } from '@/lib/email/send'
 
 export const generatePack = inngest.createFunction(
   {
@@ -274,6 +275,28 @@ export const generatePack = inngest.createFunction(
         console.log('[generate-pack] Event logged successfully')
       } catch (error) {
         console.error('[generate-pack] Failed to log event:', error)
+      }
+    })
+
+    // Send "pack ready" email notification
+    await step.run('send-pack-ready-email', async () => {
+      try {
+        const supabase = createServiceRoleClient()
+        const { data: user } = await supabase
+          .from('users')
+          .select('email, full_name, email_reminders')
+          .eq('id', userId)
+          .single()
+
+        if (user?.email && user.email_reminders !== false) {
+          await sendPackReadyEmail(user.email, {
+            name: user.full_name || undefined,
+            packTitle: generatedTitle,
+            studyPackId,
+          })
+        }
+      } catch (error) {
+        console.error('[generate-pack] Failed to send pack ready email:', error)
       }
     })
 

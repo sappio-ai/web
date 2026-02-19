@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { Flashcard, SessionStats, Grade } from '@/lib/types/flashcards'
+import { AnalyticsService } from '@/lib/services/AnalyticsService'
 
 interface UseFlashcardSessionReturn {
   currentCard: Flashcard | null
@@ -337,24 +338,13 @@ export function useFlashcardSession(
 
             updateSessionRecord(currentSessionId, finalStats)
 
-            // Track study session completed event
+            // Track review completed event
             if (!isDemo) {
-              fetch('/api/events', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  event: 'study_session_completed',
-                  props: {
-                    study_pack_id: packId,
-                    session_id: currentSessionId,
-                    duration_ms: finalStats.totalTime,
-                    cards_reviewed: finalStats.cardsReviewed,
-                    correct_count: finalStats.good + finalStats.easy,
-                    accuracy: Math.round(finalStats.accuracy),
-                    topic_filter: topicFilter || null,
-                  }
-                })
-              }).catch(console.error) // Non-blocking
+              AnalyticsService.trackReviewCompleted(
+                packId,
+                finalStats.cardsReviewed,
+                Math.round(finalStats.accuracy)
+              )
             }
           }
         }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { QuizGradingService } from '@/lib/services/QuizGradingService'
+import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import type {
   Quiz,
   QuizItem,
@@ -143,11 +144,14 @@ export function useQuizSession(
     (selectedMode: 'practice' | 'timed') => {
       setMode(selectedMode)
       if (selectedMode === 'timed' && shuffledQuiz?.items) {
-        // 2 minutes per question
         setTimeRemaining(shuffledQuiz.items.length * 120)
       }
+      // Track quiz started
+      if (shuffledQuiz?.items) {
+        AnalyticsService.trackQuizStarted(quizId, selectedMode, shuffledQuiz.items.length)
+      }
     },
-    [shuffledQuiz]
+    [shuffledQuiz, quizId]
   )
 
   const submitAnswer = useCallback(
@@ -222,6 +226,10 @@ export function useQuizSession(
           const data = await response.json()
           setResults(data.result)
           setIsComplete(true)
+          // Track quiz completed
+          if (data.result) {
+            AnalyticsService.trackQuizCompleted(quizId, data.result.score, data.result.totalQuestions || quiz?.items?.length || 0)
+          }
           break // Success
         } catch (err) {
           lastError = err instanceof Error ? err : new Error('Unknown error')

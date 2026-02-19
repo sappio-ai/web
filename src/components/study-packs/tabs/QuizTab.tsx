@@ -17,9 +17,10 @@ interface QuizTabProps {
   packId: string
   userPlan: string
   isDemo?: boolean
+  packData?: any
 }
 
-export default function QuizTab({ packId, userPlan, isDemo = false }: QuizTabProps) {
+export default function QuizTab({ packId, userPlan, isDemo = false, packData: sharedPackData }: QuizTabProps) {
   const [quiz, setQuiz] = useState<Quiz | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,20 +53,15 @@ export default function QuizTab({ packId, userPlan, isDemo = false }: QuizTabPro
       setIsLoading(true)
       setError(null)
 
-      // Fetch study pack to get quiz
-      const response = await fetch(`/api/study-packs/${packId}`)
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch study pack')
-      }
-
-      const data = await response.json()
+      // Use shared pack data if available, otherwise fetch
+      const data = sharedPackData || await fetch(`/api/study-packs/${packId}`).then(r => {
+        if (!r.ok) throw new Error('Failed to fetch study pack')
+        return r.json()
+      })
 
       if (data.quiz) {
         setQuiz(data.quiz)
-        // Use actual quiz items array length for accurate count
         setQuestionCount(data.quiz.items?.length || data.stats?.quizQuestionCount || 0)
-        // Get generation status from stats
         setGenerationStatus(data.stats?.generationStatus?.quiz)
       } else {
         setError('No quiz available for this study pack')

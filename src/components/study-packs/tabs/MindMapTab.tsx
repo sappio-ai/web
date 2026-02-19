@@ -15,6 +15,7 @@ interface MindMapTabProps {
   packId: string
   userPlan?: string
   isDemo?: boolean
+  packData?: any
 }
 
 interface MindMapData {
@@ -25,7 +26,7 @@ interface MindMapData {
   isLimited: boolean
 }
 
-export default function MindMapTab({ packId, userPlan = 'free', isDemo = false }: MindMapTabProps) {
+export default function MindMapTab({ packId, userPlan = 'free', isDemo = false, packData: sharedPackData }: MindMapTabProps) {
   const [data, setData] = useState<MindMapData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,16 +48,13 @@ export default function MindMapTab({ packId, userPlan = 'free', isDemo = false }
         setIsLoading(true)
         setError(null)
 
-        // First, get the study pack to find the mindmap ID
-        // Add cache-busting to ensure fresh data
-        const packResponse = await fetch(`/api/study-packs/${packId}?t=${Date.now()}`, {
+        // Use shared pack data if available, otherwise fetch
+        const packData = sharedPackData || await fetch(`/api/study-packs/${packId}?t=${Date.now()}`, {
           cache: 'no-store'
+        }).then(r => {
+          if (!r.ok) throw new Error('Failed to fetch study pack')
+          return r.json()
         })
-        if (!packResponse.ok) {
-          throw new Error('Failed to fetch study pack')
-        }
-
-        const packData = await packResponse.json()
         const mindmapId = packData.mindMap?.id
 
         if (!mindmapId) {

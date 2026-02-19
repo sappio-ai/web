@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { WaitlistService } from '@/lib/services/WaitlistService'
 import { BenefitService } from '@/lib/services/BenefitService'
+import { sendWelcomeEmail } from '@/lib/email/send'
 
 /**
  * POST /api/auth/post-signup
@@ -20,6 +21,11 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`[PostSignup] Processing post-signup for ${email}`)
+
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(email).catch((err) => {
+      console.error('[PostSignup] Failed to send welcome email:', err)
+    })
 
     // Check if user is on waitlist and apply benefits
     try {

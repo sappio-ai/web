@@ -13,6 +13,7 @@ import {
   generateMoreQuiz,
   generateMoreMindmap,
 } from '@/lib/inngest/functions/generate-more-content'
+import { sendDueReminders } from '@/lib/inngest/functions/send-due-reminders'
 
 // Force Node.js runtime (required for Buffer, native deps like pdf-parse)
 export const runtime = 'nodejs'
@@ -28,5 +29,6 @@ export const { GET, POST, PUT } = serve({
     generateMoreFlashcards,
     generateMoreQuiz,
     generateMoreMindmap,
+    sendDueReminders,
   ],
 })

@@ -17,9 +17,10 @@ interface InsightsTabProps {
   packId: string
   userPlan?: string
   isDemo?: boolean
+  packData?: any
 }
 
-export default function InsightsTab({ packId, userPlan, isDemo = false }: InsightsTabProps) {
+export default function InsightsTab({ packId, userPlan, isDemo = false, packData: sharedPackData }: InsightsTabProps) {
   const [quizResults, setQuizResults] = useState<QuizResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -34,16 +35,15 @@ export default function InsightsTab({ packId, userPlan, isDemo = false }: Insigh
       setIsLoading(true)
       setError(null)
 
-      // Fetch study pack stats
-      const packResponse = await fetch(`/api/study-packs/${packId}`)
-      if (packResponse.ok) {
-        const packData = await packResponse.json()
-        setPackStats(packData.stats)
+      // Use shared pack data if available, otherwise fetch
+      const packDataResult = sharedPackData || await fetch(`/api/study-packs/${packId}`).then(r => r.ok ? r.json() : null)
+      if (packDataResult) {
+        setPackStats(packDataResult.stats)
 
         // Fetch quiz results if quiz exists AND not demo
-        if (packData.quiz && !isDemo) {
+        if (packDataResult.quiz && !isDemo) {
           const quizResponse = await fetch(
-            `/api/quiz-results/history?quiz_id=${packData.quiz.id}&limit=10`
+            `/api/quiz-results/history?quiz_id=${packDataResult.quiz.id}&limit=10`
           )
           if (quizResponse.ok) {
             const quizData = await quizResponse.json()

@@ -8,6 +8,7 @@ import Input from '@/components/ui/Input'
 import PasswordInput from '@/components/ui/PasswordInput'
 import Orb from '@/components/orb/Orb'
 import { Lock, CheckCircle, ArrowRight } from 'lucide-react'
+import { AnalyticsService } from '@/lib/services/AnalyticsService'
 
 export default function SignupForm() {
   const router = useRouter()
@@ -143,6 +144,7 @@ export default function SignupForm() {
         body: JSON.stringify({ userId: data.user.id, email: data.user.email }),
       }).catch(() => { })
 
+      AnalyticsService.trackUserSignedUp('email')
       setOrbPose('success-celebrating')
       setTimeout(() => router.push('/dashboard'), 800)
     } catch (error) {

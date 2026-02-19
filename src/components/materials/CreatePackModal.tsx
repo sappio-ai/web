@@ -8,6 +8,7 @@ import { PaywallModal } from '../paywall/PaywallModal'
 import { QuotaExhaustedPaywall } from '../paywall/QuotaExhaustedPaywall'
 import { isValidUrl } from '@/lib/utils/files'
 import { X, Upload, Link2, FileText } from 'lucide-react'
+import { AnalyticsService } from '@/lib/services/AnalyticsService'
 import type { UsageStats } from '@/lib/types/usage'
 
 interface CreatePackModalProps {
@@ -74,6 +75,7 @@ export default function CreatePackModal({
         )
       }
 
+      AnalyticsService.trackPackCreated('upload')
       router.push(`/materials/${data.material.id}/status`)
       onClose()
     } catch (err: any) {
@@ -131,6 +133,7 @@ export default function CreatePackModal({
         )
       }
 
+      AnalyticsService.trackPackCreated('url')
       router.push(`/materials/${data.material.id}/status`)
       onClose()
     } catch (err: any) {
@@ -183,6 +186,7 @@ export default function CreatePackModal({
         )
       }
 
+      AnalyticsService.trackPackCreated('text')
       router.push(`/materials/${data.material.id}/status`)
       onClose()
     } catch (err: any) {

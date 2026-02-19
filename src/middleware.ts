@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
 
   // Define protected routes that require authentication
-  const protectedRoutes = ['/dashboard', '/profile', '/settings', '/study-packs', '/review', '/practice', '/upload']
+  const protectedRoutes = ['/dashboard', '/profile', '/settings', '/study-packs', '/review']
 
   // Define admin routes that require admin role
   const adminRoutes = ['/admin']

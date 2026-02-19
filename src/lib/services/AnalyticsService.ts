@@ -31,6 +31,39 @@ export class AnalyticsService {
     }
   }
 
+  // Core Funnel Events
+  static trackUserSignedUp(method: 'email' | 'google'): void {
+    this.trackEvent('user_signed_up', { method })
+  }
+
+  static trackPackCreated(method: 'upload' | 'url' | 'text'): void {
+    this.trackEvent('pack_created', { method })
+  }
+
+  static trackPackOpened(studyPackId: string): void {
+    this.trackEvent('pack_opened', { studyPackId })
+  }
+
+  static trackReviewStarted(studyPackId: string, cardCount: number): void {
+    this.trackEvent('review_started', { studyPackId, cardCount })
+  }
+
+  static trackReviewCompleted(studyPackId: string, cardsReviewed: number, accuracy: number): void {
+    this.trackEvent('review_completed', { studyPackId, cardsReviewed, accuracy })
+  }
+
+  static trackQuizStarted(studyPackId: string, mode: string, questionCount: number): void {
+    this.trackEvent('quiz_started', { studyPackId, mode, questionCount })
+  }
+
+  static trackQuizCompleted(studyPackId: string, score: number, questionCount: number): void {
+    this.trackEvent('quiz_completed', { studyPackId, score, questionCount })
+  }
+
+  static trackTabSwitched(studyPackId: string, tab: string): void {
+    this.trackEvent('tab_switched', { studyPackId, tab })
+  }
+
   // Mind Map Events
   static trackMapViewed(studyPackId: string, nodeCount: number): void {
     this.trackEvent('map_viewed', {
