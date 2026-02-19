@@ -29,7 +29,7 @@ export default function CardsDueEmail({ name, dueCount, packCount, streakDays, d
   return (
     <Html>
       <Head />
-      <Preview>You have {dueCount} cards due for review</Preview>
+      <Preview>{`You have ${dueCount} cards due for review`}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={orbSection}>
