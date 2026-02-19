@@ -8,6 +8,8 @@ import PackFilters from '@/components/dashboard/PackFilters'
 import PackSortDropdown from '@/components/dashboard/PackSortDropdown'
 import ExtraPacksBalance from '@/components/dashboard/ExtraPacksBalance'
 import ContinuePanel from '@/components/dashboard/ContinuePanel'
+import StudyRoomPromo from '@/components/dashboard/StudyRoomPromo'
+import XPWidget from '@/components/dashboard/XPWidget'
 import Orb from '@/components/orb/Orb'
 import { useOrb } from '@/lib/contexts/OrbContext'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
@@ -33,6 +35,7 @@ interface DashboardClientProps {
         totalPacks: number
         materialsCount: number
         quizResultsCount: number
+        hasRooms: boolean
     }
 }
 
@@ -182,7 +185,7 @@ export default function DashboardClient({
     // Check local progress + DB meta
     const progress = {
         has_created_pack: hasPacks || !!onboardingMeta.has_created_pack,
-        has_reviewed_flashcards: !!onboardingMeta.has_reviewed_flashcards || masteredCount > 0,
+        has_reviewed_flashcards: !!onboardingMeta.has_reviewed_flashcards,
         has_taken_quiz: !!onboardingMeta.has_taken_quiz || hasQuizResults
     }
 
@@ -291,75 +294,21 @@ export default function DashboardClient({
                         </div>
                     ) : null}
 
-                    {/* Create New Pack and Continue/Balance Panels */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        {/* Create New Pack CTA - Less prominent when cards are due */}
-                        {hasPacks && (
-                            <div className="md:col-span-1" data-tour="create-pack">
-                                <div className="relative h-full">
-                                    {/* Paper stack effect */}
-                                    <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
-
-                                    <button
-                                        onClick={() => setIsModalOpen(true)}
-                                        className={`relative w-full h-full rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border transition-all duration-200 group active:scale-[0.99] flex flex-col items-center justify-center text-center overflow-hidden ${hasDueCards
-                                            ? 'bg-white hover:bg-[#F8FAFB] border-[#94A3B8]/30 hover:border-[#5A5FF0]/40'
-                                            : 'bg-gradient-to-br from-[#1A1D2E] to-[#2A2D3E] hover:from-[#2A2D3E] hover:to-[#1A1D2E] border-[#5A5FF0]/30 hover:border-[#5A5FF0]/50 shadow-[0_2px_12px_rgba(90,95,240,0.15)]'
-                                            }`}
-                                    >
-                                        {/* Highlight accent line - only when no due cards */}
-                                        {!hasDueCards && (
-                                            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#5A5FF0] to-transparent opacity-60 group-hover:opacity-100 transition-opacity" />
-                                        )}
-
-                                        {/* Decorative Orb Image - Bottom Right */}
-                                        <div className="absolute -bottom-8 -right-8 w-48 h-48 opacity-25 group-hover:opacity-35 transition-opacity">
-                                            <Image
-                                                src="/orb/sp_ds.png"
-                                                alt=""
-                                                width={192}
-                                                height={192}
-                                                className="object-contain"
-                                            />
-                                        </div>
-
-                                        <div className={`w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform mb-3 relative z-10 ${hasDueCards
-                                            ? 'bg-[#5A5FF0]/10 border border-[#5A5FF0]/30'
-                                            : 'bg-[#5A5FF0]/20 border border-[#5A5FF0]/40'
-                                            }`}>
-                                            <Plus className={`w-7 h-7 ${hasDueCards ? 'text-[#5A5FF0]' : 'text-[#5A5FF0]'}`} strokeWidth={2.5} />
-                                        </div>
-                                        <h3 className={`text-[18px] font-bold mb-2 relative z-10 ${hasDueCards ? 'text-[#1A1D2E]' : 'text-white'
-                                            }`}>
-                                            Create New Pack
-                                        </h3>
-                                        <p className={`text-[13px] mb-3 relative z-10 ${hasDueCards ? 'text-[#64748B]' : 'text-[#94A3B8]'
-                                            }`}>
-                                            Upload materials or paste URLs
-                                        </p>
-                                        <div className={`flex items-center gap-2 font-semibold text-[13px] group-hover:gap-3 transition-all relative z-10 ${hasDueCards ? 'text-[#5A5FF0]' : 'text-[#5A5FF0]'
-                                            }`}>
-                                            <span>Get Started</span>
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                            </svg>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className={hasPacks ? "md:col-span-2 space-y-6" : "md:col-span-3 space-y-6"}>
-                            {hasPacks && (
+                    {/* Hero Row: Continue Learning + XP Widget */}
+                    {hasPacks && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div className="md:col-span-2">
                                 <ContinuePanel
-                                    lastPackId={studyPacks[0]?.id}
-                                    lastPackTitle={studyPacks[0]?.title}
-                                    dueCountInPack={studyPacks[0]?.dueCount || 0}
+                                    packs={studyPacks
+                                        .filter((p: any) => p.dueCount > 0)
+                                        .map((p: any) => ({ id: p.id, title: p.title, dueCount: p.dueCount }))}
                                 />
-                            )}
-                            <ExtraPacksBalance userId={userData?.id} userPlan={userData?.plan as 'free' | 'student_pro' | 'pro_plus'} />
+                            </div>
+                            <div className="md:col-span-1">
+                                <XPWidget />
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Stats Grid - Hide for new users */}
                     {hasPacks && (
@@ -565,8 +514,32 @@ export default function DashboardClient({
                                             </Link>
                                         )
                                     })}
+
+                                    {/* Create New Pack Card */}
+                                    <button
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="group relative"
+                                    >
+                                        <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border-2 border-dashed border-[#CBD5E1] transition-all duration-200 hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(15,23,42,0.12)] hover:border-[#5A5FF0]/50 h-full flex flex-col items-center justify-center min-h-[200px] gap-4">
+                                            <div className="w-14 h-14 rounded-2xl bg-[#5A5FF0]/10 flex items-center justify-center group-hover:bg-[#5A5FF0]/20 transition-colors">
+                                                <Plus className="w-7 h-7 text-[#5A5FF0]" strokeWidth={2} />
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-[16px] font-semibold text-[#1A1D2E] group-hover:text-[#5A5FF0] transition-colors">Create New Pack</p>
+                                                <p className="text-[13px] text-[#94A3B8] mt-1">Upload materials to study</p>
+                                            </div>
+                                        </div>
+                                    </button>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {/* Secondary Info: Extra Packs + Study Room */}
+                    {hasPacks && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                            <ExtraPacksBalance userId={userData?.id} userPlan={userData?.plan || 'free'} />
+                            <StudyRoomPromo hasRooms={dashboardData.hasRooms} />
                         </div>
                     )}
                 </div>

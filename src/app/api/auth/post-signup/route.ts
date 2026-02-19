@@ -11,7 +11,7 @@ import { sendWelcomeEmail } from '@/lib/email/send'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { userId, email } = body
+    const { userId, email, timezone } = body
 
     if (!userId || !email) {
       return NextResponse.json(
@@ -27,31 +27,41 @@ export async function POST(request: NextRequest) {
       console.error('[PostSignup] Failed to send welcome email:', err)
     })
 
+    const supabase = await createClient()
+
+    // Wait for DB trigger to create the user profile
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    const { data: profile } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_user_id', userId)
+      .single()
+
+    if (profile) {
+      // Update timezone if provided (auto-detected from browser)
+      if (timezone) {
+        await supabase
+          .from('users')
+          .update({ timezone })
+          .eq('id', profile.id)
+      }
+    }
+
     // Check if user is on waitlist and apply benefits
     try {
       const waitlistEntry = await WaitlistService.checkWaitlistMembership(email)
-      
+
       if (waitlistEntry) {
         console.log(`[PostSignup] User ${email} found on waitlist, applying benefits`)
-        
-        const supabase = await createClient()
-        
-        // Get the user profile ID (wait a moment for trigger to complete)
-        await new Promise(resolve => setTimeout(resolve, 500))
-        
-        const { data: profile } = await supabase
-          .from('users')
-          .select('id')
-          .eq('auth_user_id', userId)
-          .single()
-        
+
         if (profile) {
           // Apply waitlist benefits
           await BenefitService.applyWaitlistBenefits(profile.id, email)
-          
+
           // Mark waitlist entry as converted
           await WaitlistService.markAsConverted(email)
-          
+
           console.log(`[PostSignup] Benefits applied and marked as converted for ${email}`)
         } else {
           console.error('[PostSignup] User profile not found after signup')
@@ -62,6 +72,22 @@ export async function POST(request: NextRequest) {
     } catch (benefitError) {
       // Log error but don't fail the request
       console.error('[PostSignup] Error applying waitlist benefits:', benefitError)
+    }
+
+    // Fire onboarding drip email events
+    try {
+      const { inngest } = await import('@/lib/inngest/client')
+      const userName = undefined // Name not available at signup time for email users
+      const dripEvents = [
+        { name: 'email/onboarding-drip' as const, data: { userId, email, name: userName, day: 2 }, ts: Math.floor(Date.now() / 1000) + 2 * 86400 },
+        { name: 'email/onboarding-drip' as const, data: { userId, email, name: userName, day: 3 }, ts: Math.floor(Date.now() / 1000) + 3 * 86400 },
+        { name: 'email/onboarding-drip' as const, data: { userId, email, name: userName, day: 5 }, ts: Math.floor(Date.now() / 1000) + 5 * 86400 },
+        { name: 'email/onboarding-drip' as const, data: { userId, email, name: userName, day: 7 }, ts: Math.floor(Date.now() / 1000) + 7 * 86400 },
+      ]
+      await inngest.send(dripEvents)
+      console.log(`[PostSignup] Scheduled ${dripEvents.length} onboarding drip emails for ${email}`)
+    } catch (dripError) {
+      console.error('[PostSignup] Error scheduling drip emails:', dripError)
     }
 
     return NextResponse.json({

@@ -98,6 +98,12 @@ export default async function DashboardPage() {
     ? Math.round(quizResults.reduce((acc, r) => acc + r.score, 0) / quizResults.length)
     : null
 
+  // Check if user has any study rooms
+  const { count: roomCount } = await supabase
+    .from('room_members')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userData.id)
+
   const dashboardData = {
     dueCount,
     packsWithDueCards: packsWithDueCards.size,
@@ -107,6 +113,7 @@ export default async function DashboardPage() {
     totalPacks: studyPacks?.length || 0,
     materialsCount: materialsCount || 0,
     quizResultsCount: quizResultsCount || 0,
+    hasRooms: (roomCount || 0) > 0,
   }
 
   return (

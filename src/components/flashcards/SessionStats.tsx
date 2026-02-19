@@ -1,11 +1,12 @@
 'use client'
 
-import { CheckCircle, XCircle, Clock } from 'lucide-react'
+import { CheckCircle, XCircle, Clock, Zap } from 'lucide-react'
 import Orb from '../orb/Orb'
 import type { SessionStats as SessionStatsType } from '@/lib/types/flashcards'
 
 interface SessionStatsProps {
   stats: SessionStatsType
+  sessionXp?: number
   onRestart: () => void
   onExit?: () => void
   topicFilter?: string
@@ -13,6 +14,7 @@ interface SessionStatsProps {
 
 export default function SessionStats({
   stats,
+  sessionXp,
   onRestart,
   onExit,
   topicFilter,
@@ -63,7 +65,20 @@ export default function SessionStats({
         <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
         <div className="relative bg-white rounded-xl p-8 shadow-[0_2px_8px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] border border-[#E2E8F0]">
           {/* Main Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className={`grid grid-cols-1 ${sessionXp ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-6 mb-8`}>
+            {/* XP Earned */}
+            {sessionXp !== undefined && sessionXp > 0 && (
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-[#5A5FF0]/10 flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-[#5A5FF0]" strokeWidth={2} />
+                </div>
+                <p className="text-[32px] font-bold text-[#5A5FF0]">
+                  +{sessionXp}
+                </p>
+                <p className="text-[13px] text-[#64748B]">XP Earned</p>
+              </div>
+            )}
+
             {/* Cards Reviewed */}
             <div className="text-center">
               <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-[#5A5FF0]/10 flex items-center justify-center">

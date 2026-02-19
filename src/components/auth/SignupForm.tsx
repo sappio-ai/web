@@ -138,10 +138,11 @@ export default function SignupForm() {
         return
       }
 
+      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       fetch('/api/auth/post-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: data.user.id, email: data.user.email }),
+        body: JSON.stringify({ userId: data.user.id, email: data.user.email, timezone: detectedTimezone }),
       }).catch(() => { })
 
       AnalyticsService.trackUserSignedUp('email')
@@ -157,6 +158,9 @@ export default function SignupForm() {
   const handleGoogleSignup = async () => {
     setLoading(true)
     setOrbPose('processing-thinking')
+
+    // Set timezone cookie for OAuth callback to pick up
+    document.cookie = `sappio_tz=${Intl.DateTimeFormat().resolvedOptions().timeZone};path=/;max-age=300`
 
     try {
       const supabase = createBrowserClient()

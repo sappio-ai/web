@@ -42,6 +42,10 @@ export async function POST(request: NextRequest) {
             meta.onboarding.seen_welcome = true
         } else if (action === 'complete_onboarding') {
             meta.onboarding.completed = true
+        } else if (action === 'reviewed_flashcards') {
+            meta.onboarding.has_reviewed_flashcards = true
+        } else if (action === 'taken_quiz') {
+            meta.onboarding.has_taken_quiz = true
         }
 
         // Update user record

@@ -31,8 +31,8 @@ export default function PricingSection() {
       period: '/mo',
       desc: 'For casual learning',
       features: [
-        '5 packs / month',
-        '40 cards per pack',
+        '3 packs / month',
+        '35 cards per pack',
         'Basic quizzes',
         'No exports'
       ],
@@ -46,12 +46,12 @@ export default function PricingSection() {
     },
     {
       name: 'Student Pro',
-      price: '$9',
+      price: '$7.99',
       period: '/mo',
       desc: 'For serious students',
       features: [
-        '60 packs / month',
-        'Unlimited cards',
+        '50 packs / month',
+        '120 cards per pack',
         'Advanced quizzes',
         'Spaced repetition',
         'All export formats',
@@ -67,11 +67,11 @@ export default function PricingSection() {
     },
     {
       name: 'Pro Plus',
-      price: '$19',
+      price: '$11.99',
       period: '/mo',
       desc: 'For heavy research',
       features: [
-        '300 packs / month',
+        '150 packs / month',
         'Everything in Student Pro',
         'API Access',
         'Deep research mode',

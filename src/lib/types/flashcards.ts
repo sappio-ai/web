@@ -49,6 +49,7 @@ export interface StreakData {
   longestStreak: number
   lastReviewDate: string | null
   totalReviews: number
+  freezes?: number
 }
 
 export interface CardProgress {

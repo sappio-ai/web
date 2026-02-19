@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Trophy, Zap, Flame } from 'lucide-react'
+import { Trophy, Zap, Flame, Snowflake } from 'lucide-react'
 import type { StreakData } from '@/lib/types/flashcards'
 
 interface StreakDisplayProps {
@@ -54,6 +54,12 @@ export default function StreakDisplay({
         <span className="text-[14px] font-semibold text-[#92400E]">
           {streak.currentStreak} day streak
         </span>
+        {(streak.freezes || 0) > 0 && (
+          <span className="flex items-center gap-1 text-[12px] font-medium text-[#3B82F6]">
+            <Snowflake className="w-3 h-3" />
+            {streak.freezes}
+          </span>
+        )}
       </div>
     )
   }

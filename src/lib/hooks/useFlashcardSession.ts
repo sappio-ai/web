@@ -1,8 +1,17 @@
 // Custom hook for managing flashcard review sessions
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Flashcard, SessionStats, Grade } from '@/lib/types/flashcards'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
+
+export interface XPEvent {
+  id: string
+  amount: number
+  leveledUp: boolean
+  dailyGoalMet: boolean
+  newBadges: Array<{ id: string; name: string; icon: string; color: string }>
+  level: number
+}
 
 interface UseFlashcardSessionReturn {
   currentCard: Flashcard | null
@@ -16,6 +25,11 @@ interface UseFlashcardSessionReturn {
   isOnBreak: boolean
   breakTimeRemaining: number
   isProcessing: boolean
+  sessionXp: number
+  currentLevel: number
+  dailyXp: number
+  dailyGoal: number
+  xpEvents: XPEvent[]
   flip: () => void
   grade: (grade: Grade) => Promise<void>
   startSession: () => Promise<void>
@@ -55,6 +69,12 @@ export function useFlashcardSession(
   const [breakTimeRemaining, setBreakTimeRemaining] = useState(0)
   const [breakSuggestionsDisabled, setBreakSuggestionsDisabled] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [sessionXp, setSessionXp] = useState(0)
+  const [currentLevel, setCurrentLevel] = useState(1)
+  const [dailyXp, setDailyXp] = useState(0)
+  const [dailyGoal, setDailyGoal] = useState(100)
+  const [xpEvents, setXpEvents] = useState<XPEvent[]>([])
+  const onboardingTriggeredRef = useRef(false)
 
   // Fetch due cards
   const fetchDueCards = useCallback(async () => {
@@ -147,6 +167,9 @@ export function useFlashcardSession(
       averageTime: 0,
       totalTime: 0,
     })
+
+    setSessionXp(0)
+    setXpEvents([])
 
     await fetchDueCards()
     setCurrentIndex(0)
@@ -267,6 +290,16 @@ export function useFlashcardSession(
           return newStats
         })
 
+        // Trigger onboarding completion after 5 cards reviewed
+        if (!isDemo && !onboardingTriggeredRef.current && sessionStats.cardsReviewed + 1 >= 5) {
+          onboardingTriggeredRef.current = true
+          fetch('/api/user/onboarding', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'reviewed_flashcards' }),
+          }).catch(() => {})
+        }
+
         // Submit review to API with retry logic
         if (isDemo) {
           // In demo mode, just simulate success delay
@@ -291,6 +324,25 @@ export function useFlashcardSession(
               if (!response.ok) {
                 throw new Error('Failed to submit review')
               }
+
+              // Parse XP data from response
+              try {
+                const data = await response.json()
+                if (data.xp) {
+                  setSessionXp(prev => prev + data.xp.awarded)
+                  setCurrentLevel(data.xp.level)
+                  setDailyXp(data.xp.dailyXp)
+                  setDailyGoal(data.xp.dailyGoal)
+                  setXpEvents(prev => [...prev, {
+                    id: `${Date.now()}-${currentIndex}`,
+                    amount: data.xp.awarded,
+                    leveledUp: data.xp.leveledUp,
+                    dailyGoalMet: data.xp.dailyGoalMet,
+                    newBadges: data.xp.newBadges || [],
+                    level: data.xp.level,
+                  }])
+                }
+              } catch {}
 
               // Success - break out of retry loop
               break
@@ -421,6 +473,11 @@ export function useFlashcardSession(
     isOnBreak,
     breakTimeRemaining,
     isProcessing,
+    sessionXp,
+    currentLevel,
+    dailyXp,
+    dailyGoal,
+    xpEvents,
     flip,
     grade,
     startSession,

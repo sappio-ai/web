@@ -48,11 +48,31 @@ export class StreakService {
       streakData.lastReviewDate = today
       streakData.totalReviews++
     }
-    // Missed a day (reset streak)
+    // Missed a day — check for streak freeze before resetting
     else {
-      streakData.currentStreak = 1
+      const freezes = streakData.freezes || 0
+      if (freezes > 0) {
+        // Consume a freeze to preserve the streak
+        streakData.freezes = freezes - 1
+        streakData.currentStreak++
+        streakData.longestStreak = Math.max(
+          streakData.longestStreak,
+          streakData.currentStreak
+        )
+      } else {
+        streakData.currentStreak = 1
+      }
       streakData.lastReviewDate = today
       streakData.totalReviews++
+    }
+
+    // Award a streak freeze every 7 days (max 2)
+    if (
+      streakData.currentStreak > 0 &&
+      streakData.currentStreak % 7 === 0 &&
+      (streakData.freezes || 0) < 2
+    ) {
+      streakData.freezes = (streakData.freezes || 0) + 1
     }
 
     // Save updated streak

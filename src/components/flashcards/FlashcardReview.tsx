@@ -1,6 +1,8 @@
 'use client'
 
+import { useState, useEffect, useCallback } from 'react'
 import { useFlashcardSession } from '@/lib/hooks/useFlashcardSession'
+import type { XPEvent } from '@/lib/hooks/useFlashcardSession'
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts'
 import FlashcardCard from './FlashcardCard'
 import GradingButtons from './GradingButtons'
@@ -8,6 +10,21 @@ import SessionStats from './SessionStats'
 import BreakSuggestion from './BreakSuggestion'
 import BreakTimer from './BreakTimer'
 import Orb from '../orb/Orb'
+import FirstReviewTutorial from './FirstReviewTutorial'
+import FirstSessionComplete from './FirstSessionComplete'
+import SessionXPBar from '../gamification/SessionXPBar'
+import XPFloatingAnimation from '../gamification/XPFloatingAnimation'
+import LevelUpToast from '../gamification/LevelUpToast'
+import DailyGoalCelebration from '../gamification/DailyGoalCelebration'
+
+interface ToastData {
+  id: string
+  type: 'level' | 'badge'
+  level: number
+  badgeName?: string
+  badgeIcon?: string
+  badgeColor?: string
+}
 
 interface FlashcardReviewProps {
   packId: string
@@ -34,6 +51,11 @@ export default function FlashcardReview({
     isOnBreak,
     breakTimeRemaining,
     isProcessing,
+    sessionXp,
+    currentLevel,
+    dailyXp,
+    dailyGoal,
+    xpEvents,
     flip,
     grade,
     startSession,
@@ -41,6 +63,45 @@ export default function FlashcardReview({
     continueStudying,
     disableBreakSuggestions,
   } = useFlashcardSession(packId, topicFilter, isDemo)
+
+  // Toast queue for level-ups and badges
+  const [toasts, setToasts] = useState<ToastData[]>([])
+  const [showDailyGoal, setShowDailyGoal] = useState(false)
+  const [latestXpEvent, setLatestXpEvent] = useState<XPEvent | null>(null)
+
+  // Watch for XP events to trigger toasts and animations
+  useEffect(() => {
+    if (xpEvents.length === 0) return
+    const latest = xpEvents[xpEvents.length - 1]
+    setLatestXpEvent(latest)
+
+    if (latest.leveledUp) {
+      setToasts(prev => [...prev, {
+        id: `level-${latest.id}`,
+        type: 'level',
+        level: latest.level,
+      }])
+    }
+
+    for (const badge of latest.newBadges) {
+      setToasts(prev => [...prev, {
+        id: `badge-${badge.id}-${latest.id}`,
+        type: 'badge',
+        level: latest.level,
+        badgeName: badge.name,
+        badgeIcon: badge.icon,
+        badgeColor: badge.color,
+      }])
+    }
+
+    if (latest.dailyGoalMet) {
+      setShowDailyGoal(true)
+    }
+  }, [xpEvents])
+
+  const dismissToast = useCallback(() => {
+    setToasts(prev => prev.slice(1))
+  }, [])
 
   // Keyboard shortcut for flipping
   useKeyboardShortcuts({
@@ -92,12 +153,20 @@ export default function FlashcardReview({
 
   if (isComplete) {
     return (
-      <SessionStats
-        stats={sessionStats}
-        onRestart={startSession}
-        onExit={onComplete}
-        topicFilter={topicFilter}
-      />
+      <>
+        <FirstSessionComplete
+          stats={sessionStats}
+          onContinue={onComplete || (() => {})}
+          onRestart={startSession}
+        />
+        <SessionStats
+          stats={sessionStats}
+          sessionXp={sessionXp}
+          onRestart={startSession}
+          onExit={onComplete}
+          topicFilter={topicFilter}
+        />
+      </>
     )
   }
 
@@ -112,6 +181,9 @@ export default function FlashcardReview({
 
   return (
     <>
+      {/* First-time SRS tutorial */}
+      <FirstReviewTutorial />
+
       {/* Break Suggestion Modal */}
       {showBreakSuggestion && (
         <BreakSuggestion
@@ -119,6 +191,22 @@ export default function FlashcardReview({
           onContinue={continueStudying}
           onDisable={disableBreakSuggestions}
         />
+      )}
+
+      {/* Toasts */}
+      {toasts.length > 0 && (
+        <LevelUpToast
+          level={toasts[0].level}
+          badgeName={toasts[0].badgeName}
+          badgeIcon={toasts[0].badgeIcon}
+          badgeColor={toasts[0].badgeColor}
+          onClose={dismissToast}
+        />
+      )}
+
+      {/* Daily Goal Celebration */}
+      {showDailyGoal && (
+        <DailyGoalCelebration onDone={() => setShowDailyGoal(false)} />
       )}
 
       <div className="flex flex-col items-center max-w-4xl mx-auto">
@@ -131,6 +219,19 @@ export default function FlashcardReview({
             </span>
           )}
         </div>
+
+        {/* XP Session Bar */}
+        {!isDemo && sessionStats.cardsReviewed > 0 && (
+          <div className="w-full max-w-2xl mb-4">
+            <SessionXPBar
+              sessionXp={sessionXp}
+              dailyXp={dailyXp}
+              dailyGoal={dailyGoal}
+              level={currentLevel}
+              dailyGoalJustMet={latestXpEvent?.dailyGoalMet}
+            />
+          </div>
+        )}
 
         {/* Topic Badge */}
         {topicFilter && (
@@ -157,17 +258,24 @@ export default function FlashcardReview({
         <FlashcardCard card={currentCard} isFlipped={isFlipped} onFlip={flip} />
 
         {/* Action Buttons */}
-        {!isFlipped ? (
-          <button
-            onClick={flip}
-            disabled={isProcessing}
-            className="mt-8 px-8 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[16px] font-semibold rounded-xl shadow-sm transition-colors hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-          >
-            Show Answer (Space)
-          </button>
-        ) : (
-          <GradingButtons onGrade={grade} disabled={isProcessing} />
-        )}
+        <div className="relative">
+          {/* XP Float Animation */}
+          {latestXpEvent && (
+            <XPFloatingAnimation key={latestXpEvent.id} amount={latestXpEvent.amount} />
+          )}
+
+          {!isFlipped ? (
+            <button
+              onClick={flip}
+              disabled={isProcessing}
+              className="mt-8 px-8 py-4 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[16px] font-semibold rounded-xl shadow-sm transition-colors hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              Show Answer (Space)
+            </button>
+          ) : (
+            <GradingButtons onGrade={grade} disabled={isProcessing} />
+          )}
+        </div>
       </div>
     </>
   )

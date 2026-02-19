@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import { ArrowLeft, Sparkles, Zap, Crown, Calendar } from 'lucide-react'
+import BadgeGrid from '@/components/gamification/BadgeGrid'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -174,6 +175,15 @@ export default async function ProfilePage() {
                     </button>
                   </>
                 )}
+              </div>
+            </div>
+
+            {/* Badges */}
+            <div className="relative">
+              <div className="absolute top-[3px] left-0 right-0 h-full bg-white/60 rounded-xl border border-[#CBD5E1]/40" />
+              <div className="relative bg-white rounded-xl p-6 shadow-[0_2px_12px_rgba(15,23,42,0.08),0_1px_3px_rgba(15,23,42,0.06)] border border-[#E2E8F0]">
+                <p className="text-[#64748B] text-xs font-semibold uppercase tracking-wider mb-4">Achievements</p>
+                <BadgeGrid />
               </div>
             </div>
 

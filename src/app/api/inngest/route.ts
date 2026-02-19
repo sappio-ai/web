@@ -14,6 +14,9 @@ import {
   generateMoreMindmap,
 } from '@/lib/inngest/functions/generate-more-content'
 import { sendDueReminders } from '@/lib/inngest/functions/send-due-reminders'
+import { sendStreakAtRisk } from '@/lib/inngest/functions/send-streak-at-risk'
+import { onboardingDrip } from '@/lib/inngest/functions/onboarding-drip'
+import { checkLapsedUsers } from '@/lib/inngest/functions/check-lapsed-users'
 
 // Force Node.js runtime (required for Buffer, native deps like pdf-parse)
 export const runtime = 'nodejs'
@@ -30,5 +33,8 @@ export const { GET, POST, PUT } = serve({
     generateMoreQuiz,
     generateMoreMindmap,
     sendDueReminders,
+    sendStreakAtRisk,
+    onboardingDrip,
+    checkLapsedUsers,
   ],
 })

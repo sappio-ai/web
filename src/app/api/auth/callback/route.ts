@@ -38,6 +38,15 @@ export async function GET(request: NextRequest) {
           sendWelcomeEmail(data.user.email!).catch((err) => {
             console.error('Failed to send welcome email:', err)
           })
+
+          // Update timezone from cookie (set by login/signup page JS)
+          const tzCookie = request.cookies.get('sappio_tz')?.value
+          if (tzCookie) {
+            await supabase
+              .from('users')
+              .update({ timezone: tzCookie })
+              .eq('auth_user_id', data.user.id)
+          }
         }
       } else if (userError) {
         console.error('Error checking user creation time:', userError)

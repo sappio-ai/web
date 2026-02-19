@@ -73,10 +73,10 @@ export const DEFAULT_PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
   free: {
     plan: 'free',
     packsPerMonth: 3,
-    cardsPerPack: 20,
+    cardsPerPack: 35,
     questionsPerQuiz: 8,
     mindmapNodesLimit: 40,
-    initialCardsPerPack: 20,
+    initialCardsPerPack: 35,
     initialQuestionsPerQuiz: 8,
     initialMindmapNodes: 40,
     batchCardsSize: null,
