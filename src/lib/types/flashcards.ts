@@ -50,6 +50,7 @@ export interface StreakData {
   lastReviewDate: string | null
   totalReviews: number
   freezes?: number
+  freezeJustUsed?: boolean
 }
 
 export interface CardProgress {

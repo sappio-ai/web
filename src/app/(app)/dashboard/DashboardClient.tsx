@@ -10,6 +10,9 @@ import ExtraPacksBalance from '@/components/dashboard/ExtraPacksBalance'
 import ContinuePanel from '@/components/dashboard/ContinuePanel'
 import StudyRoomPromo from '@/components/dashboard/StudyRoomPromo'
 import XPWidget from '@/components/dashboard/XPWidget'
+import WeeklyChallenges from '@/components/dashboard/WeeklyChallenges'
+import TrialExpiredModal from '@/components/paywall/TrialExpiredModal'
+import TrialBanner from '@/components/dashboard/TrialBanner'
 import Orb from '@/components/orb/Orb'
 import { useOrb } from '@/lib/contexts/OrbContext'
 import { AnalyticsService } from '@/lib/services/AnalyticsService'
@@ -50,6 +53,7 @@ export default function DashboardClient({
 
     // Track if welcome has been dismissed THIS session (prevents re-showing after close)
     const [welcomeDismissed, setWelcomeDismissed] = useState(false)
+    const [freezeToast, setFreezeToast] = useState(false)
 
     // Search & Filter State
     const [searchQuery, setSearchQuery] = useState('')
@@ -117,6 +121,44 @@ export default function DashboardClient({
     const welcomeGreeting = welcomeOrb === 'welcome-back-morning' ? 'Good morning' :
         welcomeOrb === 'welcome-back-afternoon' ? 'Good afternoon' :
             'Good evening'
+
+    // Streak freeze toast
+    const streakData = userData?.meta_json?.streak
+    useEffect(() => {
+        if (streakData?.freezeJustUsed) {
+            setFreezeToast(true)
+            // Clear the flag
+            fetch('/api/user/onboarding', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'clear_freeze_used' })
+            }).catch(() => {})
+            const timer = setTimeout(() => setFreezeToast(false), 5000)
+            return () => clearTimeout(timer)
+        }
+    }, [streakData?.freezeJustUsed])
+
+    // Trial expired modal
+    const trialMeta = userData?.meta_json?.trial
+    const isTrialExpired = userData?.plan === 'free' && trialMeta && !userData?.meta_json?.seen_trial_expired
+    const [showTrialExpired, setShowTrialExpired] = useState(!!isTrialExpired)
+
+    const handleCloseTrialExpired = async () => {
+        setShowTrialExpired(false)
+        try {
+            await fetch('/api/user/onboarding', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'seen_trial_expired' })
+            })
+        } catch {}
+    }
+
+    // Trial countdown banner
+    const isInTrial = userData?.plan === 'student_pro' && trialMeta?.expires_at
+    const trialDaysRemaining = isInTrial
+        ? Math.max(0, Math.ceil((new Date(trialMeta.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+        : 0
 
     const debouncedSearch = useDebounce(searchQuery, 300)
 
@@ -212,6 +254,30 @@ export default function DashboardClient({
                 onClose={() => setIsModalOpen(false)}
             />
 
+            <TrialExpiredModal
+                isOpen={showTrialExpired}
+                onClose={handleCloseTrialExpired}
+                currentPlan={userData?.plan}
+            />
+
+            {/* Streak Freeze Toast */}
+            {freezeToast && (
+                <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom duration-300">
+                    <div className="bg-white rounded-xl border border-[#3B82F6]/30 shadow-xl p-4 flex items-center gap-3 max-w-sm">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#3B82F6]/10 flex items-center justify-center">
+                            <span className="text-lg">❄️</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-[#1A1D2E]">Streak Freeze Used!</p>
+                            <p className="text-xs text-[#64748B]">Your {streakData?.currentStreak}-day streak was saved</p>
+                        </div>
+                        <button onClick={() => setFreezeToast(false)} className="text-[#94A3B8] hover:text-[#1A1D2E] p-1">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="min-h-screen bg-[#F8FAFB] relative">
                 {/* Subtle paper texture */}
                 <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{
@@ -236,6 +302,11 @@ export default function DashboardClient({
                         </div>
                     </div>
 
+
+                    {/* Trial Countdown Banner */}
+                    {isInTrial && trialDaysRemaining > 0 && (
+                        <TrialBanner daysRemaining={trialDaysRemaining} currentPlan={userData?.plan} />
+                    )}
 
                     {/* Onboarding Checklist - Show for all users who haven't completed onboarding */}
                     {showChecklist && (hasSeenWelcomeInDB || welcomeDismissed) && (
@@ -366,6 +437,9 @@ export default function DashboardClient({
                             </div>
                         </div>
                     )}
+
+                    {/* Weekly Challenges */}
+                    {hasPacks && <WeeklyChallenges />}
 
                     {/* Study Packs Section */}
                     {hasPacks && (

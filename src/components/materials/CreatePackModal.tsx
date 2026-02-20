@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import UploadZone from './UploadZone'
 import Orb from '../orb/Orb'
@@ -247,7 +248,7 @@ export default function CreatePackModal({
     return false
   }
 
-  return (
+  return createPortal(
     <>
       <QuotaExhaustedPaywall
         isOpen={showPaywall}
@@ -257,7 +258,7 @@ export default function CreatePackModal({
       />
 
       <div
-        className="fixed inset-0 z-50 flex items-start justify-center pt-20 pb-20 px-4 backdrop-blur-sm bg-[#0F172A]/40 overflow-y-auto"
+        className="fixed inset-0 z-[60] flex items-start justify-center pt-20 pb-20 px-4 backdrop-blur-sm bg-[#0F172A]/40 overflow-y-auto"
         onClick={onClose}
         role="dialog"
         aria-modal="true"
@@ -589,6 +590,7 @@ export default function CreatePackModal({
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }

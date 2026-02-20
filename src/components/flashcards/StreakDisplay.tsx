@@ -128,6 +128,17 @@ export default function StreakDisplay({
                 </div>
                 <p className="text-[11px] text-[#64748B] uppercase tracking-wider font-semibold">Total Reviews</p>
               </div>
+
+              {/* Streak Freezes */}
+              <div className="text-center bg-white rounded-lg px-6 py-4 border border-[#E2E8F0] shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Snowflake className="w-5 h-5 text-[#3B82F6]" />
+                  <span className="text-[32px] font-bold text-[#1A1D2E]">
+                    {streak.freezes || 0}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#64748B] uppercase tracking-wider font-semibold">Freezes</p>
+              </div>
             </div>
           </div>
         </div>

@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import FlashcardReview from '@/components/flashcards/FlashcardReview'
 import DueQueue from '@/components/flashcards/DueQueue'
 import TopicFilter from '@/components/flashcards/TopicFilter'
+import CreateCardModal from '@/components/flashcards/CreateCardModal'
+import { Plus } from 'lucide-react'
 import ProgressChart from '@/components/flashcards/ProgressChart'
 import StreakDisplay from '@/components/flashcards/StreakDisplay'
 import ExportMenu from '@/components/exports/ExportMenu'
@@ -33,6 +35,9 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
     const [limits, setLimits] = useState<PlanLimits | null>(null)
 
     const [generationStatus, setGenerationStatus] = useState<any>(null)
+    const [showCreateModal, setShowCreateModal] = useState(false)
+    const [topics, setTopics] = useState<string[]>([])
+    const [refreshKey, setRefreshKey] = useState(0)
 
     // Use shared packData from parent when available
     useEffect(() => {
@@ -41,6 +46,32 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
             setGenerationStatus(packData.stats?.generationStatus?.flashcards)
         }
     }, [packData])
+
+    // Fetch topics for the create card modal
+    useEffect(() => {
+        const fetchTopics = async () => {
+            try {
+                const response = await fetch(`/api/study-packs/${packId}/flashcards/topics`)
+                if (response.ok) {
+                    const data = await response.json()
+                    setTopics((data.topics || []).map((t: any) => t.topic).filter(Boolean))
+                }
+            } catch (error) {
+                console.error('Error fetching topics:', error)
+            }
+        }
+        fetchTopics()
+    }, [packId, refreshKey])
+
+    const handleCardCreated = useCallback(() => {
+        setCardCount((c) => c + 1)
+        setRefreshKey((k) => k + 1)
+        // Refresh due count since new card is immediately due
+        fetch(`/api/study-packs/${packId}/flashcards/due`)
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => data && setDueCount(data.count || 0))
+            .catch(console.error)
+    }, [packId])
 
     // Fetch due count and plan limits (these are tab-specific, not shared)
     useEffect(() => {
@@ -124,11 +155,20 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
                 {isDemo ? (
                     <div className="text-xs font-medium text-gray-400">Read Only</div>
                 ) : (
-                    <ExportMenu
-                        studyPackId={packId}
-                        exportType="flashcards"
-                        userPlan={userPlan}
-                    />
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white text-[13px] font-semibold rounded-lg transition-colors shadow-sm"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Add Card
+                        </button>
+                        <ExportMenu
+                            studyPackId={packId}
+                            exportType="flashcards"
+                            userPlan={userPlan}
+                        />
+                    </div>
                 )}
             </div>
 
@@ -271,6 +311,16 @@ export default function FlashcardsTab({ packId, userPlan = 'free', isDemo = fals
                     currentPlan={userPlan as 'free' | 'student_pro' | 'pro_plus'}
                 />
             )}
+
+            {/* Create Card Modal */}
+            <CreateCardModal
+                isOpen={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                packId={packId}
+                existingTopics={topics}
+                userPlan={userPlan}
+                onCardCreated={handleCardCreated}
+            />
         </div>
     )
 }

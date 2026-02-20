@@ -7,6 +7,7 @@ import { inngest } from '../client'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { sendCardsDueEmail } from '@/lib/email/send'
 import { getUnsubscribeUrl } from '@/lib/email/unsubscribe'
+import { PushService } from '@/lib/services/PushService'
 
 export const sendDueReminders = inngest.createFunction(
   {
@@ -134,6 +135,16 @@ export const sendDueReminders = inngest.createFunction(
             unsubscribeUrl: getUnsubscribeUrl(user.userId),
           })
           sent++
+          // Send push notification (non-blocking)
+          try {
+            await PushService.sendPush(user.userId, {
+              title: 'Cards Due',
+              body: `You have ${user.dueCount} cards to review today`,
+              url: '/dashboard',
+            })
+          } catch (pushErr) {
+            console.error(`[due-reminders] Push failed for ${user.userId}:`, pushErr)
+          }
           // Wait 600ms between emails to stay under 2 req/sec limit
           await delay(600)
         } catch (error) {

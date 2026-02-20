@@ -9,6 +9,7 @@ import RoomChat from './RoomChat'
 import MemberSidebar from './MemberSidebar'
 import SharedTab from './SharedTab'
 import ToolModal from './ToolModal'
+import RoomLeaderboard from './RoomLeaderboard'
 import { createBrowserClient } from '@supabase/ssr'
 
 interface RoomInterfaceProps {
@@ -158,6 +159,11 @@ export default function RoomInterface({ room, userId, isCreator }: RoomInterface
         userId={userId}
         members={room.members}
       />
+
+      {/* Leaderboard - Below Member Sidebar */}
+      <div className="fixed top-20 left-6 z-30 w-64" style={{ top: 'calc(50% + 20px)' }}>
+        <RoomLeaderboard roomId={room.id} currentUserId={userId} />
+      </div>
 
       {/* Chat Panel - Right Side */}
       <div className="fixed top-20 right-6 bottom-6 w-80 z-30">

@@ -46,6 +46,12 @@ export async function POST(request: NextRequest) {
             meta.onboarding.has_reviewed_flashcards = true
         } else if (action === 'taken_quiz') {
             meta.onboarding.has_taken_quiz = true
+        } else if (action === 'clear_freeze_used') {
+            if (meta.streak) {
+                delete meta.streak.freezeJustUsed
+            }
+        } else if (action === 'seen_trial_expired') {
+            meta.seen_trial_expired = true
         }
 
         // Update user record

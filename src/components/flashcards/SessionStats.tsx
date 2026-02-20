@@ -1,7 +1,9 @@
 'use client'
 
-import { CheckCircle, XCircle, Clock, Zap } from 'lucide-react'
+import { useState } from 'react'
+import { CheckCircle, XCircle, Clock, Zap, Share2 } from 'lucide-react'
 import Orb from '../orb/Orb'
+import ShareScoreCard from '../sharing/ShareScoreCard'
 import type { SessionStats as SessionStatsType } from '@/lib/types/flashcards'
 
 interface SessionStatsProps {
@@ -31,9 +33,12 @@ export default function SessionStats({
     return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`
   }
 
+  const [showShareModal, setShowShareModal] = useState(false)
+
   // Determine if session was good (most cards graded Good or Easy)
   const goodCards = stats.good + stats.easy
   const isGoodSession = stats.cardsReviewed > 0 && goodCards / stats.cardsReviewed >= 0.6
+  const accuracy = stats.cardsReviewed > 0 ? Math.round((goodCards / stats.cardsReviewed) * 100) : 0
 
   return (
     <div className="flex flex-col items-center max-w-3xl mx-auto">
@@ -165,7 +170,25 @@ export default function SessionStats({
             Back to Overview
           </button>
         )}
+        <button
+          onClick={() => setShowShareModal(true)}
+          className="px-8 py-4 bg-white hover:bg-[#F8FAFC] text-[#5A5FF0] text-[16px] font-semibold rounded-lg transition-colors shadow-sm border border-[#5A5FF0]/30 flex items-center gap-2"
+        >
+          <Share2 className="w-5 h-5" />
+          Share Results
+        </button>
       </div>
+
+      <ShareScoreCard
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        data={{
+          type: 'session',
+          accuracy,
+          cardsReviewed: stats.cardsReviewed,
+          xpEarned: sessionXp,
+        }}
+      />
     </div>
   )
 }

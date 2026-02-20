@@ -86,6 +86,15 @@ export async function POST(
       throw saveError
     }
 
+    // Update weekly challenge progress
+    try {
+      const { ChallengeService } = await import('@/lib/services/ChallengeService')
+      await ChallengeService.updateProgress(dbUserId, 'quiz_completed')
+      await ChallengeService.updateProgress(dbUserId, 'quiz_score', result.score)
+    } catch (challengeErr) {
+      console.error('Challenge update error:', challengeErr)
+    }
+
     // Log event
     await supabase.from('events').insert({
       user_id: dbUserId,

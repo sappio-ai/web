@@ -54,6 +54,7 @@ export class StreakService {
       if (freezes > 0) {
         // Consume a freeze to preserve the streak
         streakData.freezes = freezes - 1
+        streakData.freezeJustUsed = true
         streakData.currentStreak++
         streakData.longestStreak = Math.max(
           streakData.longestStreak,

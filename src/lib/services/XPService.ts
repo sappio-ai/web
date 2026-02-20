@@ -66,18 +66,28 @@ export class XPService {
       throw error
     }
 
-    // Award daily goal bonus if just met
+    // Award daily goal bonus if just met (direct update, no recursion)
+    let finalTotalXp = newTotalXp
+    let finalLevel = newLevel
     if (dailyGoalMet) {
-      const bonusTotal = newTotalXp + XP_PER_LEVEL // daily goal bonus is separate
-      // We don't recurse to avoid infinite loop; just note it
-      console.log(`[XP] Daily goal met for user ${userId}, reason: ${reason}`)
+      const bonus = DAILY_XP_GOAL // 100 XP bonus
+      finalTotalXp = newTotalXp + bonus
+      finalLevel = Math.floor(finalTotalXp / XP_PER_LEVEL) + 1
+
+      await supabase.from('user_xp').update({
+        total_xp: finalTotalXp,
+        level: finalLevel,
+        updated_at: new Date().toISOString(),
+      }).eq('user_id', userId)
+
+      console.log(`[XP] Daily goal bonus +${bonus} XP awarded to user ${userId}`)
     }
 
     return {
-      totalXp: newTotalXp,
-      level: newLevel,
+      totalXp: finalTotalXp,
+      level: finalLevel,
       dailyXp: newDailyXp,
-      leveledUp: newLevel > previousLevel,
+      leveledUp: finalLevel > previousLevel,
       dailyGoalMet,
     }
   }

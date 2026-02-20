@@ -112,6 +112,17 @@ export async function POST(
       console.error('Error awarding XP:', xpError)
     }
 
+    // Update weekly challenge progress
+    try {
+      const { ChallengeService } = await import('@/lib/services/ChallengeService')
+      await ChallengeService.updateProgress(studyPack.user_id, 'card_reviewed')
+      if (xpData) {
+        await ChallengeService.updateProgress(studyPack.user_id, 'xp_earned', xpData.awarded)
+      }
+    } catch (challengeErr) {
+      console.error('Challenge update error:', challengeErr)
+    }
+
     // Log event
     await supabase.from('events').insert({
       user_id: studyPack.user_id,

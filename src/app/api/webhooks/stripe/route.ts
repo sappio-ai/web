@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/client'
 import { StripeService } from '@/lib/services/StripeService'
+import { SubscriptionService } from '@/lib/services/SubscriptionService'
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,7 +52,27 @@ export async function POST(request: NextRequest) {
         if (session.metadata?.productType === 'extra_packs') {
           console.log('Processing extra packs purchase:', session.id)
           await StripeService.handlePaymentSuccess(session)
+        } else if (session.metadata?.productType === 'subscription') {
+          console.log('Subscription checkout completed:', session.id)
         }
+        break
+      }
+
+      case 'customer.subscription.created': {
+        const subscription = event.data.object
+        await SubscriptionService.handleSubscriptionCreated(subscription)
+        break
+      }
+
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object
+        await SubscriptionService.handleSubscriptionUpdated(subscription)
+        break
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object
+        await SubscriptionService.handleSubscriptionDeleted(subscription)
         break
       }
 

@@ -76,7 +76,27 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
   const [mounted, setMounted] = useState(false)
   const [currentPlan, setCurrentPlan] = useState<'free' | 'student_pro' | 'pro_plus'>(propCurrentPlan || 'free')
   const [fetchingPlan, setFetchingPlan] = useState(false)
+  const [isUpgrading, setIsUpgrading] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
+
+  const handleUpgrade = async (plan: 'student_pro' | 'pro_plus') => {
+    try {
+      setIsUpgrading(true)
+      const res = await fetch('/api/payments/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan, billingCycle: billingCycle === 'yearly' ? 'semester' : 'monthly' }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch (error) {
+      console.error('Error starting subscription:', error)
+    } finally {
+      setIsUpgrading(false)
+    }
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -406,9 +426,13 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
                     Your Current Plan
                   </div>
                 ) : (
-                  <button className="w-full py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group">
-                    <span>Upgrade to Student Pro</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  <button
+                    onClick={() => handleUpgrade('student_pro')}
+                    disabled={isUpgrading}
+                    className="w-full py-3 bg-[#5A5FF0] hover:bg-[#4A4FD0] text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span>{isUpgrading ? 'Redirecting...' : 'Upgrade to Student Pro'}</span>
+                    {!isUpgrading && <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />}
                   </button>
                 )}
               </div>
@@ -461,9 +485,13 @@ export function PaywallModal({ isOpen, onClose, usage, trigger = 'general', curr
                     Your Current Plan
                   </div>
                 ) : (
-                  <button className="w-full py-3 bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group">
-                    <span>Upgrade to Pro</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  <button
+                    onClick={() => handleUpgrade('pro_plus')}
+                    disabled={isUpgrading}
+                    className="w-full py-3 bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold rounded-lg text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span>{isUpgrading ? 'Redirecting...' : 'Upgrade to Pro'}</span>
+                    {!isUpgrading && <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />}
                   </button>
                 )}
               </div>
